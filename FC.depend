@@ -1,0 +1,53 @@
+# depslib dependency file v1.0
+1312345837 source:f:\c-project\__test\main.cpp
+	<iostream>
+	"type.h"
+
+1312345911 f:\c-project\__test\type.h
+
+1312347207 source:f:\c-project\fc\main.cpp
+	<iostream>
+	"type.h"
+
+1312350303 f:\c-project\fc\type.h
+
+1312385924 source:e:\c-project\fc\main.cpp
+	<stdio.h>
+	"cpu.h"
+
+1312386351 e:\c-project\fc\type.h
+
+1312385955 source:e:\c-project\fc\cpu.cpp
+	"type.h"
+
+1312386882 e:\c-project\fc\cpu.h
+	"type.h"
+
+1312417844 source:f:\c-project\fc\src\main.cpp
+	<stdio.h>
+	"cpu.h"
+	"mem.h"
+
+1312418250 f:\c-project\fc\src\cpu.h
+	"type.h"
+
+1312418129 f:\c-project\fc\src\type.h
+
+1312417186 f:\c-project\fc\src\mem.h
+	"type.h"
+
+1312417327 source:f:\c-project\fc\src\mem.cpp
+	<string.h>
+	"mem.h"
+
+1312418260 source:f:\c-project\fc\src\cpu.cpp
+	"type.h"
+	"mem.h"
+
+1312419496 source:f:\c-project\fc\src\rom.cpp
+	"rom.h"
+
+1312419536 f:\c-project\fc\src\rom.h
+	"type.h"
+	"string"
+

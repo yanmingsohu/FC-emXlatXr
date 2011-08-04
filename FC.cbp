@@ -23,10 +23,16 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="cpu.cpp" />
-		<Unit filename="cpu.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="type.h" />
+		<Unit filename="src\cpu.cpp" />
+		<Unit filename="src\cpu.h" />
+		<Unit filename="src\main.cpp" />
+		<Unit filename="src\mem.cpp" />
+		<Unit filename="src\mem.h" />
+		<Unit filename="src\nes_sys.cpp" />
+		<Unit filename="src\nes_sys.h" />
+		<Unit filename="src\rom.cpp" />
+		<Unit filename="src\rom.h" />
+		<Unit filename="src\type.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

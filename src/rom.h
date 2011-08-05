@@ -3,6 +3,7 @@
 
 #include "type.h"
 #include "string"
+#include "stdio.h"
 
 using std::string;
 
@@ -36,6 +37,16 @@ struct nes_file {
 					// 它的512字节摆在ROM段之前
 	byte *vrom;		// 8KxN  VROM段, 升序排列
 
+    void printRom(int offset, int len) {
+        if (offset%16!=0) printf("\n0x%x: ", offset);
+
+        for (int i=offset; i<len+offset; ++i) {
+            if (i%16==0) printf("\n0x%x: ", i);
+            printf(" %02x", rom[i]);
+        }
+
+        printf("\n");
+    }
 };
 
 

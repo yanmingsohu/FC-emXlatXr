@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="src\cpu.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="665" topLine="21" />
+	<File name="src\cpu.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="5757" topLine="261" />
 	</File>
-	<File name="src\cpu.h" open="1" top="1" tabpos="5">
-		<Cursor position="1227" topLine="21" />
+	<File name="src\cpu.h" open="1" top="0" tabpos="4">
+		<Cursor position="3222" topLine="73" />
 	</File>
 	<File name="src\main.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="74" topLine="0" />
+		<Cursor position="40" topLine="0" />
 	</File>
-	<File name="src\mem.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1453" topLine="20" />
+	<File name="src\mem.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1474" topLine="0" />
 	</File>
-	<File name="src\mem.h" open="1" top="0" tabpos="1">
+	<File name="src\mem.h" open="0" top="0" tabpos="1">
 		<Cursor position="1109" topLine="5" />
 	</File>
-	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="78" topLine="0" />
+	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="327" topLine="0" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="409" topLine="52" />
+		<Cursor position="1377" topLine="0" />
 	</File>
-	<File name="src\rom.h" open="1" top="0" tabpos="6">
-		<Cursor position="919" topLine="8" />
+	<File name="src\rom.h" open="0" top="0" tabpos="6">
+		<Cursor position="1560" topLine="14" />
 	</File>
 	<File name="src\type.h" open="0" top="0" tabpos="7">
 		<Cursor position="170" topLine="0" />

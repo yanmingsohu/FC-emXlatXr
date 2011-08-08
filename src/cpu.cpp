@@ -41,9 +41,6 @@ void cpu_command_BPL(command_6502* cmd, command_parm* parm) {
 void cpu_command_BIT(command_6502* cmd, command_parm* parm) {
 
 }
-void cpu_command_CLC(command_6502* cmd, command_parm* parm) {
-
-}
 void cpu_command_PHP(command_6502* cmd, command_parm* parm) {
 
 }
@@ -62,9 +59,6 @@ void cpu_command_JSR(command_6502* cmd, command_parm* parm) {
 void cpu_command_BMI(command_6502* cmd, command_parm* parm) {
 
 }
-void cpu_command_SEC(command_6502* cmd, command_parm* parm) {
-
-}
 void cpu_command_RTI(command_6502* cmd, command_parm* parm) {
 
 }
@@ -78,6 +72,7 @@ void cpu_command_PHA(command_6502* cmd, command_parm* parm) {
 
 }
 
+/* 跳转指令 */
 void cpu_command_JMP(command_6502* cmd, command_parm* parm) {
 
     cpu_6502* cpu = parm->cpu;
@@ -95,9 +90,40 @@ void cpu_command_JMP(command_6502* cmd, command_parm* parm) {
 void cpu_command_BVC(command_6502* cmd, command_parm* parm) {
 
 }
-void cpu_command_ADC(command_6502* cmd, command_parm* parm) {
 
+/* 加法运算, 没有处理BCD加法 */
+void cpu_command_ADC(command_6502* cmd, command_parm* parm) {
+    cpu_6502* cpu = parm->cpu;
+
+    if (cpu->FLAGS & CPU_FLAGS_DECIMAL) {
+        display_command(cmd, parm);
+        printf(" -- 不能执行十进制加法\n");
+        cpu->debug();
+    }
+
+    word result = 0;
+
+    switch (parm->op) {
+    case 0x69:
+    case 0x6D:
+    case 0x65:
+    case 0x7D:
+    case 0x79:
+    case 0x75:
+    case 0x71:
+    case 0x61:
+        result = parm->read(parm->op - 61);
+        break;
+    }
+
+    result += cpu->A;
+    result += (cpu->FLAGS & CPU_FLAGS_CARRY) ? 1 : 0;
+
+    cpu->checkCV(result, cpu->A);
+    cpu->checkNZ((byte)result);
+    cpu->A = (byte) result;
 }
+
 void cpu_command_CLI(command_6502* cmd, command_parm* parm) {
 
 }
@@ -117,10 +143,8 @@ void cpu_command_SEI(command_6502* cmd, command_parm* parm) {
 
 }
 
+/* 把A寄存器存入内存 */
 void cpu_command_STA(command_6502* cmd, command_parm* parm) {
-
-
-    cpu_6502* cpu = parm->cpu;
     word offset = 0;
 
     switch (parm->op) {
@@ -147,13 +171,12 @@ void cpu_command_STA(command_6502* cmd, command_parm* parm) {
         break;
     }
 
+    cpu_6502* cpu = parm->cpu;
     cpu->ram->write(offset, cpu->A);
 }
 
+/* 把Y寄存器存入内存 */
 void cpu_command_STY(command_6502* cmd, command_parm* parm) {
-
-
-    cpu_6502* cpu = parm->cpu;
     word offset = 0;
 
     switch (parm->op) {
@@ -168,13 +191,12 @@ void cpu_command_STY(command_6502* cmd, command_parm* parm) {
         break;
     }
 
+    cpu_6502* cpu = parm->cpu;
     cpu->ram->write(offset, cpu->Y);
 }
 
+/* 把X寄存器存入内存 */
 void cpu_command_STX(command_6502* cmd, command_parm* parm) {
-
-
-    cpu_6502* cpu = parm->cpu;
     word offset = 0;
 
     switch (parm->op) {
@@ -189,6 +211,7 @@ void cpu_command_STX(command_6502* cmd, command_parm* parm) {
         break;
     }
 
+    cpu_6502* cpu = parm->cpu;
     cpu->ram->write(offset, cpu->X);
 }
 
@@ -202,96 +225,64 @@ void cpu_command_BCC(command_6502* cmd, command_parm* parm) {
 
 }
 
+/* 由内存载入Y寄存器 */
 void cpu_command_LDY(command_6502* cmd, command_parm* parm) {
 
-
     cpu_6502* cpu = parm->cpu;
-    word offset = 0;
 
     switch (parm->op) {
     case 0xA0:
         cpu->Y = parm->p1;
-        return;
+        break;
     case 0xAC:
-        offset = parm->abs();;
-        break;
     case 0xA4:
-        offset = parm->zpg();;
-        break;
     case 0xBC:
-        offset = parm->absX();;
-        break;
     case 0xB4:
-        offset = parm->zpgX();;
+        cpu->Y = parm->read(parm->op - 0xA0);
         break;
     }
 
-    cpu->Y = cpu->ram->read( offset );
     cpu->checkNZ(cpu->Y);
 }
 
+/* 由内存载入A寄存器 */
 void cpu_command_LDA(command_6502* cmd, command_parm* parm) {
 
-
     cpu_6502* cpu = parm->cpu;
-    word offset = 0;
 
     switch (parm->op) {
     case 0xA9:
-        cpu->A = parm->p1;
-        return;
     case 0xAD:
-        offset = parm->abs();
-        break;
     case 0xA5:
-        offset = parm->zpg();
-        break;
     case 0xBD:
-        offset = parm->absX();
-        break;
     case 0xB9:
-        offset = parm->absY();
-        break;
     case 0xB5:
-        offset = parm->zpgX();
-        break;
     case 0xB1:
-        offset = parm->$zpg$Y();
-        break;
     case 0xA1:
-        offset = parm->$zpgX$();
+        cpu->A = parm->read(parm->op - 0xA1);
         break;
     }
 
-    cpu->A = cpu->ram->read( offset );
     cpu->checkNZ(cpu->A);
 }
 
+/* 由内存载入X寄存器 */
 void cpu_command_LDX(command_6502* cmd, command_parm* parm) {
 
-
     cpu_6502* cpu = parm->cpu;
-    word offset = 0;
 
     switch (parm->op) {
     case 0xA2:
         cpu->X = parm->p1;
         return;
     case 0xAE:
-        offset = parm->abs();
-        break;
     case 0xA6:
-        offset = parm->zpg();
-        break;
     case 0xBE:
-        offset = parm->absY();
-        break;
     case 0xB6:
-        offset = parm->zpgY();
+        cpu->X = parm->read(parm->op - 0xA2);
         break;
     }
 
-    cpu->X = cpu->ram->read( offset );
     cpu->checkNZ(cpu->X);
 }
 
@@ -337,9 +328,6 @@ void cpu_command_BCS(command_6502* cmd, command_parm* parm) {
 void cpu_command_INY(command_6502* cmd, command_parm* parm) {
 
 }
-void cpu_command_CLD(command_6502* cmd, command_parm* parm) {
-
-}
 void cpu_command_CPX(command_6502* cmd, command_parm* parm) {
 
 }
@@ -355,9 +343,27 @@ void cpu_command_INX(command_6502* cmd, command_parm* parm) {
 void cpu_command_NOP(command_6502* cmd, command_parm* parm) {
 
 }
-void cpu_command_SED(command_6502* cmd, command_parm* parm) {
 
+/* 设置为十进制(BCD)算术运算 */
+void cpu_command_SED(command_6502* cmd, command_parm* parm) {
+    parm->cpu->FLAGS |= CPU_FLAGS_DECIMAL;
 }
+
+/* 还原为二进制算术运算 */
+void cpu_command_CLD(command_6502* cmd, command_parm* parm) {
+    parm->cpu->FLAGS &= 0xFF ^ CPU_FLAGS_DECIMAL;
+}
+
+/* 设置进位标志 */
+void cpu_command_SEC(command_6502* cmd, command_parm* parm) {
+    parm->cpu->FLAGS |= CPU_FLAGS_CARRY;
+}
+
+/* 清除进位标志 */
+void cpu_command_CLC(command_6502* cmd, command_parm* parm) {
+    parm->cpu->FLAGS &= 0xFF ^ CPU_FLAGS_CARRY;
+}
+
 void cpu_command_BEQ(command_6502* cmd, command_parm* parm) {
 
 }
@@ -537,6 +543,8 @@ byte cpu_6502::process() {
 
     PC += opp->len;
     parm.cpu = this;
+    parm.ram = parm.cpu->ram;
+
     display_command(opp, &parm);
     opp->op_func(opp, &parm);
 

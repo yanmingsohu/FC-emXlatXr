@@ -2,6 +2,7 @@
 #include "cpu.h"
 #include "mem.h"
 #include "rom.h"
+#include "time.h"
 
 
 void startNes() {
@@ -25,8 +26,13 @@ void startNes() {
 
     cpu.debug();
 
-    int i = 200;
-    while(cpu.process() && i--);
+    const int test_command = 300;
+    clock_t s = clock();
+    for (int i=test_command; cpu.process() && i>0; --i);
+    clock_t e = clock();
+
+    printf("执行 %d 条指令使用了 %lf 毫秒\n", test_command,
+           (double)(e - s)*(CLOCKS_PER_SEC/1000));
 
     cpu.debug();
 }

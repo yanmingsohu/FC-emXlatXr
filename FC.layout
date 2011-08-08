@@ -2,22 +2,22 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="src\cpu.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="5757" topLine="261" />
+		<Cursor position="7771" topLine="343" />
 	</File>
 	<File name="src\cpu.h" open="1" top="0" tabpos="4">
-		<Cursor position="3222" topLine="73" />
+		<Cursor position="1932" topLine="43" />
 	</File>
 	<File name="src\main.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="40" topLine="0" />
 	</File>
 	<File name="src\mem.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="1474" topLine="0" />
+		<Cursor position="991" topLine="20" />
 	</File>
 	<File name="src\mem.h" open="0" top="0" tabpos="1">
 		<Cursor position="1109" topLine="5" />
 	</File>
 	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="327" topLine="0" />
+		<Cursor position="429" topLine="0" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="1377" topLine="0" />

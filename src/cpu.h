@@ -49,21 +49,92 @@ struct cpu_6502 {
 
     /* 如果value最高位为1 则N=1,否则为0,
      * 如果value==0 则Z=1,否则为0 */
-    void checkNZ(byte value) {
+    inline void checkNZ(byte value) {
         FLAGS &= 0xFF ^ CPU_FLAGS_NEGATIVE;
-        FLAGS |= value;
+        FLAGS |= value ? CPU_FLAGS_NEGATIVE : 0;
+
         FLAGS &= 0xFF ^ CPU_FLAGS_ZERO;
         FLAGS |= value ? CPU_FLAGS_ZERO : 0;
+    }
+
+    /* 如果value>0xFF则c=1,否则=0
+     * 如果value与beforeOper的最高位不同,则v=1否则为0
+     * beforeOper是参与运算之前的累加器的值 */
+    inline void checkCV(word value, byte beforeOper) {
+        if (value>0xFF) {
+            FLAGS |= CPU_FLAGS_CARRY;
+        } else {
+            FLAGS &= 0xFF ^ CPU_FLAGS_CARRY;
+        }
+        if (value & beforeOper & 0x80) {
+            FLAGS |= CPU_FLAGS_OVERFLOW;
+        } else {
+            FLAGS &= 0xFF ^ CPU_FLAGS_OVERFLOW;
+        }
     }
 };
 
 /* 向命令处理函数传递参数          */
 struct command_parm {
 
+    memory   *ram;
     cpu_6502 *cpu;
+
     byte op; /* 命令的代码         */
     byte p1; /* 第一个参数(如果有) */
     byte p2; /* 第二个参数(如果有) */
+
+static const byte ADD_MODE_$zpgX$  = 0x00;
+static const byte ADD_MODE_zpg     = 0x04;
+static const byte ADD_MODE_imm     = 0x08;
+static const byte ADD_MODE_abs     = 0x0C;
+static const byte ADD_MODE_$zpg$Y  = 0x10;
+static const byte ADD_MODE_zpgX    = 0x14;
+static const byte ADD_MODE_absY    = 0x18;
+static const byte ADD_MODE_absX    = 0x1C;
+
+    /* 按照内存寻址方式返回该地址的上的数据            *
+     * 不同寻址类型的相同指令编码品偏移量相同(也有例外)*
+     * 于是,可以用cpu指令减去偏移得到该指令的寻址类型  */
+    inline byte read(const byte addressing_mode) {
+        word offset = 0;
+
+        switch (addressing_mode) {
+
+        case ADD_MODE_imm:
+            return p1;
+
+        case ADD_MODE_abs:
+            offset = abs();
+            break;
+
+        case ADD_MODE_zpg:
+            offset = zpg();
+            break;
+
+        case ADD_MODE_absX:
+            offset = absX();
+            break;
+
+        case ADD_MODE_absY:
+            offset = absY();
+            break;
+
+        case ADD_MODE_zpgX:
+            offset = zpgX();
+            break;
+
+        case ADD_MODE_$zpg$Y:
+            offset = $zpg$Y();
+            break;
+
+        case ADD_MODE_$zpgX$:
+            offset = $zpgX$();
+            break;
+        }
+
+        return ram->read( offset );
+    }
 
 /* 寻址算法定义, 函数返回地址      */
     inline word abs() {
@@ -91,7 +162,6 @@ struct command_parm {
         return $$$(cpu->X, 0);
     }
     inline word $$$(byte x, byte y) {
-        memory *ram = cpu->ram;
         word offset = 0;
         byte l = 0;
         byte h = 0;

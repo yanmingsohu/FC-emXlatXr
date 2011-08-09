@@ -6,6 +6,7 @@
 
 
 void startNes() {
+
     string filename = "rom/els.nes";
     nes_file rom;
 
@@ -24,9 +25,7 @@ void startNes() {
     cpu_6502 cpu(&ram);
     cpu.reset();
 
-    cpu.debug();
-
-    const int test_command = 300;
+    const int test_command = 200;
     clock_t s = clock();
     for (int i=test_command; cpu.process() && i>0; --i);
     clock_t e = clock();

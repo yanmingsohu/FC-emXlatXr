@@ -50,27 +50,28 @@ struct cpu_6502 {
     /* 如果value最高位为1 则N=1,否则为0,
      * 如果value==0 则Z=1,否则为0 */
     inline void checkNZ(byte value) {
-        FLAGS &= 0xFF ^ CPU_FLAGS_NEGATIVE;
-        FLAGS |= value ? CPU_FLAGS_NEGATIVE : 0;
+        if (value & 0x80) {
+            FLAGS |= CPU_FLAGS_NEGATIVE;
+        } else {
+            FLAGS &= 0xFF ^ CPU_FLAGS_NEGATIVE;
+        }
 
         FLAGS &= 0xFF ^ CPU_FLAGS_ZERO;
-        FLAGS |= value ? CPU_FLAGS_ZERO : 0;
+        FLAGS |= value ? 0 : CPU_FLAGS_ZERO;
     }
 
-    /* 如果value>0xFF则c=1,否则=0
-     * 如果value与beforeOper的最高位不同,则v=1否则为0
+    /* 如果value与beforeOper的最高位不同,则v=1否则为0
      * beforeOper是参与运算之前的累加器的值 */
-    inline void checkCV(word value, byte beforeOper) {
-        if (value>0xFF) {
-            FLAGS |= CPU_FLAGS_CARRY;
-        } else {
-            FLAGS &= 0xFF ^ CPU_FLAGS_CARRY;
-        }
+    inline void checkV(word value, byte beforeOper) {
         if (value & beforeOper & 0x80) {
             FLAGS |= CPU_FLAGS_OVERFLOW;
         } else {
             FLAGS &= 0xFF ^ CPU_FLAGS_OVERFLOW;
         }
+    }
+
+    inline void clearV() {
+        FLAGS &= 0xFF ^ CPU_FLAGS_OVERFLOW;
     }
 };
 
@@ -97,43 +98,41 @@ static const byte ADD_MODE_absX    = 0x1C;
      * 不同寻址类型的相同指令编码品偏移量相同(也有例外)*
      * 于是,可以用cpu指令减去偏移得到该指令的寻址类型  */
     inline byte read(const byte addressing_mode) {
-        word offset = 0;
+        return ram->read( getAddr(addressing_mode) );
+    }
 
+    /*  按照内存寻址方式把value写入到该地址            */
+    inline void write(const byte addressing_mode, byte value) {
+        cpu->ram->write(getAddr(addressing_mode), value);
+    }
+
+    inline word getAddr(const byte addressing_mode) {
         switch (addressing_mode) {
 
         case ADD_MODE_imm:
             return p1;
 
         case ADD_MODE_abs:
-            offset = abs();
-            break;
+            return abs();
 
         case ADD_MODE_zpg:
-            offset = zpg();
-            break;
+            return zpg();
 
         case ADD_MODE_absX:
-            offset = absX();
-            break;
+            return absX();
 
         case ADD_MODE_absY:
-            offset = absY();
-            break;
+            return absY();
 
         case ADD_MODE_zpgX:
-            offset = zpgX();
-            break;
+            return zpgX();
 
         case ADD_MODE_$zpg$Y:
-            offset = $zpg$Y();
-            break;
+            return $zpg$Y();
 
         case ADD_MODE_$zpgX$:
-            offset = $zpgX$();
-            break;
+            return $zpgX$();
         }
-
-        return ram->read( offset );
     }
 
 /* 寻址算法定义, 函数返回地址      */

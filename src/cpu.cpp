@@ -3,6 +3,11 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+
+#define SET_FLAGS(x) (parm->cpu->FLAGS |= (x))
+#define CLE_FLAGS(x) (parm->cpu->FLAGS &= 0xFF ^ (x))
+
+
 void display_command(command_6502* cmd, command_parm* parm) {
     const char* cc = NULL;
 
@@ -21,60 +26,198 @@ void display_command(command_6502* cmd, command_parm* parm) {
                parm->op, cmd->name, parm->p1, parm->p2);
 }
 
+void check_decimal(command_6502* cmd, command_parm* parm) {
+    if (parm->cpu->FLAGS & CPU_FLAGS_DECIMAL) {
+        display_command(cmd, parm);
+        printf(" -- 不能执行十进运算\n");
+        parm->cpu->debug();
+    }
+}
+
 void cpu_command_XXX(command_6502* cmd, command_parm* parm) {
-    printf("unknow command %s on %04x exit.",
-           cmd->name, parm->cpu->PC - cmd->len);
+    printf("! unknow command code[%02x] on %04x exit.\n",
+           parm->op, parm->cpu->PC - cmd->len);
 }
 
-void cpu_command_BRK(command_6502* cmd, command_parm* parm) {
-
+void cpu_command_NOP(command_6502* cmd, command_parm* parm) {
+    /* 不干正事 */
 }
-void cpu_command_ASL(command_6502* cmd, command_parm* parm) {
 
-}
-void cpu_command_BIT(command_6502* cmd, command_parm* parm) {
-
-}
-void cpu_command_PHP(command_6502* cmd, command_parm* parm) {
-
-}
-void cpu_command_PLP(command_6502* cmd, command_parm* parm) {
-
-}
-void cpu_command_ROL(command_6502* cmd, command_parm* parm) {
-
-}
+/* 跳跃到子过程 */
 void cpu_command_JSR(command_6502* cmd, command_parm* parm) {
+    cpu_6502 *cpu = parm->cpu;
 
+    cpu->push(cpu->PCH);
+    cpu->push(cpu->PCL);
+
+    cpu->PCH = parm->p2;
+    cpu->PCL = parm->p1;
 }
+
+/* 从子过程返回 */
+void cpu_command_RTS(command_6502* cmd, command_parm* parm) {
+    cpu_6502 *cpu = parm->cpu;
+
+    cpu->PCL = cpu->pop();
+    cpu->PCH = cpu->pop();
+}
+
+/* 中断 */
+void cpu_command_BRK(command_6502* cmd, command_parm* parm) {
+    parm->cpu->jump(0xFFFE);
+    SET_FLAGS(CPU_FLAGS_BREAK);
+}
+
+/* 从中断过程中返回 */
 void cpu_command_RTI(command_6502* cmd, command_parm* parm) {
-
+    parm->cpu->rti();
 }
-void cpu_command_BSC(command_6502* cmd, command_parm* parm) {
 
+/* value & x == true, 则设置'进位'位 */
+#define CARRY_WITH(x) \
+    (value & (x)) ? SET_FLAGS(CPU_FLAGS_CARRY) \
+                  : CLE_FLAGS(CPU_FLAGS_CARRY);
+
+/* 左移0补位 */
+void cpu_command_ASL(command_6502* cmd, command_parm* parm) {
+    cpu_6502 *cpu = parm->cpu;
+    byte value = 0;
+    byte model = parm->op - 0x02;
+
+    switch (parm->op) {
+    case 0x0A:
+        model += 0x20;
+    case 0x0E:
+    case 0x06:
+    case 0x1E:
+    case 0x16:
+        value = parm->read(model);
+    }
+
+    CARRY_WITH(0x80);
+
+    value <<= 1;
+
+    cpu->checkNZ(value);
+    parm->write(model, value);
 }
+
+/* 右移0补位 */
 void cpu_command_LSR(command_6502* cmd, command_parm* parm) {
+    cpu_6502 *cpu = parm->cpu;
+    byte value = 0;
+    byte model = parm->op - 0x42;
 
+    switch (parm->op) {
+    case 0x4A:
+        model += 0x20;
+    case 0x4E:
+    case 0x46:
+    case 0x5E:
+    case 0x56:
+        value = parm->read(model);
+    }
+
+    CARRY_WITH(0x01);
+
+    value >>= 1;
+
+    CLE_FLAGS(CPU_FLAGS_NEGATIVE);
+    cpu->checkZ(value);
+    parm->write(model, value);
 }
-void cpu_command_PHA(command_6502* cmd, command_parm* parm) {
 
+/* 左移循环补位 */
+void cpu_command_ROL(command_6502* cmd, command_parm* parm) {
+    cpu_6502 *cpu = parm->cpu;
+    byte value = 0;
+    byte model = parm->op - 0x22;
+
+    switch (parm->op) {
+    case 0x2A:
+        model += 0x20;
+    case 0x2E:
+    case 0x26:
+    case 0x3E:
+    case 0x36:
+        value = parm->read(model);
+    }
+
+    byte ro = cpu->FLAGS & CPU_FLAGS_CARRY ? 1 : 0;
+
+    CARRY_WITH(0x80);
+
+    value <<= 1;
+    value |= ro;
+
+    cpu->checkNZ(value);
+    parm->write(model, value);
+}
+
+/* 右移循环补位 */
+void cpu_command_ROR(command_6502* cmd, command_parm* parm) {
+    cpu_6502 *cpu = parm->cpu;
+    byte value = 0;
+    byte model = parm->op - 0x62;
+
+    switch (parm->op) {
+    case 0x6A:
+        model += 0x20;
+    case 0x6E:
+    case 0x66:
+    case 0x7E:
+    case 0x76:
+        value = parm->read(model);
+    }
+
+    byte ro = cpu->FLAGS & CPU_FLAGS_CARRY ? 0x80 : 0;
+
+    CARRY_WITH(0x01);
+
+    value >>= 1;
+    value |= ro;
+
+    cpu->checkNZ(value);
+    parm->write(model, value);
+}
+
+#undef CARRY_WITH
+
+/* N=M7, V=M6, Z=(执行结果==0) */
+void cpu_command_BIT(command_6502* cmd, command_parm* parm) {
+    cpu_6502 *cpu = parm->cpu;
+    byte a = cpu->A;
+    byte b = 0;
+
+    switch (parm->op) {
+    case 0x2C:
+    case 0x24:
+        b = parm->read(parm->op - 0x20);
+    }
+
+    cpu->FLAGS &= 0xFF ^ (CPU_FLAGS_NEGATIVE & CPU_FLAGS_OVERFLOW);
+    cpu->FLAGS |= b    & (CPU_FLAGS_NEGATIVE & CPU_FLAGS_OVERFLOW);
+
+    a &= b;
+
+    cpu->checkZ(a);
 }
 
 /* a<b, n=1; z=0; c=0 *
  * a=b, n=0; z=1; c=1 *
  * a>b, n=0; z=0; c=1 */
-static inline void cmp_op(cpu_6502 *cpu, byte a, byte b) {
+static inline void cmp_op(command_parm* parm, byte a, byte b) {
     if (a>b) {
-        cpu->FLAGS &= 0xFF ^ (CPU_FLAGS_NEGATIVE & CPU_FLAGS_ZERO);
-        cpu->FLAGS |= CPU_FLAGS_CARRY;
+        CLE_FLAGS(CPU_FLAGS_NEGATIVE & CPU_FLAGS_ZERO);
+        SET_FLAGS(CPU_FLAGS_CARRY);
     }
     else if (a<b) {
-        cpu->FLAGS &= 0xFF ^ (CPU_FLAGS_CARRY & CPU_FLAGS_ZERO);
-        cpu->FLAGS |= CPU_FLAGS_NEGATIVE;
+        CLE_FLAGS(CPU_FLAGS_CARRY & CPU_FLAGS_ZERO);
+        SET_FLAGS(CPU_FLAGS_NEGATIVE);
     }
     else {
-        cpu->FLAGS &= 0xFF ^ CPU_FLAGS_NEGATIVE;
-        cpu->FLAGS |= (CPU_FLAGS_CARRY & CPU_FLAGS_ZERO);
+        CLE_FLAGS(CPU_FLAGS_NEGATIVE);
+        SET_FLAGS(CPU_FLAGS_CARRY & CPU_FLAGS_ZERO);
     }
 }
 
@@ -90,7 +233,7 @@ void cpu_command_CMP(command_6502* cmd, command_parm* parm) {
     case 0xC1:
         byte a = parm->cpu->A;
         byte b = parm->read(parm->op - 0xC1);
-        cmp_op(parm->cpu, a, b);
+        cmp_op(parm, a, b);
     }
 }
 
@@ -107,7 +250,7 @@ void cpu_command_CPX(command_6502* cmd, command_parm* parm) {
         b = parm->read(parm->op - 0xE0);
     }
 
-    cmp_op(parm->cpu, a, b);
+    cmp_op(parm, a, b);
 }
 
 void cpu_command_CPY(command_6502* cmd, command_parm* parm) {
@@ -123,7 +266,7 @@ void cpu_command_CPY(command_6502* cmd, command_parm* parm) {
         b = parm->read(parm->op - 0xC0);
     }
 
-    cmp_op(parm->cpu, a, b);
+    cmp_op(parm, a, b);
 }
 
 void cpu_command_AND(command_6502* cmd, command_parm* parm) {
@@ -251,15 +394,10 @@ void cpu_command_BVC(command_6502* cmd, command_parm* parm) {
 
 /* 加法运算, 没有处理BCD加法 */
 void cpu_command_ADC(command_6502* cmd, command_parm* parm) {
+    check_decimal(cmd, parm);
+
     cpu_6502* cpu = parm->cpu;
     cpu->clearV();
-
-    if (cpu->FLAGS & CPU_FLAGS_DECIMAL) {
-        display_command(cmd, parm);
-        printf(" -- 不能执行十进制加法\n");
-        cpu->debug();
-    }
-
     word result = 0;
 
     switch (parm->op) {
@@ -279,9 +417,9 @@ void cpu_command_ADC(command_6502* cmd, command_parm* parm) {
     result += (cpu->FLAGS & CPU_FLAGS_CARRY) ? 1 : 0;
 
     if (result>0xFF) {
-        cpu->FLAGS |= CPU_FLAGS_CARRY;
+        SET_FLAGS(CPU_FLAGS_CARRY);
     } else {
-        cpu->FLAGS &= 0xFF ^ CPU_FLAGS_CARRY;
+        CLE_FLAGS(CPU_FLAGS_CARRY);
     }
 
     cpu->checkV(result, cpu->A);
@@ -291,15 +429,10 @@ void cpu_command_ADC(command_6502* cmd, command_parm* parm) {
 
 /* 减法运算 */
 void cpu_command_SBC(command_6502* cmd, command_parm* parm) {
+    check_decimal(cmd, parm);
+
     cpu_6502* cpu = parm->cpu;
     cpu->clearV();
-
-    if (cpu->FLAGS & CPU_FLAGS_DECIMAL) {
-        display_command(cmd, parm);
-        printf(" -- 不能执行十进制减法\n");
-        cpu->debug();
-    }
-
     word result = 0;
 
     switch (parm->op) {
@@ -319,9 +452,9 @@ void cpu_command_SBC(command_6502* cmd, command_parm* parm) {
     result -= (cpu->FLAGS & CPU_FLAGS_CARRY) ? 1 : 0;
 
     if (((signed short int)result)>=0) {
-        cpu->FLAGS |= CPU_FLAGS_CARRY;
+        SET_FLAGS(CPU_FLAGS_CARRY);
     } else {
-        cpu->FLAGS &= 0xFF ^ CPU_FLAGS_CARRY;
+        CLE_FLAGS(CPU_FLAGS_CARRY);
     }
 
     cpu->checkV(result, cpu->A);
@@ -482,46 +615,94 @@ void cpu_command_LDX(command_6502* cmd, command_parm* parm) {
     cpu->checkNZ(cpu->X);
 }
 
-void cpu_command_TXA(command_6502* cmd, command_parm* parm) {
-
+/* 累加器入栈 */
+void cpu_command_PHA(command_6502* cmd, command_parm* parm) {
+    cpu_6502* cpu = parm->cpu;
+    cpu->push(cpu->A);
 }
+
+/* 出栈入累加器 */
+void cpu_command_PLA(command_6502* cmd, command_parm* parm) {
+    cpu_6502* cpu = parm->cpu;
+    cpu->A = cpu->pop();
+    cpu->checkNZ(cpu->A);
+}
+
+/* FLAGS入栈 */
+void cpu_command_PHP(command_6502* cmd, command_parm* parm) {
+    cpu_6502* cpu = parm->cpu;
+    cpu->push(cpu->FLAGS);
+}
+
+/* 出栈入FLAGS */
+void cpu_command_PLP(command_6502* cmd, command_parm* parm) {
+    cpu_6502* cpu = parm->cpu;
+    cpu->FLAGS = cpu->pop() | 0x30;
+}
+
+/* a = b */
+#define _TR(b,a) cpu_6502 *cpu = parm->cpu; \
+                 cpu->a = cpu->b
+
 void cpu_command_TAY(command_6502* cmd, command_parm* parm) {
-
+    _TR(A, Y);
+    cpu->checkNZ(cpu->A);
 }
-void cpu_command_TYA(command_6502* cmd, command_parm* parm) {
 
-}
-void cpu_command_TXS(command_6502* cmd, command_parm* parm) {
-
-}
 void cpu_command_TAX(command_6502* cmd, command_parm* parm) {
+    _TR(A, X);
+    cpu->checkNZ(cpu->A);
+}
 
+void cpu_command_TXA(command_6502* cmd, command_parm* parm) {
+    _TR(X, A);
+    cpu->checkNZ(cpu->A);
+}
+
+void cpu_command_TYA(command_6502* cmd, command_parm* parm) {
+    _TR(Y, A);
+    cpu->checkNZ(cpu->A);
 }
 
 void cpu_command_TSX(command_6502* cmd, command_parm* parm) {
-
+    _TR(SP, X);
+    cpu->checkNZ(cpu->X);
 }
-void cpu_command_RTS(command_6502* cmd, command_parm* parm) {
 
+void cpu_command_TXS(command_6502* cmd, command_parm* parm) {
+    _TR(X, SP);
 }
-void cpu_command_ROR(command_6502* cmd, command_parm* parm) {
 
-}
-void cpu_command_PLA(command_6502* cmd, command_parm* parm) {
-
-}
-void cpu_command_NOP(command_6502* cmd, command_parm* parm) {
-
-}
+#undef _TR
 
 /* 设置为禁止中断 */
 void cpu_command_SEI(command_6502* cmd, command_parm* parm) {
-    parm->cpu->FLAGS |= CPU_FLAGS_INTERDICT;
+    SET_FLAGS(CPU_FLAGS_INTERDICT);
 }
 
 /* 清除禁止中断位 */
 void cpu_command_CLI(command_6502* cmd, command_parm* parm) {
-    parm->cpu->FLAGS &= 0xFF ^ CPU_FLAGS_INTERDICT;
+    CLE_FLAGS(CPU_FLAGS_INTERDICT);
+}
+
+/* 设置为十进制(BCD)算术运算 */
+void cpu_command_SED(command_6502* cmd, command_parm* parm) {
+    SET_FLAGS(CPU_FLAGS_DECIMAL);
+}
+
+/* 还原为二进制算术运算 */
+void cpu_command_CLD(command_6502* cmd, command_parm* parm) {
+    CLE_FLAGS(CPU_FLAGS_DECIMAL);
+}
+
+/* 设置进位标志 */
+void cpu_command_SEC(command_6502* cmd, command_parm* parm) {
+    SET_FLAGS(CPU_FLAGS_CARRY);
+}
+
+/* 清除进位标志 */
+void cpu_command_CLC(command_6502* cmd, command_parm* parm) {
+    CLE_FLAGS(CPU_FLAGS_CARRY);
 }
 
 /* 清除溢出位 */
@@ -529,25 +710,8 @@ void cpu_command_CLV(command_6502* cmd, command_parm* parm) {
     parm->cpu->clearV();
 }
 
-/* 设置为十进制(BCD)算术运算 */
-void cpu_command_SED(command_6502* cmd, command_parm* parm) {
-    parm->cpu->FLAGS |= CPU_FLAGS_DECIMAL;
-}
-
-/* 还原为二进制算术运算 */
-void cpu_command_CLD(command_6502* cmd, command_parm* parm) {
-    parm->cpu->FLAGS &= 0xFF ^ CPU_FLAGS_DECIMAL;
-}
-
-/* 设置进位标志 */
-void cpu_command_SEC(command_6502* cmd, command_parm* parm) {
-    parm->cpu->FLAGS |= CPU_FLAGS_CARRY;
-}
-
-/* 清除进位标志 */
-void cpu_command_CLC(command_6502* cmd, command_parm* parm) {
-    parm->cpu->FLAGS &= 0xFF ^ CPU_FLAGS_CARRY;
-}
+#undef SET_FLAGS
+#undef CLE_FLAGS
 
 /****************************************************************************/
 
@@ -682,35 +846,34 @@ static command_6502 command_list_6502[] = {
 /****************************************************************************/
 
 cpu_6502::cpu_6502(memory* ram)
-        : ram(ram)
+        : ram(ram), NMI(0), IRQ(0), RES(1)
 {
 }
 
-void cpu_6502::reset() {
-    A      = 0;
-    Y      = 0;
-    X      = 0;
-
-    PC     = 0;
-    SP     = 0x01FF;
-    FLAGS  = 0x20;
-
-    PCH    = ram->read(0xFFFD);
-    PCL    = ram->read(0xFFFC);
-}
-
-void cpu_6502::push(byte d) {
+inline void cpu_6502::push(byte d) {
     ram->write(SP | 0x0100, d);
     SP--;
 }
 
-byte cpu_6502::pop() {
+inline byte cpu_6502::pop() {
     SP++;
-    return ram->read(SP);
+    return ram->read(SP | 0x0100);
+}
+
+void cpu_6502::debug() {
+    char buf[9];
+    itoa(FLAGS, buf, 2);
+
+    printf("CPU >   A: %04x   X: %04x   Y: %04x  (NV1BDIZC)\n"
+           "    >  PC: %04x  SP: %04x       FG:   %08s\n",
+           A, X, Y, PC, SP, buf);
 }
 
 byte cpu_6502::process() {
+
     static command_parm parm;
+
+    byte cpu_cyc = reset();
 
     parm.op = ram->readPro(PC);
     command_6502 *opp = &command_list_6502[parm.op];
@@ -722,6 +885,7 @@ byte cpu_6502::process() {
         parm.p1 = ram->readPro(PC+1);
     }
 
+    /* 是否应该在指令执行前就修改PC? */
     PC += opp->len;
     parm.cpu = this;
     parm.ram = parm.cpu->ram;
@@ -729,14 +893,60 @@ byte cpu_6502::process() {
     display_command(opp, &parm);
     opp->op_func(opp, &parm);
 
-    return opp->time;
+    cpu_cyc += nmi();
+    cpu_cyc += irq();
+    cpu_cyc += opp->time;
+
+    return  cpu_cyc;
 }
 
-void cpu_6502::debug() {
-    char buf[9];
-    itoa(FLAGS, buf, 2);
+inline byte cpu_6502::reset() {
+/*  A      = 0;
+    Y      = 0;
+    X      = 0;
+    PC     = 0;
+    SP     = 0xFF; */
+    if (RES) {
+        IRQ    = 0;
+        NMI    = 0;
+        RES    = 0;
+        FLAGS  = CPU_FLAGS_CONST | CPU_FLAGS_INTERDICT;
 
-    printf("CPU >\t A: %04x\t X: %04x\t Y: %04x\n"
-           "    >\tPC: %04x\tSP: %04x\tFG: %08s\n",
-           A, X, Y, PC, SP, buf);
+        PCH    = ram->read(0xFFFD);
+        PCL    = ram->read(0xFFFC);
+
+        return CPU_RESET_CYC;
+    }
+    return 0;
+}
+
+inline byte cpu_6502::irq() {
+    if (IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
+        jump(0xFFFE);
+        return CPU_INTERRUPT_CYC;
+    }
+    return 0;
+}
+
+inline byte cpu_6502::nmi() {
+    if (NMI) {
+        jump(0xFFFA);
+        return CPU_NMI_CYC;
+    }
+    return 0;
+}
+
+inline void cpu_6502::rti() {
+    FLAGS = pop();
+    PCL   = pop();
+    PCH   = pop();
+}
+
+inline void cpu_6502::jump(word addr) {
+    push(PCH);
+    push(PCL);
+    push(FLAGS);
+    PCH    = ram->read(addr+1);
+    PCL    = ram->read(addr  );
+    FLAGS |= CPU_FLAGS_INTERDICT;
 }

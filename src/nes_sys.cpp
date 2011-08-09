@@ -23,7 +23,6 @@ void startNes() {
     ram.reset();
 
     cpu_6502 cpu(&ram);
-    cpu.reset();
 
     const int test_command = 200;
     clock_t s = clock();

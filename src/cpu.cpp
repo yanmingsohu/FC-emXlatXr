@@ -864,9 +864,9 @@ void cpu_6502::debug() {
     char buf[9];
     itoa(FLAGS, buf, 2);
 
-    printf("CPU >   A: %04x   X: %04x   Y: %04x  (NV1BDIZC)\n"
-           "    >  PC: %04x  SP: %04x       FG:   %08s\n",
-           A, X, Y, PC, SP, buf);
+    printf("CPU >   A: %04X   X: %04X   Y: %04X  (NV1BDIZC)\n"
+           "    >  PC: %04X  SP: %04X       FG:   %08s\n",
+           A, X, Y, PC, 0x0100 | SP, buf);
 }
 
 byte cpu_6502::process() {

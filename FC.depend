@@ -82,27 +82,28 @@
 
 1312442084 e:\c-project\fc\src\type.h
 
-1312528158 e:\c-project\fc\src\rom.h
+1312893881 e:\c-project\fc\src\rom.h
 	"type.h"
 	"string"
 	"stdio.h"
 
-1312554995 source:e:\c-project\fc\src\nes_sys.cpp
+1312895311 source:e:\c-project\fc\src\nes_sys.cpp
 	<stdio.h>
 	"cpu.h"
 	"mem.h"
 	"rom.h"
+	"time.h"
 
-1312558177 e:\c-project\fc\src\cpu.h
+1312895616 e:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 
-1312445247 source:e:\c-project\fc\src\rom.cpp
+1312893923 source:e:\c-project\fc\src\rom.cpp
 	"rom.h"
 	<stdio.h>
 	<stdlib.h>
 
-1312557098 source:e:\c-project\fc\src\cpu.cpp
+1312893783 source:e:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"

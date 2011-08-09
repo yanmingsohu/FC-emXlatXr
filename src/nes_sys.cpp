@@ -16,15 +16,16 @@ void startNes() {
     }
 
     printf("load '%s' over, start..\n", filename.c_str());
-
-    rom.printRom(0xfff0-0x8000, 0x10);
+    rom.romInfo();
+    rom.printRom(0xFFFA - 0x8000, 6);
+    printf("\n");
 
     memory ram(&rom);
     ram.reset();
 
     cpu_6502 cpu(&ram);
 
-    const int test_command = 200;
+    const int test_command = 20;
     clock_t s = clock();
     for (int i=test_command; cpu.process() && i>0; --i);
     clock_t e = clock();

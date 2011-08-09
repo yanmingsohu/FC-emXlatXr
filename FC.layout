@@ -2,28 +2,28 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="src\cpu.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="2224" topLine="0" />
+		<Cursor position="1174" topLine="28" />
 	</File>
 	<File name="src\cpu.h" open="1" top="0" tabpos="2">
-		<Cursor position="2489" topLine="33" />
+		<Cursor position="2886" topLine="46" />
 	</File>
 	<File name="src\main.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="40" topLine="0" />
 	</File>
-	<File name="src\mem.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="991" topLine="20" />
+	<File name="src\mem.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="801" topLine="12" />
 	</File>
 	<File name="src\mem.h" open="0" top="0" tabpos="1">
-		<Cursor position="729" topLine="0" />
+		<Cursor position="755" topLine="0" />
 	</File>
 	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="607" topLine="0" />
+		<Cursor position="173" topLine="0" />
 	</File>
-	<File name="src\rom.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="1377" topLine="0" />
+	<File name="src\rom.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="1766" topLine="40" />
 	</File>
-	<File name="src\rom.h" open="0" top="0" tabpos="6">
-		<Cursor position="1560" topLine="17" />
+	<File name="src\rom.h" open="1" top="0" tabpos="5">
+		<Cursor position="2002" topLine="22" />
 	</File>
 	<File name="src\type.h" open="0" top="0" tabpos="7">
 		<Cursor position="142" topLine="0" />

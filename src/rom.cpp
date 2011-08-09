@@ -80,13 +80,31 @@ int load_rom(nes_file* rom, const string* filename) {
     return res;
 }
 
-void free_rom(nes_file* rom) {
+nes_file::~nes_file() {
     if (rom) {
-        if (rom->rom) {
-            free(rom->rom);
-        }
-        if (rom->vrom) {
-            free(rom->vrom);
-        }
+        free(rom);
     }
+    if (vrom) {
+        free(vrom);
+    }
+}
+
+void nes_file::printRom(int offset, int len) {
+    if (offset%16!=0) printf("\n0x%x: ", offset);
+
+    for (int i=offset; i<len+offset; ++i) {
+        if (i%16==0) printf("\n0x%x: ", i);
+        printf(" %02x", rom[i]);
+    }
+
+    printf("\n");
+}
+
+word nes_file::mapperId() {
+    return (t2 & 0xF0)|(t1>>4);
+}
+
+void nes_file::romInfo() {
+    printf("Rom >> PROM: 16kB x %d, VROM: 8kB x %d, MapperID: %d, Trainer: %d\n",
+           rom_size, vrom_size, mapperId(), t1 & 0x04);
 }

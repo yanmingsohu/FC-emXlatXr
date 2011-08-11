@@ -3,6 +3,7 @@
 
 #include "type.h"
 #include "rom.h"
+#include "mmc.h"
 
 /*
 union memory {
@@ -25,13 +26,11 @@ union memory {
 struct memory {
 
 private:
-    const nes_file* rom;
-    const byte* const rom_data;
+    MMC *mmc;
     byte ram[0x07FF];
-    int pro_page;
 
 public:
-    memory(const nes_file* rom);
+    memory(MMC *mmc);
     /** 重置内存状态全部清0 */
     void reset();
     /** 可以读取全部地址 */

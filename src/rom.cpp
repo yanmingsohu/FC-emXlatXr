@@ -46,7 +46,7 @@ int load_rom(nes_file* rom, const string* filename) {
 
         int rsize = rom->rom_size * 16 * 1024;
         if (rsize>0) {
-            rom->rom = (byte*)malloc(rsize);
+            rom->rom = new byte[rsize]; //(byte*)malloc(rsize);
             readlen = fread(rom->rom, 1, rsize, file);
             if (rsize!=readlen) {
                 printf("cannot read enough rom size.\n");
@@ -59,7 +59,7 @@ int load_rom(nes_file* rom, const string* filename) {
 
         rsize = rom->vrom_size * 8 * 1024;
         if (rsize>0) {
-            rom->vrom = (byte*)malloc(rsize);
+            rom->vrom = new byte[rsize]; //(byte*)malloc(rsize);
             readlen = fread(rom->vrom, 1, rsize, file);
             if (rsize!=readlen) {
                 printf("cannot read enough vrom size.\n");
@@ -82,19 +82,24 @@ int load_rom(nes_file* rom, const string* filename) {
 
 nes_file::~nes_file() {
     if (rom) {
-        free(rom);
+        delete[] rom;
     }
     if (vrom) {
-        free(vrom);
+        delete[] vrom;
     }
 }
 
 void nes_file::printRom(int offset, int len) {
-    if (offset%16!=0) printf("\n0x%x: ", offset);
+    if (offset > rom_size* 16 * 1024) {
+        offset %= rom_size* 16 * 1024;
+        printf("] out of rom index reset to %X", offset);
+    }
+
+    if (offset%16!=0) printf("\n0x%X: ", offset);
 
     for (int i=offset; i<len+offset; ++i) {
-        if (i%16==0) printf("\n0x%x: ", i);
-        printf(" %02x", rom[i]);
+        if (i%16==0) printf("\n0x%X: ", i);
+        printf(" %02X", rom[i]);
     }
 
     printf("\n");

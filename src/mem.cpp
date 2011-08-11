@@ -2,8 +2,8 @@
 #include "string.h"
 
 
-memory::memory(const nes_file* rom)
-      : rom(rom), rom_data(rom->rom), pro_page(0)
+memory::memory(MMC *mmc)
+      : mmc(mmc)
 {
 }
 
@@ -16,7 +16,7 @@ byte memory::read(const word offset) {
         return ram[offset%0x0800];
     }
     if (offset<0x4000) {    /* PPU ¼Ä´æÆ÷                      */
-        return 0;
+        return 0xFF;
     }
     if (offset<0x4014) {    /* pAPU ¼Ä´æÆ÷                     */
         return 0;
@@ -39,9 +39,7 @@ byte memory::read(const word offset) {
     if (offset<0x8000) {    /* SRAM£¨µç³Ø´¢´æ RAM£©            */
         return 0;
     }
-    if (offset<0xFFFF) {    /* 32K ³ÌÐò´úÂë ROM                */
-        return readPro(offset);
-    }
+    return readPro(offset); /* 32K ³ÌÐò´úÂë ROM                */
 }
 
 void memory::write(const word offset, const byte data) {
@@ -56,5 +54,5 @@ void memory::write(const word offset, const byte data) {
 }
 
 byte memory::readPro(const word offset) {
-    return rom_data[offset-0x8000];
+    return mmc->readRom(offset);
 }

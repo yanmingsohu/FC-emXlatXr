@@ -23,31 +23,37 @@
 1312386882 e:\c-project\fc\cpu.h
 	"type.h"
 
-1312523729 source:f:\c-project\fc\src\main.cpp
+1313052178 source:f:\c-project\fc\src\main.cpp
 	<stdio.h>
-	"nes_sys.h"
+	<stdlib.h>
+	"time.h"
+	<string>
+	"cpu.h"
+	"mem.h"
+	"rom.h"
 
-1312895616 f:\c-project\fc\src\cpu.h
+1313040312 f:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 
-1312442084 f:\c-project\fc\src\type.h
+1313042146 f:\c-project\fc\src\type.h
 
-1312444632 f:\c-project\fc\src\mem.h
+1313042027 f:\c-project\fc\src\mem.h
 	"type.h"
 	"rom.h"
+	"mmc.h"
 
-1312445280 source:f:\c-project\fc\src\mem.cpp
+1313043578 source:f:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
 
-1312893783 source:f:\c-project\fc\src\cpu.cpp
+1313047385 source:f:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
 	"stdlib.h"
 
-1312893923 source:f:\c-project\fc\src\rom.cpp
+1313047964 source:f:\c-project\fc\src\rom.cpp
 	"rom.h"
 	<stdio.h>
 	<stdlib.h>
@@ -57,14 +63,13 @@
 	"string"
 	"stdio.h"
 
-1312434513 f:\c-project\fc\src\nes_sys.h
-
-1312895311 source:f:\c-project\fc\src\nes_sys.cpp
-	<stdio.h>
+1313046032 f:\c-project\fc\src\nes_sys.h
 	"cpu.h"
 	"mem.h"
 	"rom.h"
-	"time.h"
+
+1313046270 source:f:\c-project\fc\src\nes_sys.cpp
+	"nes_sys.h"
 
 1312523729 source:e:\c-project\fc\src\main.cpp
 	<stdio.h>
@@ -151,4 +156,19 @@
 	"cpu.h"
 	"stdio.h"
 	"stdlib.h"
+
+1313046262 source:f:\c-project\fc\src\windows.cpp
+	<windows.h>
+	"nes_sys.h"
+
+1313042150 source:f:\c-project\fc\src\type.cpp
+	"type.h"
+	<stdio.h>
+
+1313052798 source:f:\c-project\fc\src\mmc.cpp
+	"mmc.h"
+	"type.h"
+
+1313052118 f:\c-project\fc\src\mmc.h
+	"rom.h"
 

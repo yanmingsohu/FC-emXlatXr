@@ -4,6 +4,9 @@
 #include "type.h"
 #include "mem.h"
 
+struct command_6502;
+struct command_parm;
+
 struct cpu_6502 {
 
     /* NTSC制式机型运行频率为1.7897725 MHz
@@ -44,14 +47,14 @@ struct cpu_6502 {
     byte RES;       /* 如果>0则执行复位动作                */
 
     memory *ram;    /* 内存                                */
-
+    command_parm* prev_parm;    /* 前一个命令的参数        */
 
     cpu_6502(memory* ram);
 
     byte    reset();            /* 重置cpu状态,返回使用周期*/
     void    push(byte d);       /* 向堆栈中压数            */
     byte    pop();              /* 从堆栈中取数            */
-    void    debug();            /* 打印cpu状态             */
+    char*   debug();            /* 返回cpu状态字符串       */
     byte    process();          /* 处理当前命令并指向下一条命
                                  * 令,返回使用的处理器周期 */
     byte    irq();              /* 处理器执行中断,返回使用的
@@ -60,6 +63,7 @@ struct cpu_6502 {
     byte    nmi();              /* 处理不可屏蔽的中断      */
     void    jump(word addr);    /* 跳转到addr内存指向的地址(addr, addr+1)
                                  * 并保存之前的PC和FLAGS   */
+    char*   cmdInfo();          /* 返回上一条指令的描述    */
 
     /* 如果value最高位为1 则N=1,否则为0,
      * 如果value==0 则Z=1,否则为0 */
@@ -102,9 +106,10 @@ struct command_parm {
     memory   *ram;
     cpu_6502 *cpu;
 
-    byte op; /* 命令的代码         */
-    byte p1; /* 第一个参数(如果有) */
-    byte p2; /* 第二个参数(如果有) */
+    byte op;  /* 命令的代码         */
+    byte p1;  /* 第一个参数(如果有) */
+    byte p2;  /* 第二个参数(如果有) */
+    word addr;/* 当前指令的地址     */
 
 static const byte ADD_MODE_$zpgX$  = 0x00;
 static const byte ADD_MODE_zpg     = 0x04;
@@ -234,5 +239,6 @@ struct command_6502 {
     /* 指向处理函数的指针, cmd 是命令描述*/
     void (*op_func)(command_6502* cmd, command_parm* parm);
 };
+
 
 #endif // CPU_H_INCLUDED

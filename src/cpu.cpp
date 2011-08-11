@@ -7,29 +7,9 @@
 #define SET_FLAGS(x) (parm->cpu->FLAGS |= (x))
 #define CLE_FLAGS(x) (parm->cpu->FLAGS &= 0xFF ^ (x))
 
-
-void display_command(command_6502* cmd, command_parm* parm) {
-    const char* cc = NULL;
-
-    switch (cmd->len) {
-    case 3:
-        cc = "%04X.  [%02X]  %s %02X %02X \n";
-        break;
-    case 2:
-        cc = "%04X.  [%02X]  %s %02X \n";
-        break;
-    default:
-        cc = "%04X.  [%02X]  %s \n";
-    }
-
-    printf(cc, parm->cpu->PC - cmd->len,
-               parm->op, cmd->name, parm->p1, parm->p2);
-}
-
 void check_decimal(command_6502* cmd, command_parm* parm) {
     if (parm->cpu->FLAGS & CPU_FLAGS_DECIMAL) {
-        display_command(cmd, parm);
-        printf(" -- 不能执行十进运算\n");
+        printf("%s -- 不能执行十进运算\n", parm->cpu->cmdInfo());
         parm->cpu->debug();
     }
 }
@@ -332,7 +312,7 @@ void cpu_command_JMP(command_6502* cmd, command_parm* parm) {
     }
 }
 
-#define JUMP_CODE  parm->cpu->PC += ((signed char)parm->p1) - cmd->len
+#define JUMP_CODE  parm->cpu->PC += ((signed char)parm->p1)
 
 /* 条件跳转 C==0 */
 void cpu_command_BCC(command_6502* cmd, command_parm* parm) {
@@ -721,7 +701,7 @@ void cpu_command_CLV(command_6502* cmd, command_parm* parm) {
 #define  O(n, t, l, p)   Op(n, t, l, p),
 
 /* 索引既是6502命令的首字节 */
-static command_6502 command_list_6502[] = {
+command_6502 command_list_6502[] = {
 /* --------------------------------------| 0x00 - 0x0F |--- */
     O(BRK, 7, 1, not)   O(ORA, 6, 2, ind)   N
     N                   N                   O(ORA, 3, 2, zpg)
@@ -846,7 +826,7 @@ static command_6502 command_list_6502[] = {
 /****************************************************************************/
 
 cpu_6502::cpu_6502(memory* ram)
-        : ram(ram), NMI(0), IRQ(0), RES(1)
+        : NMI(0), IRQ(0), RES(1), ram(ram)
 {
 }
 
@@ -860,18 +840,47 @@ inline byte cpu_6502::pop() {
     return ram->read(SP | 0x0100);
 }
 
-void cpu_6502::debug() {
-    char buf[9];
-    itoa(FLAGS, buf, 2);
+char* cpu_6502::debug() {
+    static char abuf[256];
+    char cbuf[9];
+    itoa(FLAGS, cbuf, 2);
 
-    printf("CPU >   A: %04X   X: %04X   Y: %04X  (NV1BDIZC)\n"
-           "    >  PC: %04X  SP: %04X       FG:   %08s\n",
-           A, X, Y, PC, 0x0100 | SP, buf);
+    sprintf(abuf,
+            "CPU >   A: %04X   X: %04X   Y: %04X  (NV1BDIZC)\n"
+            "    >  PC: %04X  SP: %04X       FG:   %08s\n",
+            A, X, Y, PC, 0x0100 | SP, cbuf);
+
+    return abuf;
+}
+
+/* 返回的字符串长23字符 */
+char* cpu_6502::cmdInfo() {
+
+    static char buf[32];
+    const char* cc = NULL;
+    command_6502 *cmd = &command_list_6502[prev_parm->op];
+
+    switch (cmd->len) {
+    case 3:
+        cc = "%04X.  [%02X]  %s %02X %02X \n";
+        break;
+    case 2:
+        cc = "%04X.  [%02X]  %s %02X -- \n";
+        break;
+    default:
+        cc = "%04X.  [%02X]  %s -- -- \n";
+    }
+
+    sprintf(buf, cc, prev_parm->cpu->PC - cmd->len,
+               prev_parm->op, cmd->name, prev_parm->p1, prev_parm->p2);
+
+    return buf;
 }
 
 byte cpu_6502::process() {
 
     static command_parm parm;
+    prev_parm = &parm;
 
     byte cpu_cyc = reset();
 
@@ -885,27 +894,21 @@ byte cpu_6502::process() {
         parm.p1 = ram->readPro(PC+1);
     }
 
-    /* 是否应该在指令执行前就修改PC? */
-    PC += opp->len;
+    parm.addr = PC;
     parm.cpu = this;
     parm.ram = parm.cpu->ram;
+    PC += opp->len;
 
-    display_command(opp, &parm);
     opp->op_func(opp, &parm);
 
     cpu_cyc += nmi();
     cpu_cyc += irq();
     cpu_cyc += opp->time;
 
-    return  cpu_cyc;
+    return cpu_cyc;
 }
 
 inline byte cpu_6502::reset() {
-/*  A      = 0;
-    Y      = 0;
-    X      = 0;
-    PC     = 0;
-    SP     = 0xFF; */
     if (RES) {
         IRQ    = 0;
         NMI    = 0;

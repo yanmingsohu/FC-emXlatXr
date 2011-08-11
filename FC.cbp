@@ -11,6 +11,7 @@
 				<Option object_output="obj\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -23,21 +24,33 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add library="gdi32" />
+		</Linker>
 		<Unit filename="src\cpu.cpp" />
 		<Unit filename="src\cpu.h" />
 		<Unit filename="src\main.cpp" />
 		<Unit filename="src\mem.cpp" />
 		<Unit filename="src\mem.h" />
+		<Unit filename="src\mmc.cpp" />
+		<Unit filename="src\mmc.h" />
 		<Unit filename="src\nes_sys.cpp" />
 		<Unit filename="src\nes_sys.h" />
 		<Unit filename="src\rom.cpp" />
 		<Unit filename="src\rom.h" />
+		<Unit filename="src\type.cpp" />
 		<Unit filename="src\type.h" />
+		<Unit filename="src\windows.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
 			<lib_finder disable_auto="1" />
+			<wxsmith version="1">
+				<resources>
+					<wxPanel wxs="wxsmith/NewPanel.wxs" src="NewPanel.cpp" hdr="NewPanel.h" name="NewPanel" language="CPP" />
+				</resources>
+			</wxsmith>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

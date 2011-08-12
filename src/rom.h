@@ -25,7 +25,7 @@ struct nes_file {
 				　   * D2：1＝在$7000-$71FF有一个512字节的trainer
                      * D3：1＝4屏幕VRAM布局
 				　   * D4－D7：ROM Mapper的低4位                        */
-	byte t2;		/* D0－D3：保留，必须是0（准备作为副Mapper号^_^）
+	byte t2;		/* D0－D3：保留，必须是0（准备作为副Mapper号^_^）   *
 				　   * D4－D7：ROM Mapper的高4位                        */
 	byte zero[8];	/* 保留，必须是0                                    */
 

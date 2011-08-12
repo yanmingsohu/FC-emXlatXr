@@ -28,6 +28,7 @@ int NesSystem::load_rom(string filename) {
             printf("INT vector(0xFFFA-0xFFFF): ");
             rom->printRom(0xFFFA - 0x8000, 6);
             ram->reset();
+            ppu->swithMirror(rom->t1 & 0x0B);
             cpu->RES = 1;
         } else {
             res = ER_LOAD_ROM_BADMAP;

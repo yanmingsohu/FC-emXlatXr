@@ -12,6 +12,7 @@ const byte FAILED  = -1;
 
 void welcome();
 
+/* 无实际作用,仅用来说明vram的结构 */
 union vram {
     /* 每屏 32列 x 30行 个图形单元, 可显示960个单元            */
     struct {
@@ -36,9 +37,10 @@ union vram {
 	byte bg4m [0x03C0];	// $2C00-$2FBF 背景第四页映射
 	byte bg4c [0x0040];	// $2FC0-$2FFF 背景第四页配色区 0xFFF 4KB
 
-	byte nul1 [0x0F00];	// $3000-$3EFF 空
-	byte cdat [0x0020];	// $3F00-$3F1F 背景卡通配色代码数据
-	byte nul2 [0x00E0];	// $3F20-$3FFF 为空
+	byte nul1 [0x0F00];	// $3000-$3EFF $2000 - $2EFF 的镜像
+	byte cdat [0x0020];	// $3F00-$3F1F 背景卡通配色代码数据 各16字节
+	byte nul2 [0x00E0];	// $3F20-$3FFF 为空  $3F00-$3F1F 的7次镜像
+                        // $4000-$FFFF $0000 - $3FFF 的镜像。
 	};
 	byte idx  [0x4000];
 };

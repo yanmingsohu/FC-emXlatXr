@@ -2,8 +2,8 @@
 #include "string.h"
 
 
-memory::memory(MMC *mmc)
-      : mmc(mmc)
+memory::memory(MMC *mmc, PPU *_ppu)
+      : mmc(mmc), ppu(_ppu)
 {
 }
 
@@ -16,7 +16,7 @@ byte memory::read(const word offset) {
         return ram[offset%0x0800];
     }
     if (offset<0x4000) {    /* PPU ¼Ä´æÆ÷                      */
-        return 0xFF;
+        return ppu->readState(offset);
     }
     if (offset<0x4014) {    /* pAPU ¼Ä´æÆ÷                     */
         return 0;
@@ -47,10 +47,11 @@ void memory::write(const word offset, const byte data) {
         ram[offset%0x0800] = data;
         return;
     }
-    if (offset<0x2008) {
-        // PPU ¼Ä´æÆ÷
+    if (offset<0x2008) {    /* PPU ¼Ä´æÆ÷                      */
+        ppu->controlWrite(offset, data);
         return;
     }
+    mmc->checkSwitch(offset, data);
 }
 
 byte memory::readPro(const word offset) {

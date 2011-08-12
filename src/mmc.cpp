@@ -9,7 +9,7 @@
  * switch_page_ ÇÐ»»Ò³Ãæ´úÂë
  */////////////////////////////////////////////////////////////////////
 
-word rom_mapper_3(MapperImpl* mi, word offset) {
+dword rom_mapper_3(MapperImpl* mi, word offset) {
     if (mi->rom->rom_size==1) {
         if (offset>=0xC000)
         return (offset-0x4000);
@@ -19,12 +19,12 @@ word rom_mapper_3(MapperImpl* mi, word offset) {
 
 /* ------------------------------------------------------------------ */
 
-#define MA_PA(x, a,b,c) x.sw=a; x.r_prom=b; x.r_vrom=c
+#define MA_PA(x, a,b,c) x.sw_page = a; x.r_prom = b; x.r_vrom = c
 #define MA_P1(x, b)     MA_PA(x, NULL, b, NULL)
 #define MA_PL(x)        MA_P1(map_list[x], rom_mapper_##x)
 #define MA_PD(x, y)     MA_P1(map_list[x], rom_mapper_##y)
 
-MapperImpl map_list[256] = {0};
+MapperImpl map_list[256] = {};
 
 static void init_map_list() {
     MA_PD(0, 3);
@@ -69,4 +69,22 @@ byte MMC::readRom(const word addr) {
         return rom->rom[n_addr-0x8000];
     }
     return 0xFF;
+}
+
+byte MMC::readVRom(const word addr) {
+    if (rom) {
+        if (sw->r_vrom) {
+            word n_addr = sw->r_vrom(sw, addr);
+            return rom->vrom[n_addr];
+        } else {
+            return rom->vrom[addr];
+        }
+    }
+    return 0xFF;
+}
+
+void MMC::checkSwitch(const word addr, const byte value) {
+    if (sw->sw_page && rom) {
+        sw->sw_page(sw, addr, value);
+    }
 }

@@ -4,6 +4,7 @@
 #include "type.h"
 #include "rom.h"
 #include "mmc.h"
+#include "ppu.h"
 
 /*
 union memory {
@@ -27,10 +28,11 @@ struct memory {
 
 private:
     MMC *mmc;
+    PPU *ppu;
     byte ram[0x07FF];
 
 public:
-    memory(MMC *mmc);
+    memory(MMC *mmc, PPU *_ppu);
     /** 重置内存状态全部清0 */
     void reset();
     /** 可以读取全部地址 */

@@ -3,7 +3,6 @@
 
 #include "type.h"
 #include "string"
-#include "stdio.h"
 
 using std::string;
 
@@ -49,10 +48,19 @@ struct nes_file {
     ~nes_file();
 };
 
+#define LOAD_ROM_SUCCESS         0
+#define ER_LOAD_ROM_PARM        -1
+#define ER_LOAD_ROM_OPEN        -2
+#define ER_LOAD_ROM_HEAD        -3
+#define ER_LOAD_ROM_TRAINER     -4
+#define ER_LOAD_ROM_SIZE        -5
+#define ER_LOAD_ROM_VSIZE       -6
+#define ER_LOAD_ROM_BADMAP      -7
+#define ER_LOAD_ROM_UNKNOW      -99
 
 /**
  * 读取filename文件到rom结构中,成功返回0并设置rom参数
- * rom参数必须是有效的, 失败返回-1
+ * rom参数必须是有效的, 失败返回上面定义的错误码
  */
 int load_rom(nes_file* rom, const string* filename);
 

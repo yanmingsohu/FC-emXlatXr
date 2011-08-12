@@ -1,14 +1,18 @@
 #include <windows.h>
+#include <stdio.h>
 #include "nes_sys.h"
+#include "ppu.h"
 
 
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
+void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc);
+void start_game(HWND hwnd, PMSG messages);
+
 
 /*  Make the class name into a global variable  */
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName[ ] = "FC Ä£ÄâÆ÷ DEmo. -=CatfoOD=-";
-void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc);
 
 
 int WINAPI WinMain (HINSTANCE hThisInstance,
@@ -16,6 +20,11 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
                      LPSTR lpszArgument,
                      int nCmdShow)
 {
+    welcome();
+
+    const int width = PPU_DISPLAY_P_WIDTH;
+    const int height = PPU_DISPLAY_P_HEIGHT;
+
     HWND hwnd;               /* This is the handle for our window */
     MSG messages;            /* Here messages to the application are saved */
     WNDCLASSEX wincl;        /* Data structure for the windowclass */
@@ -49,8 +58,8 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
            WS_OVERLAPPEDWINDOW, /* default window */
            CW_USEDEFAULT,       /* Windows decides the position */
            CW_USEDEFAULT,       /* where the window ends up on the screen */
-           544,                 /* The programs width */
-           375,                 /* and height in pixels */
+           width + 20,          /* The programs width */
+           height + 40,         /* and height in pixels */
            HWND_DESKTOP,        /* The window is a child-window to desktop */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
@@ -58,37 +67,59 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
            );
 
     /* Make the window visible on the screen */
-    ShowWindow (hwnd, nCmdShow);
+    ShowWindow(hwnd, nCmdShow);
+    start_game(hwnd, &messages);
 
-	HDC hdc = GetDC(hwnd);
+    /* The program return-value is 0 - The value that PostQuitMessage() gave */
+    return messages.wParam;
+}
 
-	cpu_6502* cpu = NULL;
-	if (!cpu) {
-        return -1;
-	}
+void start_game(HWND hwnd, PMSG messages) {
+    const int width = PPU_DISPLAY_P_WIDTH;
+    const int height = PPU_DISPLAY_P_HEIGHT;
+
+    HDC hdc = GetDC(hwnd);
+	HDC hMemDC = CreateCompatibleDC(hdc);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hdc, width, height);
+    SelectObject(hMemDC, hBitmap);
+
+    HFONT font = CreateFont(10, 0, 0, 0, 100
+				, FALSE, FALSE, FALSE, GB2312_CHARSET
+				, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
+				, PROOF_QUALITY, DEFAULT_PITCH, "ËÎÌå" );
+
+    SelectObject(hMemDC, font);
+    SetTextColor(hMemDC, RGB(255, 255, 255));
+    SetBkColor(hMemDC, RGB(0, 0, 0));
+
+    NesSystem fc;
+    if (fc.load_rom("rom/Tennis.nes")) {
+        MessageBox(hwnd, "¶ÁÈ¡ROMÊ§°Ü", "´íÎó", 0);
+        return;
+    }
+
+	cpu_6502* cpu = fc.getCpu();
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
-    while (TRUE)
+    for(;;)
     {
-    	if (PeekMessage(&messages, NULL, 0, 0, PM_REMOVE)) {
-    		if (messages.message==WM_QUIT) {
+    	if (PeekMessage(messages, NULL, 0, 0, PM_REMOVE)) {
+    		if (messages->message==WM_QUIT) {
 				break;
     		}
 			/* Translate virtual-key messages into character messages */
-			TranslateMessage(&messages);
+			TranslateMessage(messages);
 			/* Send message to WindowProcedure */
-			DispatchMessage(&messages);
+			DispatchMessage(messages);
     	}
         cpu->process();
-        displayCpu(cpu, hwnd, hdc);
+        displayCpu(cpu, hwnd, hMemDC);
+        BitBlt(hdc, 0, 0, width, height, hMemDC, 0, 0, SRCCOPY);
     }
 
-
-    delete cpu->ram;
-    delete cpu;
+    DeleteObject(hBitmap);
+    DeleteDC(hMemDC);
     ReleaseDC(hwnd, hdc);
-    /* The program return-value is 0 - The value that PostQuitMessage() gave */
-    return messages.wParam;
 }
 
 void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
@@ -97,35 +128,34 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
 
     int x = 0;
 	int y = 0;
-	int xIn = 80;
-	RECT rect;
+	int xIn = 50;
 	char buf[128];
     opCount++;
 
-    if (GetClientRect(hwnd, &rect)) {
-        sprintf(buf, "A: %02X", cpu->A);
-        TextOut(hdc, x, y, buf, 5);
-        sprintf(buf, "X: %02X", cpu->X);
-        TextOut(hdc, x+=xIn, y, buf, 5);
-        sprintf(buf, "Y: %02X", cpu->Y);
-        TextOut(hdc, x+=xIn, y, buf, 5);
-        y = 18;
-        x = 0;
-        sprintf(buf, "SP: %02X", cpu->SP);
-        TextOut(hdc, x, y, buf, 6);
-        sprintf(buf, "PC: %04X", cpu->PC);
-        TextOut(hdc, x+=xIn, y, buf, 8);
-        sprintf(buf, "FG: %02X", cpu->FLAGS);
-        TextOut(hdc, x+=xIn, y, buf, 6);
+    sprintf(buf, "A: %02X", cpu->A);
+    TextOut(hdc, x, y, buf, 5);
+    sprintf(buf, "X: %02X", cpu->X);
+    TextOut(hdc, x+=xIn, y, buf, 5);
+    sprintf(buf, "Y: %02X", cpu->Y);
+    TextOut(hdc, x+=xIn, y, buf, 5);
+    y = 10;
+    x = 0;
+    sprintf(buf, "SP: %02X", cpu->SP);
+    TextOut(hdc, x, y, buf, 6);
+    sprintf(buf, "PC: %04X", cpu->PC);
+    TextOut(hdc, x+=xIn, y, buf, 8);
+    sprintf(buf, "FG: %02X", cpu->FLAGS);
+    TextOut(hdc, x+=xIn, y, buf, 6);
 
-        sprintf(buf, "op count: %09ld", opCount);
-        TextOut(hdc, x+=xIn, y, buf, 19);
+    sprintf(buf, "op count: %09ld", opCount);
+    TextOut(hdc, x+=xIn, y, buf, 19);
 
-        TextOut(hdc, 0, opy, cpu->cmdInfo(), 23);
-        if ((opy+=18) > rect.bottom-20) {
-            opy = 50;
-        }
+    TextOut(hdc, 0, opy, cpu->cmdInfo(), 25);
+    if ((opy+=10) > PPU_DISPLAY_P_HEIGHT) {
+        opy = 30;
     }
+
+    SetPixel(hdc, 200, opy, 0xFFFFFF);
 }
 
 

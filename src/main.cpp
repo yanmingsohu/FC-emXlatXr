@@ -1,42 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "time.h"
+#include <time.h>
 #include <string>
-#include "cpu.h"
-#include "mem.h"
-#include "rom.h"
-
+#include "nes_sys.h"
 
 const int test_command = 200;
 
-
-byte test() {
+void test() {
 
     using std::string;
 
     string filename = "rom/Tennis.nes"; //"rom/Dr_Mario.nes";
-    nes_file* rom = new nes_file();
 
-    if (load_rom(rom, &filename)) {
-        printf("cannot load rom, Exit.\n\n");
-        return NULL;
+    NesSystem fc;
+
+    switch (fc.load_rom(filename)) {
+    case LOAD_ROM_SUCCESS:
+        goto _LOAD_SUCCESS;
+
+    case ER_LOAD_ROM_PARM:
+        printf("parm not null.\n");
+        break;
+    case ER_LOAD_ROM_OPEN:
+        printf("\ncannot open '%s' file.\n", filename.c_str());
+        break;
+    case ER_LOAD_ROM_HEAD:
+        printf("The file '%s' not nes rom. \n", filename.c_str());
+        break;
+    case ER_LOAD_ROM_TRAINER:
+        printf("The 'trainer' not enough '%s'.\n", filename.c_str());
+        break;
+    case ER_LOAD_ROM_SIZE:
+        printf("cannot read enough rom size.\n");
+        break;
+    case ER_LOAD_ROM_VSIZE:
+        printf("cannot read enough vrom size.\n");
+        break;
+    case ER_LOAD_ROM_BADMAP:
+        printf("unsupport map id\n");
+        break;
+    default:
+        printf("unknow error.\n");
     }
 
-    printf("load '%s' over, start..\n", filename.c_str());
-    rom->romInfo();
-    //rom->printRom(0xFFFA - 0x8000, 6);
-    printf("\n");
+    return;
 
-    MMC mmc;
-    if (!mmc.loadNes(rom)) {
-        printf("unsupport map id:%d\n", rom->mapperId());
-        return NULL;
-    }
+_LOAD_SUCCESS:
 
-    memory* ram = new memory(&mmc);
-    ram->reset();
+    printf("load '%s' over, start..\n\n", filename.c_str());
 
-    cpu_6502* cpu = new cpu_6502(ram);
+    cpu_6502* cpu = fc.getCpu();
 
     int c=0;
 
@@ -58,8 +71,9 @@ byte test() {
     printf(cpu->debug());
 }
 
-int main()
+int __main()
 {
+    welcome();
     test();
     system("pause");
     return 0;

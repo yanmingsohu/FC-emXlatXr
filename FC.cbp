@@ -3,6 +3,7 @@
 	<FileVersion major="1" minor="6" />
 	<Project>
 		<Option title="FC" />
+		<Option platforms="Windows;" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -36,6 +37,8 @@
 		<Unit filename="src\mmc.h" />
 		<Unit filename="src\nes_sys.cpp" />
 		<Unit filename="src\nes_sys.h" />
+		<Unit filename="src\ppu.cpp" />
+		<Unit filename="src\ppu.h" />
 		<Unit filename="src\rom.cpp" />
 		<Unit filename="src\rom.h" />
 		<Unit filename="src\type.cpp" />

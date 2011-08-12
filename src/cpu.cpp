@@ -3,11 +3,10 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-
 #define SET_FLAGS(x) (parm->cpu->FLAGS |= (x))
 #define CLE_FLAGS(x) (parm->cpu->FLAGS &= 0xFF ^ (x))
 
-void check_decimal(command_6502* cmd, command_parm* parm) {
+HELP_FNC void check_decimal(command_6502* cmd, command_parm* parm) {
     if (parm->cpu->FLAGS & CPU_FLAGS_DECIMAL) {
         printf("%s -- 不能执行十进运算\n", parm->cpu->cmdInfo());
         parm->cpu->debug();
@@ -186,7 +185,7 @@ void cpu_command_BIT(command_6502* cmd, command_parm* parm) {
 /* a<b, n=1; z=0; c=0 *
  * a=b, n=0; z=1; c=1 *
  * a>b, n=0; z=0; c=1 */
-static inline void cmp_op(command_parm* parm, byte a, byte b) {
+HELP_FNC void cmp_op(command_parm* parm, byte a, byte b) {
     if (a>b) {
         CLE_FLAGS(CPU_FLAGS_NEGATIVE & CPU_FLAGS_ZERO);
         SET_FLAGS(CPU_FLAGS_CARRY);
@@ -856,23 +855,37 @@ char* cpu_6502::debug() {
 /* 返回的字符串长23字符 */
 char* cpu_6502::cmdInfo() {
 
-    static char buf[32];
+    static char buf[64];
     const char* cc = NULL;
+    const char* tp = NULL;
     command_6502 *cmd = &command_list_6502[prev_parm->op];
 
     switch (cmd->len) {
     case 3:
-        cc = "%04X.  [%02X]  %s %02X %02X \n";
-        break;
+        cc = "%04X.  >%s  [%02X] %s %02X %02X \n"; break;
     case 2:
-        cc = "%04X.  [%02X]  %s %02X -- \n";
-        break;
+        cc = "%04X.  >%s  [%02X] %s %02X -- \n";   break;
     default:
-        cc = "%04X.  [%02X]  %s -- -- \n";
+        cc = "%04X.  >%s  [%02X] %s -- -- \n";
     }
 
-    sprintf(buf, cc, prev_parm->cpu->PC - cmd->len,
-               prev_parm->op, cmd->name, prev_parm->p1, prev_parm->p2);
+    switch (cmd->type) {
+    case command_6502::vt_op_abs:
+        tp = "abs"; break;
+    case command_6502::vt_op_imm:
+        tp = "imm"; break;
+    case command_6502::vt_op_ind:
+        tp = "ind"; break;
+    case command_6502::vt_op_rel:
+        tp = "rel"; break;
+    case command_6502::vt_op_zpg:
+        tp = "zpg"; break;
+    default:
+        tp = "---"; break;
+    }
+
+    sprintf(buf, cc, (prev_parm->cpu->PC - cmd->len), tp,
+                 prev_parm->op, cmd->name, prev_parm->p1, prev_parm->p2);
 
     return buf;
 }
@@ -952,4 +965,130 @@ inline void cpu_6502::jump(word addr) {
     PCH    = ram->read(addr+1);
     PCL    = ram->read(addr  );
     FLAGS |= CPU_FLAGS_INTERDICT;
+}
+
+inline void cpu_6502::checkNZ(byte value) {
+    if (value & 0x80) {
+        FLAGS |= CPU_FLAGS_NEGATIVE;
+    } else {
+        FLAGS &= 0xFF ^ CPU_FLAGS_NEGATIVE;
+    }
+
+    checkZ(value);
+}
+
+inline void cpu_6502::checkZ(byte value) {
+    if (value) {
+        FLAGS &= 0xFF ^ CPU_FLAGS_ZERO;
+    } else {
+        FLAGS |= CPU_FLAGS_ZERO;
+    }
+}
+
+inline void cpu_6502::checkV(word value, byte beforeOper) {
+    if (value & beforeOper & 0x80) {
+        FLAGS |= CPU_FLAGS_OVERFLOW;
+    } else {
+        FLAGS &= 0xFF ^ CPU_FLAGS_OVERFLOW;
+    }
+}
+
+inline void cpu_6502::clearV() {
+    FLAGS &= 0xFF ^ CPU_FLAGS_OVERFLOW;
+}
+
+/****************************************************************************/
+
+inline word command_parm::abs() {
+    return (p2<<8) | p1;
+}
+
+inline word command_parm::absX() {
+    return abs() + cpu->X;
+}
+
+inline word command_parm::absY() {
+    return abs() + cpu->Y;
+}
+
+inline word command_parm::zpg() {
+    return p1 & 0x00FF;
+}
+
+inline word command_parm::zpgX() {
+    return (p1 + cpu->X) & 0x00FF;
+}
+
+inline word command_parm::zpgY() {
+    return (p1 + cpu->Y) & 0x00FF;
+}
+
+inline word command_parm::$zpg$Y() {
+    return $$$(0, cpu->Y);
+}
+
+inline word command_parm::$zpgX$() {
+    return $$$(cpu->X, 0);
+}
+
+inline word command_parm::$$$(byte x, byte y) {
+    word offset = 0;
+    byte l = 0;
+    byte h = 0;
+
+    offset = ram->read( (p1 + x) & 0x00FF );
+    l = ram->read( offset   );
+    h = ram->read( offset+1 ) + y;
+    return h<<8 | l;
+}
+
+inline byte command_parm::read(const byte addressing_mode) {
+    if (addressing_mode==ADD_MODE_imm) {
+        return p1;
+    } else
+    if (addressing_mode==ADD_MODE_acc) {
+        return cpu->A;
+    }
+    return ram->read( getAddr(addressing_mode) );
+}
+
+inline void command_parm::write(const byte addressing_mode, byte value) {
+    if (addressing_mode==ADD_MODE_imm) {
+        printf("!不能向立即数中写数据");
+        return;
+    } else
+    if (addressing_mode==ADD_MODE_acc) {
+        cpu->A = value;
+        return;
+    }
+    cpu->ram->write(getAddr(addressing_mode), value);
+}
+
+inline word command_parm::getAddr(const byte addressing_mode) {
+    switch (addressing_mode) {
+
+    case ADD_MODE_abs:
+        return abs();
+
+    case ADD_MODE_zpg:
+        return zpg();
+
+    case ADD_MODE_absX:
+        return absX();
+
+    case ADD_MODE_absY:
+        return absY();
+
+    case ADD_MODE_zpgX:
+        return zpgX();
+
+    case ADD_MODE_$zpg$Y:
+        return $zpg$Y();
+
+    case ADD_MODE_$zpgX$:
+        return $zpgX$();
+    }
+
+    printf("!无效的寻址代码: %d\n", addressing_mode);
+    return 0;
 }

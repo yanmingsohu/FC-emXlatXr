@@ -5,15 +5,15 @@
 
 int load_rom(nes_file* rom, const string* filename) {
     FILE* file = NULL;
-    int res = FAILED;
+    int res = ER_LOAD_ROM_UNKNOW;
 
     do {
         if (!rom) {
-            printf("%s: parm rom not null.\n", __FILE__);
+            res = ER_LOAD_ROM_PARM;
             break;
         }
         if (!filename) {
-            printf("%s: parm filename not null.\n", __FILE__);
+            res = ER_LOAD_ROM_PARM;
             break;
         }
 
@@ -21,55 +21,55 @@ int load_rom(nes_file* rom, const string* filename) {
         file = fopen(filen, "rb");
 
         if (!file) {
-			printf("\ncannot open '%s' file.\n", filen);
+			res = ER_LOAD_ROM_OPEN;
 			break;
 		}
 
         int readlen = fread(rom, 1, NES_FILE_HEAD_LEN, file);
         if (readlen<NES_FILE_HEAD_LEN) {
-            printf("The file '%s' not enough size. \n", filen);
+            res = ER_LOAD_ROM_HEAD;
             break;
         }
 
         if (rom->magic_i!=NES_FILE_MAGIC) {
-            printf("The file '%s' not nes rom. \n", filen);
+            res = ER_LOAD_ROM_HEAD;
             break;
         }
 
         if (NES_FILE_HAS_TRA(rom)) {
             readlen = fread(rom->trainer, 1, NES_FILE_TRA_SIZE, file);
             if (readlen!=NES_FILE_TRA_SIZE) {
-                printf("The 'trainer' not enough '%s'.\n", filen);
+                res = ER_LOAD_ROM_TRAINER;
                 break;
             }
         }
 
         int rsize = rom->rom_size * 16 * 1024;
         if (rsize>0) {
-            rom->rom = new byte[rsize]; //(byte*)malloc(rsize);
+            rom->rom = new byte[rsize];
             readlen = fread(rom->rom, 1, rsize, file);
             if (rsize!=readlen) {
-                printf("cannot read enough rom size.\n");
+                res = ER_LOAD_ROM_SIZE;
                 break;
             }
         } else {
-            printf("the rom is bad zero size");
+            res = ER_LOAD_ROM_SIZE;
             break;
         }
 
         rsize = rom->vrom_size * 8 * 1024;
         if (rsize>0) {
-            rom->vrom = new byte[rsize]; //(byte*)malloc(rsize);
+            rom->vrom = new byte[rsize];
             readlen = fread(rom->vrom, 1, rsize, file);
             if (rsize!=readlen) {
-                printf("cannot read enough vrom size.\n");
+                res = ER_LOAD_ROM_VSIZE;
                 break;
             }
         } else {
             rom->vrom = NULL;
         }
 
-        res = SUCCESS;
+        res = LOAD_ROM_SUCCESS;
 
     } while(0);
 
@@ -92,7 +92,7 @@ nes_file::~nes_file() {
 void nes_file::printRom(int offset, int len) {
     if (offset > rom_size* 16 * 1024) {
         offset %= rom_size* 16 * 1024;
-        printf("] out of rom index reset to %X", offset);
+        printf("> out of rom index REmapping to %X", offset);
     }
 
     if (offset%16!=0) printf("\n0x%X: ", offset);

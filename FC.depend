@@ -71,7 +71,7 @@
 	"nes_sys.h"
 	<stdio.h>
 
-1313218941 source:e:\c-project\fc\src\main.cpp
+1313234524 source:e:\c-project\fc\src\main.cpp
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
@@ -84,9 +84,10 @@
 	"rom.h"
 	"video.h"
 
-1313145626 source:e:\c-project\fc\src\mem.cpp
+1313228365 source:e:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
+	<stdio.h>
 
 1313145626 e:\c-project\fc\src\mem.h
 	"type.h"
@@ -114,7 +115,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1313219908 source:e:\c-project\fc\src\cpu.cpp
+1313235804 source:e:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"

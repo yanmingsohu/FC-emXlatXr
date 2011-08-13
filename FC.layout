@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="src\cpu.cpp" open="1" top="1" tabpos="7">
-		<Cursor position="6889" topLine="281" />
+	<File name="src\cpu.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="12476" topLine="540" />
 	</File>
 	<File name="src\cpu.h" open="1" top="0" tabpos="9">
-		<Cursor position="4109" topLine="66" />
+		<Cursor position="3569" topLine="66" />
 	</File>
 	<File name="src\main.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="1577" topLine="53" />
+		<Cursor position="1898" topLine="53" />
 	</File>
-	<File name="src\mem.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="475" topLine="22" />
+	<File name="src\mem.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="1465" topLine="26" />
 	</File>
 	<File name="src\mem.h" open="1" top="0" tabpos="2">
 		<Cursor position="860" topLine="9" />

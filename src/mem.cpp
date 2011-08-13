@@ -1,5 +1,6 @@
 #include "mem.h"
 #include "string.h"
+#include <stdio.h>
 
 
 memory::memory(MMC *mmc, PPU *_ppu)
@@ -50,6 +51,9 @@ void memory::write(const word offset, const byte data) {
     if (offset<0x2008) {    /* PPU 寄存器                      */
         ppu->controlWrite(offset, data);
         return;
+    }
+    if (offset>=0x8000) {
+        printf("MEM::向程序段写入数据: 0x%x = 0x%x \n", offset, data);
     }
     mmc->checkSwitch(offset, data);
 }

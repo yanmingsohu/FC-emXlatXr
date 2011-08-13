@@ -308,8 +308,6 @@ void cpu_command_JMP(command_6502* cmd, command_parm* parm) {
         word offset = (parm->p2<<8) | parm->p1;
         cpu->PCL = cpu->ram->read( offset   );
         cpu->PCH = cpu->ram->read( offset+1 );
-
-    printf("%s%s\n%x,%x\n", cpu->cmdInfo(), cpu->debug(), cpu->PCL, cpu->PCH);
     }
 }
 
@@ -551,7 +549,6 @@ void cpu_command_LDY(command_6502* cmd, command_parm* parm) {
         cpu->Y = parm->read(parm->op - 0xA0);
         break;
     }
-
     cpu->checkNZ(cpu->Y);
 }
 
@@ -1036,14 +1033,10 @@ inline word command_parm::$zpgX$() {
 }
 
 inline word command_parm::$$$(byte x, byte y) {
-    word offset = 0;
-    byte l = 0;
-    byte h = 0;
-
-    offset = ram->read( (p1 + x) & 0x00FF );
-    l = ram->read( offset   );
-    h = ram->read( offset+1 ) + y;
-    return h<<8 | l;
+    word offset = (p1 + x) & 0x00FF;
+    byte l = ram->read( offset   );
+    byte h = ram->read( offset+1 );
+    return (h<<8 | l) + y;
 }
 
 inline byte command_parm::read(const byte addressing_mode) {

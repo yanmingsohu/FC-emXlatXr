@@ -4,7 +4,7 @@
 #include <string>
 #include "nes_sys.h"
 
-const int test_command = 200;
+const int test_command = 800;
 
 class CmdVideo : public Video {
     void drawPixel(int x, int y, T_COLOR color) {
@@ -66,7 +66,9 @@ _LOAD_SUCCESS:
     for (;;) {
         if (cpu->process() || c++<test_command) {
             //printf(cpu->cmdInfo());
-            ppu->drawNextPixel();
+            for (int dmp=0; dmp<100; ++dmp) {
+                ppu->drawNextPixel();
+            }
         } else {
             break;
         }

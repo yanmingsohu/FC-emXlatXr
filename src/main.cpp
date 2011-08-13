@@ -6,13 +6,20 @@
 
 const int test_command = 200;
 
+class CmdVideo : public Video {
+    void drawPixel(int x, int y, T_COLOR color) {
+        printf("(%x,%x)=%x\t", x, y, color);
+    }
+};
+
 void test() {
 
     using std::string;
 
     string filename = "rom/Tennis.nes"; //"rom/Dr_Mario.nes";
 
-    NesSystem fc;
+    CmdVideo video;
+    NesSystem fc(&video);
 
     switch (fc.load_rom(filename)) {
     case LOAD_ROM_SUCCESS:
@@ -50,14 +57,16 @@ _LOAD_SUCCESS:
     printf("load '%s' over, start..\n\n", filename.c_str());
 
     cpu_6502* cpu = fc.getCpu();
+    PPU *ppu = fc.getPPU();
 
     int c=0;
 
     clock_t s = clock();
 
     for (;;) {
-        if (cpu->process() && c++<test_command) {
-            printf(cpu->cmdInfo());
+        if (cpu->process() || c++<test_command) {
+            //printf(cpu->cmdInfo());
+            ppu->drawNextPixel();
         } else {
             break;
         }
@@ -71,7 +80,7 @@ _LOAD_SUCCESS:
     printf(cpu->debug());
 }
 
-int __main()
+int main()
 {
     welcome();
     test();

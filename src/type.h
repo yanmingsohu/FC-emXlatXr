@@ -6,6 +6,7 @@
 typedef unsigned char       byte;
 typedef unsigned short int  word;
 typedef unsigned int        dword;
+typedef dword               T_COLOR; /* 真彩色定义最高字节为0xFF透明0xTTRRGGBB */
 
 const byte SUCCESS = 0;
 const byte FAILED  = -1;

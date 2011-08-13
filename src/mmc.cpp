@@ -1,6 +1,6 @@
 #include "mmc.h"
 #include "type.h"
-
+#include "stdio.h"
 
 /* ------------------------------------------------------------------ */
 /* 前缀:
@@ -64,6 +64,10 @@ bool MMC::loadNes(nes_file* rom) {
 }
 
 byte MMC::readRom(const word addr) {
+    if (addr<0x8000) {
+        printf("MMC::读取ROM错误:使用了无效的程序地址 0x%x\n", addr);
+        return 0;
+    }
     if (sw && rom) {
         word n_addr = sw->r_prom(sw, addr);
         return rom->rom[n_addr-0x8000];

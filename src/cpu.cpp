@@ -306,8 +306,10 @@ void cpu_command_JMP(command_6502* cmd, command_parm* parm) {
         cpu->PCH = parm->p2;
     } else {
         word offset = (parm->p2<<8) | parm->p1;
-        cpu->PCL = cpu->ram->read( offset );
+        cpu->PCL = cpu->ram->read( offset   );
         cpu->PCH = cpu->ram->read( offset+1 );
+
+    printf("%s%s\n%x,%x\n", cpu->cmdInfo(), cpu->debug(), cpu->PCL, cpu->PCH);
     }
 }
 
@@ -884,7 +886,7 @@ char* cpu_6502::cmdInfo() {
         tp = "---"; break;
     }
 
-    sprintf(buf, cc, (prev_parm->cpu->PC - cmd->len), tp,
+    sprintf(buf, cc, prev_parm->addr, tp,
                  prev_parm->op, cmd->name, prev_parm->p1, prev_parm->p2);
 
     return buf;
@@ -938,6 +940,7 @@ inline byte cpu_6502::reset() {
 
 inline byte cpu_6502::irq() {
     if (IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
+        IRQ = 0;
         jump(0xFFFE);
         return CPU_INTERRUPT_CYC;
     }
@@ -946,6 +949,7 @@ inline byte cpu_6502::irq() {
 
 inline byte cpu_6502::nmi() {
     if (NMI) {
+        NMI = 0;
         jump(0xFFFA);
         return CPU_NMI_CYC;
     }

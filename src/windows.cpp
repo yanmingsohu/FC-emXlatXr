@@ -10,6 +10,20 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc);
 void start_game(HWND hwnd, PMSG messages);
 
 
+class WindowsVideo : public Video {
+private:
+    HDC hdc;
+
+public:
+    WindowsVideo(HDC hMemDC) : hdc(hMemDC) {
+    }
+
+    void drawPixel(int x, int y, T_COLOR color) {
+        SetPixel(hdc, x, y, color);
+    }
+};
+
+
 /*  Make the class name into a global variable  */
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName[ ] = "FC Ä£ÄâÆ÷ DEmo. -=CatfoOD=-";
@@ -92,13 +106,16 @@ void start_game(HWND hwnd, PMSG messages) {
     SetTextColor(hMemDC, RGB(255, 255, 255));
     SetBkColor(hMemDC, RGB(0, 0, 0));
 
-    NesSystem fc;
+    WindowsVideo video(hMemDC);
+    NesSystem fc(&video);
+
     if (fc.load_rom("rom/Tennis.nes")) {
         MessageBox(hwnd, "¶ÁÈ¡ROMÊ§°Ü", "´íÎó", 0);
         return;
     }
 
 	cpu_6502* cpu = fc.getCpu();
+	PPU *ppu = fc.getPPU();
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
@@ -113,7 +130,10 @@ void start_game(HWND hwnd, PMSG messages) {
 			DispatchMessage(messages);
     	}
         cpu->process();
-        displayCpu(cpu, hwnd, hMemDC);
+        ppu->drawNextPixel();
+
+        //printf(cpu->cmdInfo());
+        //displayCpu(cpu, hwnd, hMemDC);
         BitBlt(hdc, 0, 0, width, height, hMemDC, 0, 0, SRCCOPY);
     }
 
@@ -154,8 +174,6 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
     if ((opy+=10) > PPU_DISPLAY_P_HEIGHT) {
         opy = 30;
     }
-
-    SetPixel(hdc, 200, opy, 0xFFFFFF);
 }
 
 

@@ -43,6 +43,7 @@
 		<Unit filename="src\rom.h" />
 		<Unit filename="src\type.cpp" />
 		<Unit filename="src\type.h" />
+		<Unit filename="src\video.h" />
 		<Unit filename="src\windows.cpp" />
 		<Extensions>
 			<code_completion />

@@ -1,12 +1,13 @@
 #include "nes_sys.h"
 #include <stdio.h>
 
-NesSystem::NesSystem() {
+NesSystem::NesSystem(Video* video) {
     mmc = new MMC();
-    ppu = new PPU(mmc);
+    ppu = new PPU(mmc, video);
     ram = new memory(mmc, ppu);
     cpu = new cpu_6502(ram);
     rom = new nes_file();
+    ppu->setNMI(&cpu->NMI);
     state = 0;
 }
 
@@ -29,10 +30,12 @@ int NesSystem::load_rom(string filename) {
             rom->printRom(0xFFFA - 0x8000, 6);
             ram->reset();
             ppu->swithMirror(rom->t1 & 0x0B);
+            ppu->reset();
             cpu->RES = 1;
         } else {
             res = ER_LOAD_ROM_BADMAP;
         }
+        state = res;
     }
 
     return res;
@@ -43,4 +46,8 @@ cpu_6502* NesSystem::getCpu() {
         printf("> NesSystem::…–Œ¥≥ı ºªØrom.\n");
     }
     return cpu;
+}
+
+PPU* NesSystem::getPPU() {
+    return ppu;
 }

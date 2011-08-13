@@ -4,7 +4,7 @@
 #include "cpu.h"
 #include "mem.h"
 #include "rom.h"
-
+#include "video.h"
 
 struct NesSystem {
 
@@ -17,13 +17,14 @@ private:
     int         state;
 
 public:
-    NesSystem();
+    NesSystem(Video* video);
     ~NesSystem();
 
     /* 读取rom文件,成功返回0,失败返回错误代码 */
     int load_rom(string filename);
 
     cpu_6502* getCpu();
+    PPU *getPPU();
 };
 
 

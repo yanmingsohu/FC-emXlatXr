@@ -121,44 +121,51 @@
 	"stdio.h"
 	"stdlib.h"
 
-1312523729 source:e:\fc\src\main.cpp
+1313300576 source:e:\fc\src\main.cpp
 	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<string>
 	"nes_sys.h"
 
-1312434513 e:\fc\src\nes_sys.h
-
-1312445280 source:e:\fc\src\mem.cpp
-	"mem.h"
-	"string.h"
-
-1312444632 e:\fc\src\mem.h
-	"type.h"
-	"rom.h"
-
-1312442084 e:\fc\src\type.h
-
-1312528158 e:\fc\src\rom.h
-	"type.h"
-	"string"
-	"stdio.h"
-
-1312806853 source:e:\fc\src\nes_sys.cpp
-	<stdio.h>
+1313300576 e:\fc\src\nes_sys.h
 	"cpu.h"
 	"mem.h"
 	"rom.h"
-	"time.h"
+	"video.h"
 
-1312796523 e:\fc\src\cpu.h
+1313300576 source:e:\fc\src\mem.cpp
+	"mem.h"
+	"string.h"
+	<stdio.h>
+
+1313300576 e:\fc\src\mem.h
+	"type.h"
+	"rom.h"
+	"mmc.h"
+	"ppu.h"
+
+1313300576 e:\fc\src\type.h
+
+1313300576 e:\fc\src\rom.h
+	"type.h"
+	"string"
+
+1313300576 source:e:\fc\src\nes_sys.cpp
+	"nes_sys.h"
+	<stdio.h>
+
+1313300576 e:\fc\src\cpu.h
 	"type.h"
 	"mem.h"
+	"ppu.h"
 
-1312445247 source:e:\fc\src\rom.cpp
+1313300576 source:e:\fc\src\rom.cpp
 	"rom.h"
 	<stdio.h>
 	<stdlib.h>
 
-1312809860 source:e:\fc\src\cpu.cpp
+1313321318 source:e:\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
@@ -215,4 +222,33 @@
 
 1313215797 e:\c-project\fc\src\video.h
 	"type.h"
+
+1313300576 e:\fc\src\mmc.h
+	"rom.h"
+
+1313325692 e:\fc\src\ppu.h
+	"mmc.h"
+	"video.h"
+
+1313300576 e:\fc\src\video.h
+	"type.h"
+
+1313300576 source:e:\fc\src\mmc.cpp
+	"mmc.h"
+	"type.h"
+	"stdio.h"
+
+1313324209 source:e:\fc\src\ppu.cpp
+	"ppu.h"
+	"stdio.h"
+
+1313300576 source:e:\fc\src\type.cpp
+	"type.h"
+	<stdio.h>
+
+1313326043 source:e:\fc\src\windows.cpp
+	<windows.h>
+	<stdio.h>
+	"nes_sys.h"
+	"ppu.h"
 

@@ -1,0 +1,3330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0054)http://blog.csdn.net/silvasaga/article/details/3220731 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>任天堂产品系统文件 - silvasaga的专栏 - CSDN博客</title>
+    
+    <meta name="description" content=" 
+任天堂产品系统文件（Pinokio@163.com 译、编 2002/10/10）目录·1、系统简介·2、缩写表·3、中央处理器·4、图形处理器·5、声音处理器·6、手柄、控制器和扩展口·7、内存映像硬件·8、I/O端口·9、NES文件格式·10、任天堂磁碟机系统_________________________________________________">
+    <script type="text/javascript" async="" src="./任天堂产品系统文件_files/ga.js"></script><script src="./任天堂产品系统文件_files/jquery.js" type="text/javascript"></script>
+    <script src="./任天堂产品系统文件_files/plugins.js" type="text/javascript"></script>
+    <script src="./任天堂产品系统文件_files/common.js" type="text/javascript"></script>
+    <link rel="Stylesheet" type="text/css" href="./任天堂产品系统文件_files/style.css">
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/silvasaga/rss/list">
+    <link rel="shortcut icon" href="http://blog.csdn.net/favicon.ico">
+    <link type="text/css" rel="stylesheet" href="./任天堂产品系统文件_files/default.css">
+    <script type="text/javascript" src="./任天堂产品系统文件_files/shCore.js"></script>
+    <style type="text/css">
+        
+    </style>
+</head>
+<body>
+    <script src="./任天堂产品系统文件_files/pub_topnav_2011.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="./任天堂产品系统文件_files/navtop_2011.css">
+<div class="nav_top_2011">
+<p><span style="color:red;">您还未登录！</span>|<a href="http://passport.csdn.net/UserLogin.aspx">登录</a>|<a href="http://passport.csdn.net/CSDNUserRegister.aspx">注册</a>|<a href="http://passport.csdn.net/help/faq">帮助</a></p><ul>
+<li><a href="http://www.csdn.net/" target="_blank">CSDN首页</a></li>
+<li><a href="http://news.csdn.net/" target="_blank">资讯</a></li>
+<li><a href="http://bbs.csdn.net/" target="_blank">论坛</a></li>
+<li><a href="http://blog.csdn.net/" target="_blank">博客</a></li>
+<li><a href="http://download.csdn.net/" target="_blank">下载</a></li>
+<li><a href="http://so.csdn.net/" target="_blank">搜索</a></li>
+<li class="more"><h2 id="topnav_btnmore"><a href="javascript:void(0);">更多</a></h2>
+<ul id="topnav_hidlist" style="display: none; ">
+<li><a href="http://cto.csdn.net/" target="_blank">CTO俱乐部</a></li>
+<li><a href="http://student.csdn.net/" target="_blank">学生大本营</a></li>
+<li><a href="http://edu.csdn.net/" target="_blank">培训充电</a></li>
+<li><a href="http://mobile.csdn.net/" target="_blank">移动开发</a></li>
+<li><a href="http://sd.csdn.net/" target="_blank">软件研发</a></li>
+<li><a href="http://cloud.csdn.net/" target="_blank">云计算</a></li>
+<li><a href="http://www.programmer.com.cn/" target="_blank">程序员</a></li>
+<li><a href="http://tup.csdn.net/" target="_blank">TUP</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h1>
+                <a href="http://blog.csdn.net/silvasaga">silvasaga的专栏</a></h1>
+            <h2></h2>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>
+            <!--<li id="btnHome"><a href="/silvasaga"><span><img src="http://static.blog.csdn.net/images/ico_home.gif">我的首页</span></a></li>-->
+            <li id="btnContents"><a href="http://blog.csdn.net/silvasaga?viewmode=contents"><span><img src="./任天堂产品系统文件_files/ico_list.gif">目录视图</span></a></li>
+            <li id="btnView"><a href="http://blog.csdn.net/silvasaga?viewmode=list"><span><img src="./任天堂产品系统文件_files/ico_summary.gif">摘要视图</span></a></li>
+            <li id="btnRss"><a href="http://blog.csdn.net/silvasaga/rss/list"><span><img src="./任天堂产品系统文件_files/ico_rss.gif">订阅</span></a></li>
+</ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "silvasaga";
+    var blog_address = "http://blog.csdn.net/silvasaga";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = $.cookie("UserName");
+</script>
+        
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                <div class="notice"><font size="2"><a href="http://blog.csdn.net/csdnproduct/article/details/6678118"><font color="red">公告：CSDN下载频道即将全面改版</font></a></font></div>
+                <script type="text/javascript" src="./任天堂产品系统文件_files/ad.js"></script>
+
+<div id="article_details" class="details">
+    <div class="article_title">
+    <span class="ico ico_type_Repost"></span>
+    <h3>
+        <span class="link_title"><a href="./任天堂产品系统文件_files/任天堂产品系统文件.htm" title="任天堂产品系统文件">任天堂产品系统文件</a></span>
+        
+    </h3>
+</div>
+
+        
+    <div class="article_manage">
+    <span class="link_postdate">2008-11-04 21:29</span>
+    <span class="link_view" title="阅读次数">428人阅读</span>
+    <span class="link_comments" title="评论次数"><a href="http://blog.csdn.net/silvasaga/article/details/3220731#comments">评论</a>(2)</span>
+    <span class="link_collect"><a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;任天堂产品系统文件&#39;,&#39;3220731&#39;);return false;" title="收藏">收藏</a></span>
+    <span class="link_report"><a href="http://blog.csdn.net/silvasaga/article/details/3220731#report" onclick="javascript:report(3220731,2);return false;" title="举报">举报</a></span>
+    
+</div>
+
+    
+<div class="article_content">
+    &nbsp;
+<div>
+<h1>任天堂产品系统文件</h1>
+<p align="right"><font color="#800080">（Pinokio@163.com 译、编 2002/10/10）</font> </p>
+<h3>目录</h3>
+<p><a href="file:///D:/_Books/GameConsole/nessys.htm#1%E3%80%81%E7%B3%BB%E7%BB%9F%E7%AE%80%E4%BB%8B"><font color="#0000ff"><u>·1、系统简介<br></u></font></a><a href="file:///D:/_Books/GameConsole/nessys.htm#2%E3%80%81%E7%BC%A9%E5%86%99%E8%A1%A8"><font color="#0000ff"><u>·2、缩写表<br></u></font></a><a href="file:///D:/_Books/GameConsole/nessys.htm#3%E3%80%81%E4%B8%AD%E5%A4%AE%E5%A4%84%E7%90%86%E5%99%A8"><font color="#0000ff"><u>·3、中央处理器<br></u></font></a><a href="file:///D:/_Books/GameConsole/nessys.htm#4%E3%80%81%E5%9B%BE%E5%BD%A2%E5%A4%84%E7%90%86%E5%99%A8"><font color="#0000ff"><u>·4、图形处理器<br></u></font></a><a href="file:///D:/_Books/GameConsole/nessys.htm#5%E3%80%81%E5%A3%B0%E9%9F%B3%E5%A4%84%E7%90%86%E5%99%A8"><font color="#0000ff"><u>·5、声音处理器</u></font></a><br><a href="file:///D:/_Books/GameConsole/nessys.htm#6%E3%80%81%E6%89%8B%E6%9F%84%E3%80%81%E6%8E%A7%E5%88%B6%E5%99%A8%E5%92%8C%E6%89%A9%E5%B1%95%E5%8F%A3"><font color="#0000ff"><u>·6、手柄、控制器和扩展口<br></u></font></a><a href="file:///D:/_Books/GameConsole/nessys.htm#7%E3%80%81%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E7%A1%AC%E4%BB%B6"><font color="#0000ff"><u>·7、内存映像硬件<br></u></font></a><a href="file:///D:/_Books/GameConsole/nessys.htm#8%E3%80%81I/O%E7%AB%AF%E5%8F%A3"><font color="#0000ff"><u>·8、I/O端口</u></font></a><br><a href="file:///D:/_Books/GameConsole/nessys.htm#9%E3%80%81NES%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><font color="#0000ff"><u>·9、NES文件格式</u></font></a><br><a href="file:///D:/_Books/GameConsole/nessys.htm#10%E3%80%81%E4%BB%BB%E5%A4%A9%E5%A0%82%E7%A3%81%E7%A2%9F%E6%9C%BA%E7%B3%BB%E7%BB%9F"><u><font color="#0000ff">·10、任天堂磁碟机系统</font></u></a><br>_____________________________________________________________________ </p>
+<h2><a name="1、系统简介">1、系统简介</a></h2>
+<p>任天堂主机由6502处理器和一个特制的图形处理器组成。CPU是6502，而不是传言中的65C02（CMOS）。PPU的显存是和CPU的内存是分离的，可以通过对特殊端口的读/写来操作。卡带可能包含的内容有位于处理器地址$8000-$FFFF的ROM，和位于PPU地址$0000-$1FFF的 VROM。由于NES只有2K的RAM，因此变量的可用的变量空间只有从$0000到$07FF共8个页面。在开机之后RAM和VRAM中的内容是0，但是注意：复位并不改变其中的内容。在更小的卡带，比如只有16KB的ROM，它占有$C000-$FFFF，而$8000-$BFFF的空间是不用的。那些大于32KB的卡带，它被特殊的电路分页到一定的地址空间。一些卡带在$6000-$7FFF有SRAM，那是电池存储的位置。卡带VROM被用来做图案表（例如 Tile 表, 角色发生器等等)。通常的数量是8KB，包含两个图案表。大于8KB 的VROM被特殊的电路分页到一定的地址空间。内部的VRAM在 PPU 内存里定位于$2000-$3FFF，它用来存储命名表（例如屏幕缓冲）。虽然PPU 支持4个命名表，但只能支持两个的存放空间。另外的两个是开始两个的镜像。NES共有154条指令。<br>在本文本里，你将遇到如下形式的符号：“Dn" (5 位，3 位，等等)。位是按从最低位(0 位)到最高位(7 位)。所有的十六进制都在前面加上一个美圆符号($)（$2002,$4026,等等）是在6502处理器汇编里常用的符号,二进制前面加上一个百分号%。 </p>
+<h2><a name="2、缩写表">2、缩写表</a></h2>
+<table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>NES </td>
+<td>任天堂娱乐系统 </td></tr>
+<tr>
+<td>Famicom </td>
+<td>任天堂家用计算机，即FC </td></tr>
+<tr>
+<td>FDS </td>
+<td>任天堂磁碟机系统 </td></tr>
+<tr>
+<td>CPU </td>
+<td>中央处理器，NES使用一个定制的6502（NMOS）芯片，有些型号为6527 </td></tr>
+<tr>
+<td>PPU </td>
+<td>图像处理器，用来处理背景，精灵和其他图像特性，通常为6538 </td></tr>
+<tr>
+<td>APU </td>
+<td>声音处理器，集合在CPU内部，包含4个模拟通道和1个数字通道 </td></tr>
+<tr>
+<td>MMC </td>
+<td>ROM和VROM的扩容控制，用来控制访问超过6502限制的64K地址，同样，也可以扩容VROM </td></tr>
+<tr>
+<td>VRAM </td>
+<td>图像RAM，PPU专用，2K字节 </td></tr>
+<tr>
+<td>VROM </td>
+<td>图像ROM，储存图像数据的地方，可以由MMC切换到VRAM里 </td></tr>
+<tr>
+<td>ROM </td>
+<td>程序ROM，实际程序储存的地方，扩容部分可以通过MMC切换到PRG－RAM里 </td></tr>
+<tr>
+<td>RAM </td>
+<td>程序RAM，和ROM同义，不同的是它是RAM </td></tr>
+<tr>
+<td>SPR－RAM </td>
+<td>精灵RAM，RAM中的256字节，专用于储存精灵，它不属于VRAM或ROM </td></tr>
+<tr>
+<td>SRAM </td>
+<td>电池RAM，卡带上用来保存游戏记录的EPROM－电擦写ROM </td></tr>
+<tr>
+<td>DMC </td>
+<td>三角波调制通道，APU用来处理数字声音的，也写作PCM通道 </td></tr>
+<tr>
+<td>EX－RAM </td>
+<td>扩展VRAM，用在MMC5里，可以扩展VRAM容量 </td></tr></tbody></table>
+<h2><a name="3、中央处理器">3、中央处理器</a></h2>
+<p>NES定制的6502内部特别加上了声音处理单元。NTSC制式的NES使用1.7897725MHz主频，PAL制式使用1.773447MHz主频。<br><b>CPU内存映像：</b> 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>开始地址 </td>
+<td>用途 </td>
+<td>结束地址 </td></tr>
+<tr>
+<td>$0000 </td>
+<td>2K字节RAM，做4次镜象（即$0000-$07FF可用) </td>
+<td>$1FFF </td></tr>
+<tr>
+<td>$2000 </td>
+<td>寄存器 </td>
+<td>$2007 </td></tr>
+<tr>
+<td>$2008 </td>
+<td>寄存器（$2000-$2008的镜像，每8个字节镜像一次） </td>
+<td>$3FFF </td></tr>
+<tr>
+<td>$4000 </td>
+<td>寄存器 </td>
+<td>$401F </td></tr>
+<tr>
+<td>$4020 </td>
+<td>扩展ROM </td>
+<td>$5FFF </td></tr>
+<tr>
+<td>$6000 </td>
+<td>卡带的SRAM（需要有电池支持） </td>
+<td>$7FFF </td></tr>
+<tr>
+<td>$8000 </td>
+<td>卡带的下层ROM </td>
+<td>$BFFF </td></tr>
+<tr>
+<td>$C000 </td>
+<td>卡带的上层ROM </td>
+<td>$FFFF </td></tr></tbody></table><p></p>
+<p><b>中断：<br></b>6502有3个中断IRQ/BRK、NMI和RESET，每个中断都有一个16位的向量，即指针，用来存放该中断发生时中断服务函数的地址。中断发生时CPU都会把状态标志和返回地址压栈，然后调用中断服务程序。<br>IRQ/BRK中断由一下两种情况产生：一是软件通过BRK指令产生，一是硬件通过IRQ引脚产生。<br>RESET在开机的时候触发，这是ROM被装入，6502跳到RESET向量指向的地址没有寄存器被修改，没有内存被清空，这些都只在开机是发生。<br>NMI指不可屏蔽中断，它在VBlank即屏幕刷新时发生，持续时间根据系统（NTSC/PAL）不同而不同。NTSC是每秒60次，而PAL是每秒50 次。6502的中断延时是7个时钟周期，也就是说，进入和离开中断都需要7个时钟周期。它产生于PPU的每一帧结束，NMI中断可以由$2000的第7位的1/0控制允许/禁止。<br>大部分中断应该使用RTI指令返回，但是有些游戏不用，例如《最终幻想1》。它用一个很奇怪的方式：手工修改堆栈指针，然后执行RTS指令。这种方法在技术上是可行的，但是应该尽量避免。<br>以上中断在ROM内有以下对应的地址： 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>中断地址 </td>
+<td>中断 </td>
+<td>优先权 </td></tr>
+<tr>
+<td>$FFFA </td>
+<td>NMI </td>
+<td>中 </td></tr>
+<tr>
+<td>$FFFC </td>
+<td>RESET </td>
+<td>高 </td></tr>
+<tr>
+<td>$FFFE </td>
+<td>IRQ/BRK </td>
+<td>低 </td></tr></tbody></table><p></p>
+<p><b>特别说明：<br></b>NES的6502不支持10进制。虽然CLD和SED指令都正常工作，但是ADC和SBC都不使用CPU状态标志的“D”位。由于复位后“D”位的状态是不确定的，所以游戏通常在程序开始时使用一个CLD指令。<br>声音寄存器映射到CPU内部，所有波形发生的工作都在CPU内部完成。<br>注意那两个分开的16K ROM段，它们可能是连续的，但是它们根据卡带的大小扮演不同的角色。有的卡带只有一个16K ROM，那么它就同时被装入$8000和$COOO。<br>所有游戏都将它们自己装入$8000，使用32K RAM，但是它们都能够通过内存映射把多于一个16K ROM装入$8000。VROM也是同样的道理。<br>当BRK中断发生的时候，CPU把状态标志压入堆栈，同时设置“B”标志。而IRQ中断发生时，CPU把状态标志压入堆栈，同时清除“B”标志。这是因为6502使用同一个向量来处理两种中断，用“B”标志来区分它们。你可以用以下程序来区别两种中断：<br>&nbsp;&nbsp;&nbsp; C134: PLA ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 拷贝CPU状态标志到A<br>&nbsp;&nbsp;&nbsp; C135: PHA ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 把状态标志还回给堆栈<br>&nbsp;&nbsp;&nbsp; C136: AND #$10 ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 检查“B”标志<br>&nbsp;&nbsp;&nbsp; C138: BNE is_BRK_opcode;&nbsp;&nbsp;&nbsp; 如果设置了，就是软件中断(BRK)<br>在NMI里指向BRK会导致已经被压栈的“B”标志被设置。<br>6502的$6C指令（间接绝对跳转）有一个BUG，当低位字节是$FF时CPU将不能正确计算有效地址。例如：<br>&nbsp;&nbsp;&nbsp; C100: 4F<br>&nbsp;&nbsp;&nbsp; C1FF: 00<br>&nbsp;&nbsp;&nbsp; C200: 23<br>&nbsp;&nbsp;&nbsp; ..<br>&nbsp;&nbsp;&nbsp; D000: 6C FF C1 - JMP ($C1FF)<br>本来它是应该跳到$2300的，但是在计算高位字节的时候，在页面边界处地址是不能再增加的，所以实际将跳转到$4F00。<br>需要注意的是，页面越界不会在变址间接寻址模式发生。由于0页面的限制，由于0页面的限制，所有变址间接寻址的读写都应该在计算有效地址之后和#$FF进行逻辑与操作。例如：<br>&nbsp;&nbsp;&nbsp; C000: LDX #3 ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从 $0002+$0003 读变址地址，<br>&nbsp;&nbsp;&nbsp; C002: LDA ($FF,X) ;&nbsp;&nbsp;&nbsp; 不是 $0102+$0103.<br>_________________________________________________________________________________ </p>
+<h2><a name="4、图形处理器">4、图形处理器</a></h2>
+<p><b>PPU时序：</b> 
+</p><table cellspacing="0" border="1">
+<tbody>
+<tr>
+<td>　</td>
+<td>NTSC制式</td>
+<td>PAL制式</td></tr>
+<tr>
+<td>基频（Base clock）</td>
+<td>21477270.0Hz</td>
+<td>21281364.0Hz</td></tr>
+<tr>
+<td>CPU主频（Cpu clock）</td>
+<td>1789772.5Hz</td>
+<td>1773447.0Hz</td></tr>
+<tr>
+<td>总扫描线数（Total scanlines）</td>
+<td>262</td>
+<td>312</td></tr>
+<tr>
+<td>扫描线总周期（Scanline total cycles）</td>
+<td>1364(15.75KHz)</td>
+<td>1362(15.625KHz)</td></tr>
+<tr>
+<td>水平扫描周期（H-Draw cycles）</td>
+<td>1024</td>
+<td>1024</td></tr>
+<tr>
+<td>水平空白周期（H-Blank cycles）</td>
+<td>340</td>
+<td>338</td></tr>
+<tr>
+<td>结束周期（End cycles）</td>
+<td>4</td>
+<td>2</td></tr>
+<tr>
+<td>帧周期（Frame cycles）</td>
+<td>1364*262</td>
+<td>1362*312</td></tr>
+<tr>
+<td>帧IRQ周期（FrameIRQ cycles）</td>
+<td>29830</td>
+<td>35469</td></tr>
+<tr>
+<td>帧率（Frame rate）</td>
+<td>60(59.94Hz)</td>
+<td>50Hz</td></tr>
+<tr>
+<td>帧时间（Frame period）</td>
+<td>1000.0/60.0(ms)</td>
+<td>1000.0/50.0(ms)</td></tr></tbody></table><p></p>
+<p><br>镜像是指通过硬件映射特殊的内存地址或范围的一个过程。<br><b>PPU内存映像：</b> 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>开始地址 </td>
+<td>用途 </td>
+<td>结束地址 </td></tr>
+<tr>
+<td>$0000 </td>
+<td>图案表0（256x2x8，可能是VROM） </td>
+<td>$0FFF </td></tr>
+<tr>
+<td>$1000 </td>
+<td>图案表1（256x2x8，可能是VROM） </td>
+<td>$1FFF </td></tr>
+<tr>
+<td>$2000 </td>
+<td>命名表0（32x30块）（镜像，见命名表镜像） </td>
+<td>$23BF </td></tr>
+<tr>
+<td>$23C0 </td>
+<td>属性表0（镜像，见命名表镜像） </td>
+<td>$23FF </td></tr>
+<tr>
+<td>$2400 </td>
+<td>命名表1（32x30块）（镜像，见命名表镜像） </td>
+<td>$27BF </td></tr>
+<tr>
+<td>$27C0 </td>
+<td>属性表1（镜像，见命名表镜像） </td>
+<td>$27FF </td></tr>
+<tr>
+<td>$2800 </td>
+<td>命名表2（32x30块）（镜像，见命名表镜像） </td>
+<td>$2BBF </td></tr>
+<tr>
+<td>$2BC0 </td>
+<td>属性表2（镜像，见命名表镜像） </td>
+<td>$2BFF </td></tr>
+<tr>
+<td>$2C00 </td>
+<td>命名表3（32x30块）（镜像，见命名表镜像） </td>
+<td>$2FBF </td></tr>
+<tr>
+<td>$2FC0 </td>
+<td>属性表3（镜像，见命名表镜像） </td>
+<td>$2FFF </td></tr>
+<tr>
+<td>$3000 </td>
+<td>$2000-$2EFF的镜像 </td>
+<td>$3EFF </td></tr>
+<tr>
+<td>$3F00 </td>
+<td>背景调色板#1 </td>
+<td>$3F0F </td></tr>
+<tr>
+<td>$3F10 </td>
+<td>精灵调色板#1 </td>
+<td>$3F1F </td></tr>
+<tr>
+<td>$3F20 </td>
+<td>镜像，（见调色板镜像） </td>
+<td>$3FFF </td></tr>
+<tr>
+<td>$4000 </td>
+<td>$0000-$3FFF的镜像 </td>
+<td>$7FFF </td></tr></tbody></table><p></p>
+<p><b>命名表：<br></b>NES 的图像通过Tile矩阵来显示，这个网格就叫命名表。一个命名表和字符模式下的屏幕缓冲比较相象，它包含字符的代码，也就是30列的32Byte长度。每个Tile有8x8个象素，每个命名表有32x30个Tile，也就是256x240象素。PPU支持4个命名表，他们在$2000,$2400,$2800,$2C00。在NTSC制式下，上面和下面的8象素通常不显示出来，只有256x224象素；在PAL制式下，屏幕有256x240象素。<br>需要说的是，虽然PPU支持4个命名表，任天堂主机只支持2个命名表。另外两个被做了镜像。命名表保存了Tile的编号，而Tile存在图案表里。计算命名表里Tile号对应的实际地址的公式是：<br>（Tile号×16）＋由$2000端口指定的图案表地址 </p>
+<p><b>命名表镜像：</b><br>NES只有2048字节（$800）的VRAM给命名表使用，但是如前表所示，NES有能力寻址到4个命名表。缺省情况下，NES卡带都带有水平和垂直镜像，允许你改变命名表指向PPU的VRAM位置。这种方式同时影响两个命名表，你不能单独改变其中的一个。每个卡带都控制着PPU地址线的A10 和A11。它可能将他们设置成以下4种可能的方式的1种。下面这个图表有助于理解NES里的各种镜像，指向PPU VRAM中命名表的12位地址相当于“$2xxxx”：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>&nbsp;名字 </td>
+<td>命名 表#0 </td>
+<td>命名 表#1 </td>
+<td>命名 表#2 </td>
+<td>命名 表#3 </td>
+<td>说明 </td>
+<td>&nbsp;地址线A11 </td>
+<td>地址线A10 </td></tr>
+<tr>
+<td>水平 </td>
+<td>$000 </td>
+<td>$000 </td>
+<td>$400 </td>
+<td>$400 </td>
+<td>　 </td>
+<td>1 </td>
+<td>0 </td></tr>
+<tr>
+<td>垂直 </td>
+<td>$000 </td>
+<td>$800 </td>
+<td>$000 </td>
+<td>$800 </td>
+<td>　 </td>
+<td>0 </td>
+<td>1 </td></tr>
+<tr>
+<td>4屏幕镜像 </td>
+<td>$000 </td>
+<td>$400 </td>
+<td>$800 </td>
+<td>$C00 </td>
+<td>卡带里有2K VRAM，4个命名表物理上独立的 </td>
+<td>1 </td>
+<td>1 </td></tr>
+<tr>
+<td>单屏幕 </td>
+<td>$X00 </td>
+<td>$X00 </td>
+<td>$X00 </td>
+<td>$X00 </td>
+<td>所有的命名表指相同的VRAM区域,X=0、4、8、C </td>
+<td>0 </td>
+<td>0 </td></tr>
+<tr>
+<td>VROM镜像 </td>
+<td width="71%" colspan="5">Mapper 68#游戏映射VROM到PPU VRAM的命名表，这使得命名表是基于VROM的，你不能写它但却可以通过mapper自己来控制是否使用这种特性 </td>
+<td>　 </td>
+<td>　 </td></tr></tbody></table><p></p>
+<p><b>图案表：<br></b>图案表储存了实际8x8象素的Tile，同时也储存了用来指向NES调色板全部16种颜色的4位元矩阵的低两位。PPU支持两个图案表在$0000和$1000。他们有以下格式： 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>VRAM地址 </td>
+<td colspan="2">图案表内容 </td>
+<td>颜色效果 </td></tr>
+<tr>
+<td>$0000<br>..<br>..<br>..<br>..<br>..<br>..<br>$0007 </td>
+<td>%00010000 = $10<br>%00000000 = $00<br>%01000100 = $44<br>%00000000 = $00<br>%11111110 = $FE<br>%00000000 = $00<br>%10000010 = $82<br>%00000000 = $00 </td>
+<td>组 0 </td>
+<td>...1....<br>..2.2...<br>.3...3..<br>2.....2.<br>1111111.<br>2.....2.<br>3.....3. </td></tr>
+<tr>
+<td>$0008<br>..<br>..<br>..<br>..<br>..<br>..<br>$000F </td>
+<td>%00000000 = $00<br>%00101000 = $28<br>%01000100 = $44<br>%10000010 = $82&nbsp;<br>%00000000 = $00<br>%10000010 = $82&nbsp;<br>%10000010 = $82<br>%00000000 = $00 </td>
+<td>组 1 </td>
+<td>点表示0号颜色，数字表示实际调色板颜色代号 </td></tr></tbody></table><p></p>
+<p>注意在图案表里存储的是每个点的2个位。其他两个由属性表得到。所以，在屏幕上总体出现的颜色数是16，而每个块里只有4种颜色。 </p>
+<p><b>属性表：<br></b>每个命名表有它自己的属性表。属性表的每一个字节代表了屏幕上的一组4x4的Tile，一共有8x8个字节。有几种方法来描述属性表里一个字节的功能：<br>&nbsp;&nbsp;&nbsp; *保存32x32象素方格的高2位颜色，每16x16象素用2位；<br>&nbsp;&nbsp;&nbsp; *保存16个8x8 Tile的高2位颜色；<br>&nbsp;&nbsp;&nbsp; *保存4个4x4 Tile格子的高2位颜色。<br>看以下两个图表帮助理解：<br>1、一个16x16 象素的格子：#0-F 代表了一个8x8 Tile,方块 [x] 代表了4个8x8 Tile, 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>
+<table cellspacing="0" border="1">
+<tbody>
+<tr>
+<td colspan="2">方块 0 </td></tr>
+<tr>
+<td>#0 </td>
+<td>#1 </td></tr>
+<tr>
+<td>#2 </td>
+<td>#3 </td></tr></tbody></table></td>
+<td>
+<table cellspacing="0" align="left" border="1">
+<tbody>
+<tr>
+<td colspan="2">方块 1 </td></tr>
+<tr>
+<td>#4 </td>
+<td>#5 </td></tr>
+<tr>
+<td>#6 </td>
+<td>#7 </td></tr></tbody></table></td></tr>
+<tr>
+<td>
+<table cellspacing="0" border="1">
+<tbody>
+<tr>
+<td colspan="2">方块 2 </td></tr>
+<tr>
+<td>#8 </td>
+<td>#9 </td></tr>
+<tr>
+<td>#A </td>
+<td>#B </td></tr></tbody></table></td>
+<td>
+<table cellspacing="0" border="1">
+<tbody>
+<tr>
+<td colspan="2">方块 3 </td></tr>
+<tr>
+<td>#C </td>
+<td>#D </td></tr>
+<tr>
+<td>#E </td>
+<td>#F </td></tr></tbody></table></td></tr></tbody></table><p></p>
+<p>2、属性表一个字节的实际格式定义如下（对应于上面的例子）： 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>位 </td>
+<td>描述 </td></tr>
+<tr>
+<td>0、1 </td>
+<td>方块 0的高两位颜色(Tile #0,1,2,3) </td></tr>
+<tr>
+<td>2、3 </td>
+<td>方块 1的高两位颜色(Tile #4,5,6,7) </td></tr>
+<tr>
+<td>4、5 </td>
+<td>方块 2的高两位颜色(Tile #8,9,A,B) </td></tr>
+<tr>
+<td>6、7 </td>
+<td>方块 3的高两位颜色(Tile #C,D,E,F) </td></tr></tbody></table><p></p>
+<p><b>调色板：</b><br>NES有两个调色板，背景调色板和精灵调色板。调色板不包含实际的RGB值，它们更象一个索引表。写到$3F00-$3FFF的D6－D7字节被忽略。 
+</p><table height="88" cellspacing="0" cellpadding="0" width="80%" border="0">
+<tbody>
+<tr>
+<td width="100%" bgcolor="#000000" colspan="18">&nbsp; </td></tr>
+<tr>
+<td width="2%" bgcolor="#000000" height="83" rowspan="5">　 </td>
+<td width="5%" bgcolor="#ffffff" height="21">30 </td>
+<td width="6%" bgcolor="#a6fcff" height="21">31 </td>
+<td width="6%" bgcolor="#b3ecff" height="21">32 </td>
+<td width="6%" bgcolor="#daabeb" height="21">33 </td>
+<td width="6%" bgcolor="#ffa8f9" height="21">34 </td>
+<td width="6%" bgcolor="#ffabb3" height="21">35 </td>
+<td width="6%" bgcolor="#ffd2b0" height="21">36 </td>
+<td width="6%" bgcolor="#ffefa6" height="21">37 </td>
+<td width="6%" bgcolor="#fff79c" height="21">38 </td>
+<td width="6%" bgcolor="#d7e895" height="21">39 </td>
+<td width="6%" bgcolor="#a6edaf" height="21">3A </td>
+<td width="6%" bgcolor="#a2f2da" height="21">3B </td>
+<td width="6%" bgcolor="#99fffc" height="21">3C </td>
+<td width="6%" bgcolor="#dddddd" height="21">3D </td>
+<td width="6%" bgcolor="#111111" height="21"><font color="#ffffff">3E</font> </td>
+<td width="6%" bgcolor="#111111" height="21"><font color="#ffffff">3F</font> </td>
+<td width="3%" bgcolor="#000000" height="83" rowspan="5">&nbsp; </td></tr>
+<tr>
+<td width="5%" bgcolor="#ffffff" height="21">20 </td>
+<td width="6%" bgcolor="#0fd7ff" height="21">21 </td>
+<td width="6%" bgcolor="#69a2ff" height="21">22 </td>
+<td width="6%" bgcolor="#d480ff" height="21">23 </td>
+<td width="6%" bgcolor="#ff45f3" height="21">24 </td>
+<td width="6%" bgcolor="#ff618b" height="21">25 </td>
+<td width="6%" bgcolor="#ff8833" height="21">26 </td>
+<td width="6%" bgcolor="#ff9c12" height="21">27 </td>
+<td width="6%" bgcolor="#fabc20" height="21">28 </td>
+<td width="6%" bgcolor="#9fe30e" height="21">29 </td>
+<td width="6%" bgcolor="#2bf035" height="21">2A </td>
+<td width="6%" bgcolor="#0cf0a4" height="21">2B </td>
+<td width="6%" bgcolor="#05fbff" height="21">2C </td>
+<td width="6%" bgcolor="#5e5e5e" height="21"><font color="#ffffff">2D</font> </td>
+<td width="6%" bgcolor="#0d0d0d" height="21"><font color="#ffffff">2E</font> </td>
+<td width="6%" bgcolor="#0d0d0d" height="21"><font color="#ffffff">2F</font> </td></tr>
+<tr>
+<td width="5%" bgcolor="#c7c7c7" height="21">10 </td>
+<td width="6%" bgcolor="#0077ff" height="21">11 </td>
+<td width="6%" bgcolor="#2155ff" height="21">12 </td>
+<td width="6%" bgcolor="#8237fa" height="21">13 </td>
+<td width="6%" bgcolor="#eb2fb5" height="21">14 </td>
+<td width="6%" bgcolor="#ff2950" height="21">15 </td>
+<td width="6%" bgcolor="#ff2200" height="21">16 </td>
+<td width="6%" bgcolor="#d63200" height="21">17 </td>
+<td width="6%" bgcolor="#c46200" height="21">18 </td>
+<td width="6%" bgcolor="#358000" height="21">19 </td>
+<td width="6%" bgcolor="#058f00" height="21">1A </td>
+<td width="6%" bgcolor="#008a55" height="21">1B </td>
+<td width="6%" bgcolor="#0099cc" height="21">1C </td>
+<td width="6%" bgcolor="#212121" height="21"><font color="#ffffff">1D</font> </td>
+<td width="6%" bgcolor="#090909" height="21"><font color="#ffffff">1E</font> </td>
+<td width="6%" bgcolor="#090909" height="21"><font color="#ffffff">1F</font> </td></tr>
+<tr>
+<td width="5%" bgcolor="#808080" height="21"><font color="#ffffff">00</font> </td>
+<td width="6%" bgcolor="#003da6" height="21"><font color="#ffffff">01</font> </td>
+<td width="6%" bgcolor="#0012b0" height="21"><font color="#ffffff">02</font> </td>
+<td width="6%" bgcolor="#440096" height="21"><font color="#ffffff">03</font> </td>
+<td width="6%" bgcolor="#a1005e" height="21"><font color="#ffffff">04</font> </td>
+<td width="6%" bgcolor="#c70028" height="21"><font color="#ffffff">05</font> </td>
+<td width="6%" bgcolor="#ba0600" height="21"><font color="#ffffff">06</font> </td>
+<td width="6%" bgcolor="#8c1700" height="21"><font color="#ffffff">07</font> </td>
+<td width="6%" bgcolor="#5c2f00" height="21"><font color="#ffffff">08</font> </td>
+<td width="6%" bgcolor="#104500" height="21"><font color="#ffffff">09</font> </td>
+<td width="6%" bgcolor="#054a00" height="21"><font color="#ffffff">0A</font> </td>
+<td width="6%" bgcolor="#00472e" height="21"><font color="#ffffff">0B</font> </td>
+<td width="6%" bgcolor="#004166" height="21"><font color="#ffffff">0C</font> </td>
+<td width="6%" bgcolor="#000000" height="21"><font color="#ffffff">0D</font> </td>
+<td width="6%" bgcolor="#050505" height="21"><font color="#ffffff">0E</font> </td>
+<td width="6%" bgcolor="#050505" height="21"><font color="#ffffff">0F</font> </td></tr>
+<tr>
+<td width="100%" bgcolor="#000000" colspan="16">&nbsp; </td></tr></tbody></table><p></p>
+<p><b>调色板镜像：<br></b>镜像发生在背景调色板和精灵调色板之间，例如所有写到$3F00的数据会被镜像到$3F10，$3F04镜像到$3F14。背景和精灵的最高3个调色板的0号色盘定义为透明，存在那里的颜色不会被画出来。PPU使用放在$3F00里的颜色作为背景色，详细如下：<br>&nbsp;&nbsp;&nbsp; *$0D被写到$3F00（镜像到$3F10)；<br>&nbsp;&nbsp;&nbsp; *$03被写到$3F08（镜像到$3F18)；<br>&nbsp;&nbsp;&nbsp; *$1A被写到$3F18；<br>&nbsp;&nbsp;&nbsp; *$3F08被读到累加器。<br>PPU使用$0D作为背景颜色，尽管$3F08有一个颜色$03（因为0号颜色在所有的调色板里都定义为透明）。最后，累加器上有一个值$1A，这是从$3F18映像过来的。又一次，这个$1A值没有被画出，因为所有的调色板的0号颜色被定义为透明。整个背景和精灵调色板同时也映像到VRAM的其他区域，$3F20-$3FFF全部都是这两个调色板分别的映像。写到$3F00-$3FFF的D6－D7字节被忽略。 </p>
+<p><b>背景滚动：<br></b>NES可以通过预提取命名表，图案表和属性表来使背景滚动，背景是独立于精灵而位于最下层的。可以水平和垂直滚动。 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>水平滚动 </td>
+<td>垂直滚动 </td></tr>
+<tr>
+<td>
+<div align="justify">
+<table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td align="justify" colspan="2">0&nbsp;&nbsp;&nbsp;&nbsp;512 </td></tr>
+<tr>
+<td width="32" height="48">A </td>
+<td width="33" height="48">B </td></tr></tbody></table></div></td>
+<td>
+<table height="46" cellspacing="1" width="82" border="1">
+<tbody>
+<tr>
+<td width="40" height="18">A </td>
+<td width="26" height="34" rowspan="2">0<br>
+<p>480 </p></td></tr>
+<tr>
+<td width="40">B </td></tr></tbody></table></td></tr></tbody></table><p></p>
+<p>命名表A通过$2000的D1-D0指定，B是跟在后面的一个命名表，根据镜像不同B是动态的。这个不能工作在水平和垂直同时滚动的游戏里。背景会跨越多个命名表，如下所示： 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>命名表#2<br>($2800) </td>
+<td>命名表#3<br>($2C00) </td></tr>
+<tr>
+<td>命名表#0<br>($2000) </td>
+<td>命名表#1<br>($2400) </td></tr></tbody></table><p></p>
+<p>在$2005里写到水平滚动的值可以从0－256，写到垂直滚动的值从0－239，239是考虑了负值的结果，例如248代表－8。 </p>
+<p><b>屏幕和精灵分层：<br></b>下面是NES画图的循序： 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>前台 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>后台 </td></tr>
+<tr>
+<td>CI </td>
+<td>OBJs 0-63 </td>
+<td>BG </td>
+<td>OBJs 0-63 </td>
+<td>EXT </td></tr>
+<tr>
+<td>　 </td>
+<td>&nbsp;精灵RAM&nbsp;<br>BGPRI==0 </td>
+<td>　 </td>
+<td>&nbsp;精灵RAM<br>BGPRI==1 </td>
+<td>　 </td></tr></tbody></table><p></p>
+<p>CI 代表颜色亮度，相当于$2001的D7-D5；BG是背景；EXT是扩展口的图像信号。BGPRI代表VRAM里背景‘优先权’位，每个精灵都有的，即第二字节的D5位。OBJ数代表了实际精灵的号码，不是Tile索引值。前台高于任何其他层，最后被画上，后台低于任何其他层，最先被画上。 </p>
+<p><b>精灵和精灵RAM：<br></b>NES用一个页面（256字节）来存放动画，每个精灵4个字节，一共可以有64 个动画/精灵，它们可以是8x8或8x16象素。动画/精灵图案被存储在VRAM的图案表其中一个里面。精灵属性，例如翻转和优先权被储存在一个特殊的 256字节的精灵RAM，它不是CPU或PPU的地址的一部分。整个精灵RAM可以通过$4014的DMA方式来写，写一个8位的数到$4014就将这个 8位数所指定的内存页面整个拷贝到精灵RAM上。也可以通过把开始地址放在$2003然后读/写于$2004（每次存取地址自动加一），它是一个一个字节存取的。动画/精灵的属性格式是：<br>动画/精灵属性RAM:<br>| 精灵#0 | 精灵#1 | ... | 精灵#62 | 精灵#63 | &nbsp;&nbsp; &nbsp; 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>字节 </td>
+<td>位&nbsp; </td>
+<td>描述 </td></tr>
+<tr>
+<td>0 </td>
+<td>YYYYYYYY </td>
+<td>精灵左上角的Y坐标－1 </td></tr>
+<tr>
+<td>1 </td>
+<td>IIIIIIII </td>
+<td>Tile索引号 </td></tr>
+<tr>
+<td rowspan="4">2 </td>
+<td rowspan="4">vhp000cc </td>
+<td>v＝垂直翻转(1＝翻转) </td></tr>
+<tr>
+<td>h＝水平翻转(1＝翻转) </td></tr>
+<tr>
+<td>p＝背景优先权（0＝前台1＝后台） </td></tr>
+<tr>
+<td>c＝颜色的高2位 </td></tr>
+<tr>
+<td>3 </td>
+<td>XXXXXXXX </td>
+<td>精灵左上角的X坐标 </td></tr></tbody></table><p></p>
+<p>Tile 索引号就和命名表里的一样。精灵图案可以象Tile图案对于背景图片一样抓取。唯一的不同是在8x16的精灵时，上半部分（偶数号码）的Tile索引由精灵图案表的$0000开始，而下半部分（奇数号码）由$1000开始。$2000寄存器对8x16精灵无效。全部64个精灵有自己内部的优先权，0号最高（最后被画），63号最低（最先被画）。每条扫描线只能显示8个精灵，每个精灵RAM条目都会被检查是否处于其他精灵的水平范围内。注意，这是基于扫描线的，不是基于精灵的，也就是说，会进行256次检查，而不是256/8或256/16次。在一个真实的NES芯片里，如果精灵被禁止（$2001的D4是 0）很长一段时间，精灵数据会渐渐消失。可以理解为精灵RAM是一个DRAM，D4控制了DRAM的周期刷新信号。 </p>
+<p><b>碰撞标志：<br></b>碰撞标志是PPU状态寄存器($2002)的第6位（D6）。PPU能够找出0号精灵的位置，然后设置D6，它是这样工作的：PPU扫描出背景图案象素和精灵象素同时不是透明的第一个地方。比如，屏幕的背景是一个非透明颜色(颜色号&gt;0)，0号精灵的坐标是（12，34），它只是在第4行的开始才有象素，那么，碰撞标志在屏幕刷新到（12，37）时才被设置。要记住，0号颜色被定义为透明。引起D6被设置的象素必须是已经被画出来的。下面的例子能帮助理解，这是两个Tile，下划线表示透明的0号颜色，*号表示碰撞标志被设置。 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>精灵 </td>
+<td rowspan="2">+ </td>
+<td>&nbsp;背景 </td>
+<td rowspan="2">= </td>
+<td>结果 </td>
+<td rowspan="2">‘*’会用2号颜色画出 </td></tr>
+<tr>
+<td>&nbsp;__1111__<br>_111111_<br>11222211<br>112__211<br>112__211<br>11222211<br>_111111_<br>__1111__ </td>
+<td>________<br>_______2<br>______21<br>_____211<br>____2111<br>___21111<br>__211111<br>_2111111 </td>
+<td>__1111__<br>_1111112<br>11222211<br>112__*11<br>112_2211<br>11222211<br>_1111111<br>_2111111 </td></tr></tbody></table><p></p>
+<p>这个例子说的是背景＋精灵，但是对于靠近背景的精灵也通用，即精灵＋精灵，通过设置背景优先权来实现。D6不可以通过读PPU的状态来复位，只在每次VBlank之后被清零。Hit标志可以用在水平或者垂直屏幕分割的时候，还有许多好玩的效果。 </p>
+<p><b>水平和垂直消隐：<br></b>所有的游戏机都有一个刷新动作，用来重新定位电子枪显示可见的数据。最通用的显示设备是电视机，它分为每秒刷新60次的NTSC制式和50次的PAL制式。电子枪从左到右画出象素，它每次只能画一条扫描线，画下一条之前要先回到左面并且做好准备，这之间有一段时间叫做水平消隐（HBlank）。在画完全部 256条扫描线之后它又回到屏幕左上角准备下一次画屏幕（帧），这之间的一段时间就是垂直消隐（VBlank）。电子枪就是一个不断的走‘之’字形的过程。VBlank标志就是$2002的D7，它表明PPU是否在VBlank期间，当VBlank标志存在时，你就可以通过$2006和$2007访问 PPU内存。一个程序可以通过读$2002来使D7复位。在屏幕刷新期间，我们不能访问PPU，而PPU会在CPU背后修改VRAM指针，这样我们很容易在写入VRAM时出错，为了让PPU停下来，可以对$2000和$2001写00。 </p>
+<p><b>访问PPU RAM:<br></b>在一个任天堂主机，访问PPU内存只可以在VBlank期间。当在屏幕刷新时访问会破坏刷新地址寄存器，一般它经常用来做隐含的“分割屏幕”效果（见“在屏幕刷新的时候访问VRAM”）。很多小些的ROM用只读存储体(VROM) 用做图案表。在这种情况下，你不可以写PPU地址，只可以读。<br>写PPU记忆体:<br>&nbsp;&nbsp;&nbsp; a) 写高位地址字节到$2006<br>&nbsp;&nbsp;&nbsp; b) 写低位地址字节到$2006<br>&nbsp;&nbsp;&nbsp; c) 写数据到$2007。每一个写操作后，地址会增加1($2000的第二位是0)或增加32($2000的第二位是1)。<br>读PPU记忆体:<br>&nbsp;&nbsp;&nbsp; a) 写高位地址字节到$2006<br>&nbsp;&nbsp;&nbsp; b) 写低位地址字节到$2006<br>&nbsp;&nbsp;&nbsp; c) 从$2007读数据。从$2007读到的第一个字节是无效的(见下例)。然后每读一次地址就增加一($2000的第二位是0)或增加<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 32($2000的第二位是1)。<br>例子：VRAM的$2000里有$AA $BB $CC $DD。VRAM的增量是1。执行效果如下：<br>&nbsp;&nbsp;&nbsp; LDA #$20<br>&nbsp;&nbsp;&nbsp; STA $2006<br>&nbsp;&nbsp;&nbsp; LDA #$00<br>&nbsp;&nbsp;&nbsp; STA $2006 ; VRAM 地址设为 $2000<br>&nbsp;&nbsp;&nbsp; LDA $2007 ; A=??&nbsp; VRAM 缓冲=$AA<br>&nbsp;&nbsp;&nbsp; LDA $2007 ; A=$AA VRAM 缓冲=$BB<br>&nbsp;&nbsp;&nbsp; LDA $2007 ; A=$BB VRAM 缓冲=$CC<br>&nbsp;&nbsp;&nbsp; LDA #$20<br>&nbsp;&nbsp;&nbsp; STA $2006<br>&nbsp;&nbsp;&nbsp; LDA #$00<br>&nbsp;&nbsp;&nbsp; STA $2006 ; VRAM 地址设为 $2000<br>&nbsp;&nbsp;&nbsp; LDA $2007 ; A=$CC VRAM 缓冲=$AA<br>&nbsp;&nbsp;&nbsp; LDA $2007 ; A=$AA VRAM 缓冲=$BB<br>这个只适用于$0000-$FEFF，访问调色板数据没有这种现象。 </p>
+<p><b>在屏幕刷新的时候访问VRAM：<br></b>前面说过，在屏幕刷新的时候存取VRAM的地址和数据是不合法的。许多程序存取这些寄存器来制造不同的滚动效果。比如，一些游戏从屏幕底部开始滚动，那么它可能向$2006写第一行的状态来复位屏幕滚动。更好的诡计是PPU在屏幕刷新时用VRAM的地址寄存器来储存当前地址。通过向$2006修改地址以及让 PPU从一个不同的地方接着刷新。关于$2007如何影响屏幕刷新仍不了解。<br>&nbsp;&nbsp;&nbsp; 当不知道向$2006中写什么数据时，看下面的图表。<br>&nbsp;&nbsp;&nbsp; 写到$2006的地址 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>位 </td>
+<td>描述 </td></tr>
+<tr>
+<td>0－4 </td>
+<td>Tiles的水平偏移量(例如1 = 8象素)；水平位置＝水平偏移量×8 </td></tr>
+<tr>
+<td>5－9 </td>
+<td>Tiles的垂直偏移量(例如1 = 8象素)；垂直位置＝垂直偏移量×8 </td></tr>
+<tr>
+<td>A、B </td>
+<td>命名表的号码($2000,$2400,$2800,$2C00)； </td></tr>
+<tr>
+<td>C、D </td>
+<td>附加的垂直偏移量，单位：象素(0..3)；扫描线＝垂直偏移量＋附加的垂直偏移量 </td></tr>
+<tr>
+<td>E、F </td>
+<td>00 </td></tr></tbody></table><p></p>
+<h2>　</h2>
+<h2><a name="5、声音处理器">5、声音处理器</a></h2>
+<p>NES的集成CPU里包含了一个4声道的声音处理器（2A03），为播放音乐提供准模拟的声音。4个声道分别是：2个方波，一个三角波和一个噪声发生通道，每个声道的特性都不一样。</p>
+<p><b>声道：<br></b>方波声道能够产生54.6Hz到12.4KHz的方波，它的主要特性是频率扫略功能和调整输出的占空周期；三角波声道可产生27.3Hz到55.9KHz分辨率是4位（16级）的三角波，它的主要特性是输出模拟三角波和线性计数器（可用来定时关闭声道）；噪声通道能产生29.3Hz到44.7KHz的随机噪声，它的主要特性是产生伪随机数，在声道输出随机频率。</p>
+<p><b>帧计数器：<br></b>2A03有一个内含的帧计数器，它能够产生60Hz（1/1帧率）、120Hz（1/2帧率）和240Hz（1/4帧率）的信号，提供给其他一些声音硬件使用。1/4帧率的信号是由CPU频率乘以2即3579545Hz再除以14915得到的。</p>
+<p><b>声音硬件延迟：<br></b>在2A03复位之后，到各个声音硬件开始接收时钟信号之间有2048个时钟周期的延迟。当这2K个时钟周期之后，声音开始正常工作，输出使能有效。这种现象只发生在系统复位之后的2048个时钟周期内。这个资料的准确性有待验证。</p>
+<p><b>控制寄存器：<br></b>2A03的声音控制寄存器在CPU内分配的特殊地址如下：</p>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>寄存器地址 </td>
+<td>描述 </td></tr>
+<tr>
+<td>$4000-$4003 </td>
+<td>方波1 </td></tr>
+<tr>
+<td>$4004-$4007 </td>
+<td>方波2 </td></tr>
+<tr>
+<td>$4008-$400B </td>
+<td>三角波 </td></tr>
+<tr>
+<td>$400C-$400F </td>
+<td>噪声 </td></tr>
+<tr>
+<td>$4015 </td>
+<td>声道使能、音长计数状态 </td></tr></tbody></table>
+<p>只有$4015是可读可写的，其他都是只能够写的，如果你读这些寄存器最可能得到的是$40（因为NES数据线的重负荷）。读这些只写寄存器对寄存器本身和声道都没有任何影响。每个声音通道都有4个寄存器，具体描述如下：</p>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>寄存器/位 </td>
+<td>0 </td>
+<td>1 </td>
+<td>2 </td>
+<td>3 </td>
+<td>4 </td>
+<td>5 </td>
+<td>6 </td>
+<td>7 </td></tr>
+<tr>
+<td>$4000/$4004/$400C </td>
+<td colspan="4">音量衰减率 </td>
+<td>无衰减 </td>
+<td>音长计数中止/衰减循环使能 </td>
+<td colspan="2">占空周期类型 </td></tr>
+<tr>
+<td>$4001/$4005 </td>
+<td colspan="3">右移量 </td>
+<td>1减少/0增加波长 </td>
+<td colspan="3">扫描更新率 </td>
+<td>扫描使能 </td></tr>
+<tr>
+<td>$4002/$4006/$400A </td>
+<td colspan="8">波长低八位 </td></tr>
+<tr>
+<td>$4003/$4007/$400B/$400F </td>
+<td colspan="3">波长高三位 </td>
+<td colspan="5">音长计数值 </td></tr>
+<tr>
+<td>$4008 </td>
+<td colspan="7">线性计数值 </td>
+<td>音长计数中止/线性计数开始 </td></tr>
+<tr>
+<td>$4009/$400D </td>
+<td colspan="8">未使用 </td></tr>
+<tr>
+<td>$400E </td>
+<td colspan="4">播放采样率 </td>
+<td colspan="3">未使用 </td>
+<td>随机数类型发生 </td></tr>
+<tr>
+<td>$4015:音长状态（读） </td>
+<td>方1 </td>
+<td>方2 </td>
+<td>三角 </td>
+<td>噪声 </td>
+<td>DMC </td>
+<td colspan="2">未使用 </td>
+<td>DMC的IRQ状态 </td></tr>
+<tr>
+<td>$4015:通道使能（写） </td>
+<td>方1 </td>
+<td>方2 </td>
+<td>三角 </td>
+<td>噪声 </td>
+<td>DMC </td>
+<td colspan="3">未使用 </td></tr></tbody></table>
+<p><b>声道结构体系：<br></b>总表：</p>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>设备 </td>
+<td>三角波 </td>
+<td>噪声 </td>
+<td>方波 </td></tr>
+<tr>
+<td>三角阶梯发生器 </td>
+<td>√ </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>线性计数器 </td>
+<td>√ </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>可编程定时器 </td>
+<td>√ </td>
+<td>√ </td>
+<td>√ </td></tr>
+<tr>
+<td>音长计数器 </td>
+<td>√ </td>
+<td>√ </td>
+<td>√ </td></tr>
+<tr>
+<td>4位DAC </td>
+<td>√ </td>
+<td>√ </td>
+<td>√ </td></tr>
+<tr>
+<td>音量衰减单元 </td>
+<td>　 </td>
+<td>√ </td>
+<td>√ </td></tr>
+<tr>
+<td>扫频单元 </td>
+<td>　 </td>
+<td>　 </td>
+<td>√ </td></tr>
+<tr>
+<td>占空周期发生器 </td>
+<td>　 </td>
+<td>　 </td>
+<td>√ </td></tr>
+<tr>
+<td>波长转换器 </td>
+<td>　 </td>
+<td>√ </td>
+<td>　 </td></tr>
+<tr>
+<td>随机数发生器 </td>
+<td>　 </td>
+<td>√ </td>
+<td>　 </td></tr></tbody></table>
+<p>三角阶梯发生器：<br>这是一个5位的单向的计数器，只存在于三角波通道，计数器输出的低4位分别通到一个XNOR（异或非）门。4个XNOR门被同一个选通信号控制，当选通是 0时，计数器输出的4个低位在门电路的输出端反相；当选通是1时，不反相。选通信号连到计数器的最高位，这样就可以在XNOR门的输出端产生一个计数序列，就造出了一个比较理想的三角阶梯信号发生器。XNOR门的输出反馈到一个4位的DAC输入端。当三角波的音长计数器或线性计数器是0时，这个5位的计算器会暂停，同时锁定，计数器不会被重设置到某一个特定的状态。在系统复位的时候，计数器装入0。计数器的时钟输入直接连接到三角波通道内一个11位的可编程定时器的输出端，这样，这个5位的三角波阶梯信号发生器的输出频率就是通道内可编程定时器频率的1/32。</p>
+<p>线性计数器：（$4008）<br>这是一个7位的递减计数器，只存在于三角波通道，计数器减到0时输出。计数器的时钟是240Hz（1/4帧率），用帧来计算长度就是0.25×N，其中N 是预先装入的7位的值。计数器会保持计数状态直到输出0，这时线性计数器和三角阶梯发生器的时钟信号被禁止，导致两个计数器被锁定，线性计数器的输出保持是0，声道因此而出现静音。线性计算器有两种工作模式：装入和计数。在装入模式，所有的输入（写到$4008）的值都会在传送到输出，也就没有计数；在计数模式，计数器会从当前值向下减，在$4008的数会被忽略。下表表示了如何通过$4008的最高位设置计数器：</p>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>旧值 </td>
+<td>新值 </td>
+<td>模式 </td></tr>
+<tr>
+<td>0 </td>
+<td>X </td>
+<td>计数 </td></tr>
+<tr>
+<td>1 </td>
+<td>0 </td>
+<td>在写周期没有变化，计数 </td></tr>
+<tr>
+<td>1 </td>
+<td>1 </td>
+<td>没有变化 </td></tr></tbody></table>
+<p>可编程定时器（$4002/3、$4006/7、$400A/B、$400F）：<br>这是一个11位可预设的递减计数器，每个声音通道都有，但是注意在噪声通道不是直接可用的，详见“波长转换器”。这个计数器在计数完成的时候自动重载，因此它在减到0前会计算N＋1个时钟周期，其中N是预装入的11位值。这个计数器直接使用6502的频率（1.79MHz）作为时钟，输出频率是 1.79MHz/(N＋1)。当到达计数终点的时候会产生一个1时钟周期的脉冲，而输出频率会被反馈到对应于声音通道的特殊设备。对于方波，这个计数终点脉冲会被送到占空周期发生器；对于三角波，会被送到三角阶梯发生器；对于噪声，会被送到随机数发生器。</p>
+<p>音长计数器（$4003、$4007、$400B、$400F）：<br>这是一个7位的递减计数器，时钟是60Hz，每个声音通道都有。当计数器减到0，计数停止，相应的通道出现静音。可以通过设置音长计数时钟的禁止位来暂停计数，写1则中止计数，0则允许计数。在不同的寄存器里，这个位的位置不同，见寄存器表。计数值通过$4003、$4007、$400B和$400F的 3－7位来写入。输入的5位值通过下面2个表转换到计数器的7位值：</p>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td colspan="3">第3位＝0 </td></tr>
+<tr>
+<td rowspan="2">4－6位的值 </td>
+<td colspan="2">帧 </td></tr>
+<tr>
+<td>第7位＝0 </td>
+<td>第7位＝1 </td></tr>
+<tr>
+<td>0 </td>
+<td>05 </td>
+<td>06 </td></tr>
+<tr>
+<td>1 </td>
+<td>0A </td>
+<td>0C </td></tr>
+<tr>
+<td>2 </td>
+<td>14 </td>
+<td>18 </td></tr>
+<tr>
+<td>3 </td>
+<td>28 </td>
+<td>30 </td></tr>
+<tr>
+<td>4 </td>
+<td>50 </td>
+<td>60 </td></tr>
+<tr>
+<td>5 </td>
+<td>1E </td>
+<td>24 </td></tr>
+<tr>
+<td>6 </td>
+<td>07 </td>
+<td>08 </td></tr>
+<tr>
+<td>7 </td>
+<td>0E </td>
+<td>10 </td></tr></tbody></table>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td colspan="2">第3位＝1 </td></tr>
+<tr>
+<td>4－7位 </td>
+<td>帧 </td></tr>
+<tr>
+<td>0 </td>
+<td>7F </td></tr>
+<tr>
+<td>1 </td>
+<td>01 </td></tr>
+<tr>
+<td>2 </td>
+<td>02 </td></tr>
+<tr>
+<td>3 </td>
+<td>03 </td></tr>
+<tr>
+<td>4 </td>
+<td>04 </td></tr>
+<tr>
+<td>5 </td>
+<td>05 </td></tr>
+<tr>
+<td>6 </td>
+<td>06 </td></tr>
+<tr>
+<td>7 </td>
+<td>07 </td></tr>
+<tr>
+<td>8 </td>
+<td>08 </td></tr>
+<tr>
+<td>9 </td>
+<td>09 </td></tr>
+<tr>
+<td>A </td>
+<td>0A </td></tr>
+<tr>
+<td>B </td>
+<td>0B </td></tr>
+<tr>
+<td>C </td>
+<td>0C </td></tr>
+<tr>
+<td>D </td>
+<td>0C </td></tr>
+<tr>
+<td>E </td>
+<td>0E </td></tr>
+<tr>
+<td>F </td>
+<td>0F </td></tr></tbody></table>
+<p>音长计数器的状态可以通过$4015来读取，0表示计数器处于0状态（停止在0），1表示处于非0状态。通过写0到$4015可以令音长计数器永远处于0状态，使得声道被禁止；写1可以取消禁止状态，但它不会改变计数器里面的值。在系统复位时这个寄存器全部5个使用的位都被设置为0。</p>
+<p>4位DAC：<br>这是一个标准的4位DAC（数模转换）单元，有16级输出电压，4个声道共用。在2A03里，方波1和方波2混合通过引脚1输入，三角波和噪音通过引脚2 输入。这些模拟量输出需要一个负的电流源，以使得电压的级输出变成平滑的声音信号。因为NES只外置了一个100欧姆的下拉电阻，使得输出波形的幅值很小，但是也获得最小的不平滑度。这个不平滑度小到难以发现，就算用示波器也不明显。</p>
+<p>音量衰减单元（$4000、$4004、$400C）：<br>音量衰减器只存在于方波和噪声通道。当衰减禁止位（第4位）被设置为1，当前的音量值（0－3位）被直接送到DAC。在下列情况中，音量值会被忽略，而直接送0到DAC。<br>·声道硬件要停止声音，例如音长计数器或扫频单元；<br>·处于占空周期或随机数发生器输出频率信号的负值部分，也即在声音使能的时候送到DAC的或者是音量值或者是0（无声）。<br>当衰减禁止位被清零，0－3位当前的值就是衰减率。衰减率是指音量从最大值向下线性衰减的速度，衰减速度是240/(N+1)，N的值从$0－$F。当衰减到0之后，根据寄存器第5位的状态将发生两种情况： 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>第5位 </td>
+<td>行为 </td></tr>
+<tr>
+<td>0 </td>
+<td>音量停在0，声道静音 </td></tr>
+<tr>
+<td>1 </td>
+<td>音量循环不断从最大值减到0 </td></tr></tbody></table><p></p>
+<p>只有通过对寄存器进行写操作才能重新设置硬件的衰减状态，否则就一直按当前状态进行衰减甚至循环，即使寄存器的第4位被设置成禁止衰减也没有用。<br><br>扫频单元：<br>这个东西只存在在方波通道中。当寄存器的第7位被设为1，扫频被激活，波长会实时地增加或减少（对应频率降低或提高）。波长的值通过$4002/3 和$4006/7被不断的读入和更新，写到那里的值会立刻反应到声音里。第4－6位代表了频率扫略速度，或者说$4002/3和$4006/7里波长值被改变的频率。刷新率是120Hz/(N+1)，N是写入的值，从0－7。第3位控制扫频的模式，1表示波长减少，0表示波长增加。第0－2位是右移量，用来控制波长增量的右移量，见下表： 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>第3位 </td>
+<td>表达式，N是右移量从0－7 </td></tr>
+<tr>
+<td>0 </td>
+<td>波长＝波长＋（波长&gt;&gt;N） </td></tr>
+<tr>
+<td>1 </td>
+<td>波长＝波长－（波长&gt;&gt;N） </td></tr></tbody></table><p></p>
+<p>当满足以下3个条件，波长寄存器每个周期都会被更新：<br>·第7位被设置，即扫频使能；<br>·右移量不等于0；<br>·音量计数器的值非0。<br>以下两种情况会暂停扫描时钟，使声道静音，而不管扫描刷新率是多少或扫描使能位是否设置：<br>·11位的波长值小于$008；<br>·扫频处于增加模式，而进位标志＝1。硬件在波长寄存器被更新之前总要检查进位标志的。 </p>
+<p>占空周期发生器（$4000、$4004）：<br>占空周期发生器只存在于方波通道，它使用可编程定时器的输出频率作为时钟，使用4位计数器来产生4种类型的占空周期，因此它的输出频率是可编程定时器的1/16，输出信号反馈到音量衰减器。占空类型见下表： 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>6、7位 </td>
+<td>一个时钟周期里的占空周期（正/负) </td></tr>
+<tr>
+<td>00 </td>
+<td>2/14 </td></tr>
+<tr>
+<td>01 </td>
+<td>4/12 </td></tr>
+<tr>
+<td>10 </td>
+<td>8/8 </td></tr>
+<tr>
+<td>11 </td>
+<td>12/4 </td></tr></tbody></table><p></p>
+<p>波长转换器（$400E）：<br>这个东西只存在于噪声通道，用来将一个给定的4位值转换成11位的波长，然后送到可编程定时器。下表是转换关系： 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>0－3位 </td>
+<td>音度 </td>
+<td>音阶 </td>
+<td>CPU时钟周期（11位波长＋1） </td></tr>
+<tr>
+<td>0 </td>
+<td>15 </td>
+<td>A </td>
+<td>002 </td></tr>
+<tr>
+<td>1 </td>
+<td>14 </td>
+<td>A </td>
+<td>004 </td></tr>
+<tr>
+<td>2 </td>
+<td>13 </td>
+<td>A </td>
+<td>008 </td></tr>
+<tr>
+<td>3 </td>
+<td>12 </td>
+<td>A </td>
+<td>010 </td></tr>
+<tr>
+<td>4 </td>
+<td>11 </td>
+<td>A </td>
+<td>020 </td></tr>
+<tr>
+<td>5 </td>
+<td>11 </td>
+<td>D </td>
+<td>030 </td></tr>
+<tr>
+<td>6 </td>
+<td>10 </td>
+<td>A </td>
+<td>040 </td></tr>
+<tr>
+<td>7 </td>
+<td>10 </td>
+<td>F </td>
+<td>050 </td></tr>
+<tr>
+<td>8 </td>
+<td>10 </td>
+<td>C </td>
+<td>065 </td></tr>
+<tr>
+<td>9 </td>
+<td>9 </td>
+<td>A </td>
+<td>07F </td></tr>
+<tr>
+<td>A </td>
+<td>9 </td>
+<td>D </td>
+<td>0BE </td></tr>
+<tr>
+<td>B </td>
+<td>8 </td>
+<td>A </td>
+<td>0FE </td></tr>
+<tr>
+<td>C </td>
+<td>8 </td>
+<td>D </td>
+<td>17D </td></tr>
+<tr>
+<td>D </td>
+<td>7 </td>
+<td>A </td>
+<td>1FC </td></tr>
+<tr>
+<td>E </td>
+<td>6 </td>
+<td>A </td>
+<td>3F9 </td></tr>
+<tr>
+<td>F </td>
+<td>5 </td>
+<td>A </td>
+<td>7F2 </td></tr></tbody></table><p></p>
+<p>随机数发生器（$400E）：<br>噪声通道有一个1位的伪随机数发生器，它是由一个15位的移位寄存器和一个异或门组成，它能够提供‘长’和‘短’两种类型的伪随机数序列：当寄存器第7位是0时，产生32767位的长序列（32K模式）；是1时，产生93位的短序列（93位模式）。93位模式通常在声道中产生较高频率的声音回放。下表说明了在移位寄存器的那些位里进行异或： 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>模式 </td>
+<td>EDCBA9876543210<br>&lt;-------------&lt; </td></tr>
+<tr>
+<td>32K </td>
+<td>** </td></tr>
+<tr>
+<td>93位 </td>
+<td>*&nbsp;&nbsp;&nbsp;&nbsp; * </td></tr></tbody></table><p></p>
+<p>当前的异或结果在下一个移位周期之前送到移位寄存器的0位，1个位的随机数从E引脚输出，反相然后送到音量衰减器。移位寄存器每接收到两个可编程定时器的时钟脉冲就移位一次，所以它的频率是可编程定时器的一半，也就是低一个音度。系统复位的时候移位寄存器被装入值1。</p>
+<h2><a name="6、手柄、控制器和扩展口">6、手柄、控制器和扩展口</a></h2>
+<p>NES 支持很多种输入设备，主要有手柄，光枪、4适配器和摇杆。两个手柄分别通过$4016和$4017访问，用选通脉冲对手柄复位，即对$4016 或$4017先写1后写0，这将在游戏手柄的电路里发生个脉冲，然后可以在$4016或$4017读取了。每次读取将返回一个单一的按钮的状态，在第0位（1表示按下，0表没有）。第1位表示了游戏棒是否和端口连接。如果连接就置0，否则是1。第6和7位的$4016/$4017好像有相同的重要性，不知是什么，有些游戏期望当一个按钮按下的时候在$4016/$4017得到$41。复位的时候返回0。</p>
+<table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>读取 # </td>
+<td>1 </td>
+<td>2 </td>
+<td>3 </td>
+<td>4 </td>
+<td>5 </td>
+<td>6 </td>
+<td>7 </td>
+<td>8 </td>
+<td>9 </td>
+<td>10 </td>
+<td>11 </td>
+<td>12 </td>
+<td>13 </td>
+<td>14 </td>
+<td>15 </td>
+<td>16 </td>
+<td>17 </td>
+<td>18 </td>
+<td>19 </td>
+<td>20 </td>
+<td>21 </td>
+<td>22 </td>
+<td>23 </td>
+<td>24 </td></tr>
+<tr>
+<td>按键 </td>
+<td>A键 </td>
+<td>B键 </td>
+<td>选择 </td>
+<td>开始 </td>
+<td>上 </td>
+<td>下 </td>
+<td>左 </td>
+<td>右 </td>
+<td colspan="8">忽略 </td>
+<td colspan="4">信号 </td>
+<td>0 </td>
+<td>0 </td>
+<td>0 </td>
+<td>0 </td></tr></tbody></table>
+<p>信号用来检测是4端口的接入状态：<br>&nbsp;&nbsp;&nbsp; %0000:没有连接设备<br>&nbsp;&nbsp;&nbsp; %0001:只有$4016手柄<br>&nbsp;&nbsp;&nbsp; %0010:只有$4017手柄<br><b>光枪：<br></b>只是简单地使用了$4016或$4017的D0、D3和D4位，完全有可能同时接两支光枪。<br><b>4适配器</b>：<br>将手柄扩展到4个，支持4手柄的游戏有：Tengen的《Gauntlet II》和Nintendo的《RC Pro Am 2》。全部4个控制器使用$4016或$4017的D0位。对于$4016端口，读1－8字节是手柄1，9－16字节是手柄3，$4017则对应手柄2和4。</p>
+<table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>读取 </td>
+<td>1 </td>
+<td>2 </td>
+<td>3 </td>
+<td>4 </td>
+<td>5 </td>
+<td>6 </td>
+<td>7 </td>
+<td>8 </td>
+<td>9 </td>
+<td>10 </td>
+<td>11 </td>
+<td>12 </td>
+<td>13 </td>
+<td>14 </td>
+<td>15 </td>
+<td>16 </td>
+<td>17 </td>
+<td>18 </td>
+<td>19 </td>
+<td>20 </td>
+<td>21 </td>
+<td>22 </td>
+<td>23 </td>
+<td>24 </td></tr>
+<tr>
+<td>按键 </td>
+<td>1P A </td>
+<td>1P B </td>
+<td>1P选择 </td>
+<td>1P开始 </td>
+<td>1P上 </td>
+<td>1P下 </td>
+<td>1P左 </td>
+<td>1P右 </td>
+<td>2P A </td>
+<td>2P B </td>
+<td>2P选择 </td>
+<td>2P开始 </td>
+<td>2P上 </td>
+<td>2P下 </td>
+<td>2P左 </td>
+<td>2P右 </td>
+<td colspan="4">信号 </td>
+<td>0 </td>
+<td>0 </td>
+<td>0 </td>
+<td>0 </td></tr></tbody></table>
+<p><b>摇杆：<br></b>有的游戏使用摇杆，例如Taito的《Arkanoid》。摇杆的位置通过$4017的D1来读取，第一个读的是MSB，第8个读的是LSB，有效值的范围是98－242，98代表了，摇杆完全是被逆时针转的。读到的数据要取反，例如读到%01101011，取反是%10010100，即146。摇杆还带有一个按钮，通过$4016的D1来读取，1代表按钮被按下。</p>
+<p><b>扩展口：<br></b>NES都有一个扩展口，用来接手柄或双手柄。手柄初始化需要写1和0，如果初始化没有完成，或者循序错了，扩展口就可以用来通讯，例如：<br>&nbsp;&nbsp;&nbsp; LDA #%00000001<br>&nbsp;&nbsp;&nbsp; STA $4016<br>&nbsp;&nbsp;&nbsp; STA $4017&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; 开始扩展口的读模式<br>&nbsp;&nbsp;&nbsp; LDA #%00000011 ; 写%110到扩展口<br>&nbsp;&nbsp;&nbsp; STA $4016<br>确实有些卡带用这种方式来通讯。</p>
+<p>任天堂主机内部输入/输出端口映射到$2000-$2007和$4000-$4017。一些端口的用处是未明的或未知的。任何有关信息将受到感激。 </p>
+<h2><a name="7、内存映射硬件">7、内存映射硬件</a></h2>
+<p>这里只提供一些硬件资料，软件方面请参考扩容资料。<br>Mapper其实就是硬件上的地址映射。用了切换ROM和VROM，更有的用于动态切换VROM。动态切换VROM通常有2种办法：一是用 Latches，所谓Latch就是切换器，当PPU访问命名表遇到特定的数据时，自动切换去指定的VROM，例如圣火徽章外传就用了这种方法，它的特定数据是FE和FD，就是对话框的两个边^_^；二是用IRQ中断，算好PPU的时序和CPU的指令周期后设置IRQ计数器，等待到特定的时候就触发IRQ 中断，调用中断服务切换VROM，例如三国志2－霸王之大陆就是这样，有的IRQ计数器是每个CPU周期增加1，有的是每条扫描线增加1，视硬件电路而定。</p>
+<p>图例：<br>R：连接到ROM部分；<br>S：由ROM，MMC和NES共用；<br>N：连接到卡带接口；<br>W：连接到电池RAM；<br>Pxxx：对应于CPU的；<br>Vxxx：对应于PPU的；<br>M2：时钟。</p>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>M2 </td>
+<td>PA13 </td>
+<td>PA14 </td>
+<td>P-CE </td>
+<td>PD7 </td>
+<td>PD0 </td>
+<td>R/W </td>
+<td>VA10 </td>
+<td>VA12 </td>
+<td>VA11 </td>
+<td>V10 </td></tr>
+<tr>
+<td>24 </td>
+<td>23 </td>
+<td>22 N </td>
+<td>21 N </td>
+<td>20 N </td>
+<td>19 S </td>
+<td>18 S </td>
+<td>17 </td>
+<td>16 N </td>
+<td>15 N </td>
+<td>14 S </td>
+<td>13 S </td></tr>
+<tr>
+<td>） </td>
+<td colspan="11">MMC1 </td></tr>
+<tr>
+<td>1 R </td>
+<td>2 R </td>
+<td>3 R </td>
+<td>4 R </td>
+<td>5 R </td>
+<td>6 W </td>
+<td>7 R </td>
+<td>8 R </td>
+<td>9 R </td>
+<td>10 R </td>
+<td>11 R/W </td>
+<td>12 </td></tr>
+<tr>
+<td>PA14 </td>
+<td>PA15 </td>
+<td>PA16 </td>
+<td>PA17 </td>
+<td>P-CE </td>
+<td>B-CE </td>
+<td>VA12 </td>
+<td>VA13 </td>
+<td>VA14 </td>
+<td>VA15 </td>
+<td>VA16/B-CE </td>
+<td>GND </td></tr></tbody></table>
+<p>RD387-001: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>+5V </td>
+<td>GND </td>
+<td>VA10 </td>
+<td>VA15 </td>
+<td>VA12 </td>
+<td>VA14 </td>
+<td>VA12 </td>
+<td>VA13 </td>
+<td>VA16 </td>
+<td>VA8 </td>
+<td>VA5 </td>
+<td>VA9 </td>
+<td>VA4 </td>
+<td>VA11 </td>
+<td>VA3 </td>
+<td>VA7 </td>
+<td>VA2 </td>
+<td>VA10 </td>
+<td>VA1 </td>
+<td>V-CE </td></tr>
+<tr>
+<td>XX </td>
+<td>40 </td>
+<td>39 </td>
+<td>38 N </td>
+<td>37 R </td>
+<td>36 R </td>
+<td>35 R </td>
+<td>34 N </td>
+<td>33 R </td>
+<td>32 R </td>
+<td>31 S </td>
+<td>30 S </td>
+<td>29 S </td>
+<td>28 S </td>
+<td>27 S </td>
+<td>26 S </td>
+<td>25 S </td>
+<td>24 S </td>
+<td>23 S </td>
+<td>22 S </td>
+<td>21 S </td></tr>
+<tr>
+<td>） </td>
+<td colspan="20">MMC2&nbsp; </td></tr>
+<tr>
+<td>XX </td>
+<td>01 </td>
+<td>02 N </td>
+<td>03 N </td>
+<td>04 R </td>
+<td>05 R </td>
+<td>06 S </td>
+<td>07 R </td>
+<td>08 R </td>
+<td>09 R </td>
+<td>10 S </td>
+<td>11 S </td>
+<td>12 S </td>
+<td>13 S </td>
+<td>14 S </td>
+<td>15 N </td>
+<td>16 N </td>
+<td>17 S </td>
+<td>18 S </td>
+<td>19 S </td>
+<td>20 </td></tr>
+<tr>
+<td>GND </td>
+<td>M2 </td>
+<td>PA14 </td>
+<td>PA13 </td>
+<td>PA15 </td>
+<td>PA14 </td>
+<td>PA12 </td>
+<td>PA13 </td>
+<td>PA16 </td>
+<td>P-CE </td>
+<td>PD4 </td>
+<td>PD3 </td>
+<td>PD0 </td>
+<td>PD1 </td>
+<td>PD2 </td>
+<td>R/W </td>
+<td>P-CE </td>
+<td>V-RD </td>
+<td>VA0 </td>
+<td>VA6 </td>
+<td>GND </td></tr></tbody></table><p></p>
+<p>　 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>PD6 </td>
+<td>PA0 </td>
+<td>PD7 </td>
+<td>B-CE </td>
+<td>M2 </td>
+<td>GND </td>
+<td>+5V </td>
+<td>P-CE </td>
+<td>PA18 </td>
+<td>PA13 </td>
+<td>PA17 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>33 S </td>
+<td>32 S </td>
+<td>31 S </td>
+<td>30 W </td>
+<td>29 </td>
+<td>28 </td>
+<td>27 </td>
+<td>26 R </td>
+<td>25 R </td>
+<td>24 N </td>
+<td>23 R </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>PD0 </td>
+<td>34 S </td>
+<td colspan="11" rowspan="11">MMC3 </td>
+<td>22 R </td>
+<td>PA14 </td></tr>
+<tr>
+<td>PD5 </td>
+<td>35 S </td>
+<td>21 R </td>
+<td>PA16 </td></tr>
+<tr>
+<td>PD1 </td>
+<td>36 S </td>
+<td>20 N </td>
+<td>PA14 </td></tr>
+<tr>
+<td>PD4 </td>
+<td>37 S </td>
+<td>19 R </td>
+<td>PA13 </td></tr>
+<tr>
+<td>PD2 </td>
+<td>38 S </td>
+<td>18 R </td>
+<td>PA15 </td></tr>
+<tr>
+<td>PD3 </td>
+<td>39 S </td>
+<td>17 N </td>
+<td>R/W </td></tr>
+<tr>
+<td>GND </td>
+<td>40 </td>
+<td>16 </td>
+<td>? </td></tr>
+<tr>
+<td>B-CE </td>
+<td>41 W </td>
+<td>15 </td>
+<td>GND </td></tr>
+<tr>
+<td>B-WE </td>
+<td>42 W </td>
+<td>14 N </td>
+<td>P-CE </td></tr>
+<tr>
+<td>PA11 </td>
+<td>43 R </td>
+<td>13 </td>
+<td>IRQ </td></tr>
+<tr>
+<td>PA16 </td>
+<td>44 R </td>
+<td>12 R </td>
+<td>VA17 </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>1 </td>
+<td>2 R </td>
+<td>3 N </td>
+<td>4 N </td>
+<td>5 N </td>
+<td>6 </td>
+<td>7 R </td>
+<td>8 R </td>
+<td>9 R </td>
+<td>10 N </td>
+<td>11 R </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>? </td>
+<td>VA10 </td>
+<td>VA12 </td>
+<td>VA11 </td>
+<td>VA10 </td>
+<td>GND </td>
+<td>VA13 </td>
+<td>VA14 </td>
+<td>VA12 </td>
+<td>VA10 </td>
+<td>VA15 </td>
+<td>　 </td>
+<td>　 </td></tr></tbody></table><p></p>
+<p>MMC5: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td></tr>
+<tr>
+<td>1 </td>
+<td>RC0 </td>
+<td>21 R </td>
+<td>VA16 </td>
+<td>41 S </td>
+<td>PD5 </td>
+<td>61 R </td>
+<td>PA14 </td>
+<td>81 </td>
+<td>NC </td></tr>
+<tr>
+<td>2 </td>
+<td>RC1 </td>
+<td>22 R </td>
+<td>VA17 </td>
+<td>42 S </td>
+<td>PD6 </td>
+<td>62 R </td>
+<td>PA15 </td>
+<td>82 </td>
+<td>NC </td></tr>
+<tr>
+<td>3 </td>
+<td>RC2 </td>
+<td>23 R </td>
+<td>VA18 </td>
+<td>43 S </td>
+<td>PD7 </td>
+<td>63 R </td>
+<td>PA16 </td>
+<td>83 W </td>
+<td>B-CE </td></tr>
+<tr>
+<td>4 </td>
+<td>+5V </td>
+<td>24 R </td>
+<td>VA19 </td>
+<td>44 </td>
+<td>+5V </td>
+<td>64 R </td>
+<td>PA17 </td>
+<td>84 S </td>
+<td>VD0 </td></tr>
+<tr>
+<td>5 S </td>
+<td>VA0 </td>
+<td>25 N </td>
+<td>VA10 </td>
+<td>45 S </td>
+<td>PA0 </td>
+<td>65 R </td>
+<td>PA18 </td>
+<td>85 S </td>
+<td>VD1 </td></tr>
+<tr>
+<td>6 S </td>
+<td>VA1 </td>
+<td>26 N </td>
+<td>VA11 </td>
+<td>46 S </td>
+<td>PA1 </td>
+<td>66 R </td>
+<td>PA19 </td>
+<td>86 S </td>
+<td>VD2 </td></tr>
+<tr>
+<td>7 S </td>
+<td>VA2 </td>
+<td>27 N </td>
+<td>VA12 </td>
+<td>47 S </td>
+<td>PA2 </td>
+<td>67 N </td>
+<td>PA13 </td>
+<td>87 S </td>
+<td>VD3 </td></tr>
+<tr>
+<td>8 S </td>
+<td>VA3 </td>
+<td>28 N </td>
+<td>VA13 </td>
+<td>48 S </td>
+<td>PA3 </td>
+<td>68 N </td>
+<td>PA14 </td>
+<td>88 S </td>
+<td>VD4 </td></tr>
+<tr>
+<td>9 S </td>
+<td>VA4 </td>
+<td>29 </td>
+<td>NC </td>
+<td>49 S </td>
+<td>PA4 </td>
+<td>69 W </td>
+<td>A13 </td>
+<td>89 S </td>
+<td>VD5 </td></tr>
+<tr>
+<td>10 S </td>
+<td>VA5 </td>
+<td>30 </td>
+<td>NC </td>
+<td>50 S </td>
+<td>PA5 </td>
+<td>70 W </td>
+<td>A14 </td>
+<td>90 S </td>
+<td>VD6 </td></tr>
+<tr>
+<td>11 S </td>
+<td>VA6 </td>
+<td>31 N </td>
+<td>V-CE </td>
+<td>51 S </td>
+<td>PA6 </td>
+<td>71 W </td>
+<td>CE-0 </td>
+<td>91 S </td>
+<td>VD7 </td></tr>
+<tr>
+<td>12 S </td>
+<td>VA7 </td>
+<td>32 N </td>
+<td>VA10 </td>
+<td>52 S </td>
+<td>PA7 </td>
+<td>72 W </td>
+<td>CE-1 </td>
+<td>92 </td>
+<td>NC </td></tr>
+<tr>
+<td>13 S </td>
+<td>VA8 </td>
+<td>33 N </td>
+<td>V-WR </td>
+<td>53 S </td>
+<td>PA8 </td>
+<td>73 </td>
+<td>NC </td>
+<td>93 </td>
+<td>NC </td></tr>
+<tr>
+<td>14 S </td>
+<td>VA9 </td>
+<td>34 S </td>
+<td>V-RD </td>
+<td>54 S </td>
+<td>PA9 </td>
+<td>74 R </td>
+<td>P-CE </td>
+<td>94 R </td>
+<td>VA0 </td></tr>
+<tr>
+<td>15 R </td>
+<td>VA10 </td>
+<td>35 N </td>
+<td>IRQ </td>
+<td>55 S </td>
+<td>PA10 </td>
+<td>75 </td>
+<td>NC </td>
+<td>95 R </td>
+<td>VA1 </td></tr>
+<tr>
+<td>16 R </td>
+<td>VA11 </td>
+<td>36 S </td>
+<td>PD0 </td>
+<td>56 W </td>
+<td>VCC </td>
+<td>76 W </td>
+<td>B-WE </td>
+<td>96 R </td>
+<td>VA2 </td></tr>
+<tr>
+<td>17 R </td>
+<td>VA12 </td>
+<td>37 S </td>
+<td>PD1 </td>
+<td>57 </td>
+<td>+BAT </td>
+<td>77 </td>
+<td>NC </td>
+<td>97 </td>
+<td>CL3 </td></tr>
+<tr>
+<td>18 R </td>
+<td>VA13 </td>
+<td>38 S </td>
+<td>PD2 </td>
+<td>58 S </td>
+<td>PA11 </td>
+<td>78 </td>
+<td>NC </td>
+<td>98 </td>
+<td>SL3 </td></tr>
+<tr>
+<td>19 R </td>
+<td>VA14 </td>
+<td>39 S </td>
+<td>PD3 </td>
+<td>59 S </td>
+<td>PA12 </td>
+<td>79 N </td>
+<td>M2 </td>
+<td>99 </td>
+<td>GND </td></tr>
+<tr>
+<td>20 R </td>
+<td>VA15 </td>
+<td>40 S </td>
+<td>PD4 </td>
+<td>60 R </td>
+<td>PA13 </td>
+<td>80 </td>
+<td>GND </td>
+<td>100 </td>
+<td>RC3 </td></tr></tbody></table><p></p>
+<p>MMC6: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td>
+<td>引脚 </td>
+<td>功能 </td></tr>
+<tr>
+<td>1 N </td>
+<td>PA13 </td>
+<td>11 </td>
+<td>GND </td>
+<td>21 R </td>
+<td>VA13 </td>
+<td>31 </td>
+<td>IRQ </td>
+<td>41 S </td>
+<td>PD5 </td>
+<td>51 S </td>
+<td>PA5 </td>
+<td>61 R </td>
+<td>PA14 </td></tr>
+<tr>
+<td>2 </td>
+<td>M2 </td>
+<td>12 </td>
+<td>+5V </td>
+<td>22 R </td>
+<td>VA12 </td>
+<td>32 N </td>
+<td>P-CE </td>
+<td>42 S </td>
+<td>PA0 </td>
+<td>52 S </td>
+<td>PA6 </td>
+<td>62 R </td>
+<td>PA18 </td></tr>
+<tr>
+<td>3 </td>
+<td>GND </td>
+<td>13 </td>
+<td>HLD </td>
+<td>23 R </td>
+<td>VA14 </td>
+<td>33 </td>
+<td>R/W </td>
+<td>43 S </td>
+<td>PD6 </td>
+<td>53 S </td>
+<td>PA9 </td>
+<td>63 N </td>
+<td>PA14 </td></tr>
+<tr>
+<td>4 </td>
+<td>GND </td>
+<td>14 N </td>
+<td>VA10 </td>
+<td>24 </td>
+<td>GND </td>
+<td>34 S </td>
+<td>PD2 </td>
+<td>44 S </td>
+<td>PA1 </td>
+<td>54 S </td>
+<td>PA7 </td>
+<td>64 R </td>
+<td>PA17 </td></tr>
+<tr>
+<td>5 </td>
+<td>GND </td>
+<td>15 N </td>
+<td>VA11 </td>
+<td>25 </td>
+<td>+BAT </td>
+<td>35 S </td>
+<td>PD3&nbsp; </td>
+<td>45 S </td>
+<td>PD7 </td>
+<td>55 S </td>
+<td>PA8 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>6 </td>
+<td>NC </td>
+<td>16 </td>
+<td>NC </td>
+<td>26 R </td>
+<td>VA18 </td>
+<td>36 S </td>
+<td>PD1 </td>
+<td>46 S </td>
+<td>PA2 </td>
+<td>56 </td>
+<td>+BAT </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>7 </td>
+<td>GND </td>
+<td>17 R </td>
+<td>VA10 </td>
+<td>27 N </td>
+<td>VA10 </td>
+<td>37 </td>
+<td>GND </td>
+<td>47 R </td>
+<td>P-CE </td>
+<td>57 </td>
+<td>GND </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>8 </td>
+<td>+5V </td>
+<td>18 R </td>
+<td>VA16 </td>
+<td>28 S </td>
+<td>V-RD </td>
+<td>38 </td>
+<td>+BAT </td>
+<td>48 S </td>
+<td>PA3 </td>
+<td>58 S </td>
+<td>PA12 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>9 </td>
+<td>+5V </td>
+<td>19 R </td>
+<td>VA11 </td>
+<td>29 S </td>
+<td>V-CE </td>
+<td>39 S </td>
+<td>PD4 </td>
+<td>49 S </td>
+<td>PA4 </td>
+<td>59 R </td>
+<td>PA13 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>10 </td>
+<td>+BAT </td>
+<td>20 N </td>
+<td>VA12 </td>
+<td>30 R </td>
+<td>VA17 </td>
+<td>40 S </td>
+<td>PD0 </td>
+<td>50 R </td>
+<td>PA16 </td>
+<td>60 R </td>
+<td>PA15 </td>
+<td>　 </td>
+<td>　 </td></tr></tbody></table><p></p>
+<p>NES-CN-ROM-256-[02,05]: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>NC </td>
+<td>VA14 </td>
+<td>VA13 </td>
+<td>VA12 </td>
+<td>VA11 </td>
+<td>GND </td>
+<td>R/W </td></tr>
+<tr>
+<td>16 </td>
+<td>15 </td>
+<td>14 R </td>
+<td>13 R </td>
+<td>12 </td>
+<td>11 </td>
+<td>10 </td>
+<td>09 </td></tr>
+<tr>
+<td>） </td>
+<td colspan="7">74LS161 </td></tr>
+<tr>
+<td>01 </td>
+<td>02 </td>
+<td>03 </td>
+<td>04 </td>
+<td>05 </td>
+<td>06 </td>
+<td>07 </td>
+<td>08 </td></tr>
+<tr>
+<td>+5V </td>
+<td>P-CE </td>
+<td>PD0 </td>
+<td>PD1 </td>
+<td>PD4 </td>
+<td>PD5 </td>
+<td>GND </td>
+<td>GND </td></tr></tbody></table><p></p>
+<p>NES-AOROM-03 NES-BN-ROM-01: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>NC </td>
+<td>PA15 </td>
+<td>PA16 </td>
+<td>PA17 </td>
+<td>VA10 </td>
+<td>GND </td>
+<td>R/W </td></tr>
+<tr>
+<td>16 </td>
+<td>15 </td>
+<td>14 </td>
+<td>13 </td>
+<td>12 </td>
+<td>11 </td>
+<td>10 </td>
+<td>09 </td></tr>
+<tr>
+<td>） </td>
+<td colspan="7">74LS161 </td></tr>
+<tr>
+<td>01 </td>
+<td>02 </td>
+<td>03 </td>
+<td>04 </td>
+<td>05 </td>
+<td>06 </td>
+<td>07 </td>
+<td>08 </td></tr>
+<tr>
+<td>+5V </td>
+<td>P-CE </td>
+<td>PD0 </td>
+<td>PD1 </td>
+<td>PD2 </td>
+<td>PD4 </td>
+<td>GND </td>
+<td>GND </td></tr></tbody></table><p></p>
+<p>NES-CN-ROM-256-[02,05]: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>NC </td>
+<td>LS32-13 </td>
+<td>LS32-2 </td>
+<td>LS32-9 </td>
+<td>NC </td>
+<td>GND </td>
+<td>R/W </td></tr>
+<tr>
+<td>16 </td>
+<td>15 </td>
+<td>14 R </td>
+<td>13 R </td>
+<td>12 </td>
+<td>11 </td>
+<td>10 </td>
+<td>09 </td></tr>
+<tr>
+<td>） </td>
+<td colspan="7">74LS161 </td></tr>
+<tr>
+<td>01 </td>
+<td>02 </td>
+<td>03 </td>
+<td>04 </td>
+<td>05 </td>
+<td>06 </td>
+<td>07 </td>
+<td>08 </td></tr>
+<tr>
+<td>+5V </td>
+<td>P-CE </td>
+<td>PD0 </td>
+<td>PD1 </td>
+<td>PD2 </td>
+<td>GND </td>
+<td>GND </td>
+<td>GND </td></tr></tbody></table>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>LS161-14 </td>
+<td>A14 </td>
+<td>A14 </td>
+<td>A14 </td>
+<td>LS161-12 </td>
+<td>A16 </td></tr>
+<tr>
+<td>14 </td>
+<td>13 </td>
+<td>12 </td>
+<td>11 R </td>
+<td>10 </td>
+<td>09 </td>
+<td>08 R </td></tr>
+<tr>
+<td>） </td>
+<td colspan="6">LS32 </td></tr>
+<tr>
+<td>01 </td>
+<td>02 </td>
+<td>03 R </td>
+<td>04 </td>
+<td>05 </td>
+<td>06 </td>
+<td>07 </td></tr>
+<tr>
+<td>A14 </td>
+<td>LS161-13 </td>
+<td>A15 </td>
+<td>GND </td>
+<td>GND </td>
+<td>NC </td>
+<td>GND </td></tr></tbody></table><p></p>
+<p><br>NES-ANROM-03: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>NC </td>
+<td>PA15 </td>
+<td>PA16 </td>
+<td>NC </td>
+<td>VA10 </td>
+<td>GND </td>
+<td>R/W </td></tr>
+<tr>
+<td>16 </td>
+<td>15 </td>
+<td>14&nbsp; </td>
+<td>13&nbsp; </td>
+<td>12 </td>
+<td>11 </td>
+<td>10 </td>
+<td>09 </td></tr>
+<tr>
+<td>） </td>
+<td colspan="7">74LS161 </td></tr>
+<tr>
+<td>01 </td>
+<td>02 </td>
+<td>03 </td>
+<td>04 </td>
+<td>05 </td>
+<td>06 </td>
+<td>07 </td>
+<td>08 </td></tr>
+<tr>
+<td>+5V </td>
+<td>P-CE </td>
+<td>PD0 </td>
+<td>PD1 </td>
+<td>+5V </td>
+<td>PD4 </td>
+<td>GND </td>
+<td>GND </td></tr></tbody></table>
+<table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>-8-9 </td>
+<td>-1 </td>
+<td>P-CE </td>
+<td>CE </td>
+<td>-13 </td>
+<td>-13 </td></tr>
+<tr>
+<td>14 </td>
+<td>13 </td>
+<td>12 </td>
+<td>11 R </td>
+<td>10 R </td>
+<td>09 </td>
+<td>08 </td></tr>
+<tr>
+<td>） </td>
+<td colspan="6">LS02 </td></tr>
+<tr>
+<td>01 </td>
+<td>02 </td>
+<td>03 R </td>
+<td>04 </td>
+<td>05 </td>
+<td>06 </td>
+<td>07 </td></tr>
+<tr>
+<td>-12 </td>
+<td>R/W </td>
+<td>R/W </td>
+<td>NC </td>
+<td>GND </td>
+<td>GND </td>
+<td>GND </td></tr></tbody></table><p></p>
+<p>CPU: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>Load </td>
+<td>Q1 </td>
+<td>Q2 </td>
+<td>INP0 </td>
+<td>INP1 </td>
+<td>NMI </td>
+<td>R/W </td>
+<td>IRQ </td>
+<td>M2 </td>
+<td>GND </td>
+<td>CLK </td>
+<td>D0 </td>
+<td>D1 </td>
+<td>D2 </td>
+<td>D3 </td>
+<td>D4 </td>
+<td>D5 </td>
+<td>D6 </td>
+<td>D7 </td></tr>
+<tr>
+<td>40 </td>
+<td>39 </td>
+<td>38 </td>
+<td>37 </td>
+<td>36 </td>
+<td>35 </td>
+<td>34 </td>
+<td>33 </td>
+<td>32 </td>
+<td>31 </td>
+<td>30 </td>
+<td>29 </td>
+<td>28 </td>
+<td>27 </td>
+<td>26 </td>
+<td>25 </td>
+<td>24 </td>
+<td>23 </td>
+<td>22 </td>
+<td>21 </td></tr>
+<tr>
+<td>） </td>
+<td colspan="19">6502/6527 </td></tr>
+<tr>
+<td>01 </td>
+<td>02 </td>
+<td>03 </td>
+<td>04 </td>
+<td>05 </td>
+<td>06 </td>
+<td>07 </td>
+<td>08 </td>
+<td>09 </td>
+<td>10 </td>
+<td>11 </td>
+<td>12 </td>
+<td>13 </td>
+<td>14 </td>
+<td>15 </td>
+<td>16 </td>
+<td>17 </td>
+<td>18 </td>
+<td>19 </td>
+<td>20 </td></tr>
+<tr>
+<td>Audio1 </td>
+<td>Audio2 </td>
+<td>RESET </td>
+<td>A0 </td>
+<td>A1 </td>
+<td>A2 </td>
+<td>A3 </td>
+<td>A4 </td>
+<td>A5 </td>
+<td>A6 </td>
+<td>A7 </td>
+<td>A8 </td>
+<td>A9 </td>
+<td>A10 </td>
+<td>A11 </td>
+<td>A12 </td>
+<td>A13 </td>
+<td>A14 </td>
+<td>A15 </td>
+<td>GND </td></tr></tbody></table><p></p>
+<p>PPU: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>+5V </td>
+<td>ALE </td>
+<td>AD0 </td>
+<td>AD1 </td>
+<td>AD2 </td>
+<td>AD3 </td>
+<td>AD4 </td>
+<td>AD5 </td>
+<td>AD6 </td>
+<td>AD7 </td>
+<td>A8 </td>
+<td>A9 </td>
+<td>A10 </td>
+<td>A11 </td>
+<td>A12 </td>
+<td>A13 </td>
+<td>RD </td>
+<td>WR </td>
+<td>RST </td>
+<td>VIDEO OUT </td></tr>
+<tr>
+<td>40 </td>
+<td>39 </td>
+<td>38 </td>
+<td>37 </td>
+<td>36 </td>
+<td>35 </td>
+<td>34 </td>
+<td>33 </td>
+<td>32 </td>
+<td>31 </td>
+<td>30 </td>
+<td>29 </td>
+<td>28 </td>
+<td>27 </td>
+<td>26 </td>
+<td>25 </td>
+<td>24 </td>
+<td>23 </td>
+<td>22 </td>
+<td>21 </td></tr>
+<tr>
+<td>） </td>
+<td colspan="19">6528/6538 </td></tr>
+<tr>
+<td>01 P </td>
+<td>02 P </td>
+<td>03 P </td>
+<td>04 P </td>
+<td>05 P </td>
+<td>06 P </td>
+<td>07 P </td>
+<td>08 P </td>
+<td>09 P </td>
+<td>10 P </td>
+<td>11 P </td>
+<td>12 P </td>
+<td>13 P </td>
+<td>14 P </td>
+<td>15 P </td>
+<td>16 P </td>
+<td>17 P </td>
+<td>18 P </td>
+<td>19 P </td>
+<td>20 </td></tr>
+<tr>
+<td>R/W </td>
+<td>D0 </td>
+<td>D1 </td>
+<td>D2 </td>
+<td>D3 </td>
+<td>D4 </td>
+<td>D5 </td>
+<td>D6 </td>
+<td>D7 </td>
+<td>A2 </td>
+<td>A1 </td>
+<td>A0 </td>
+<td>CE </td>
+<td>GND </td>
+<td>GND </td>
+<td>GND </td>
+<td>GND </td>
+<td>CLK </td>
+<td>INT </td>
+<td>GND </td></tr></tbody></table><p></p>
+<h2>　</h2>
+<h2><a name="8、I/O端口">8、I/O端口</a></h2>
+<p>端口是预分配好的可访问地址，程序通过端口和PPU或APU交换信息。每个端口都是16位的 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>端口 </td>
+<td>读写/位 </td>
+<td>功能描述 </td></tr>
+<tr>
+<td>$2000 </td>
+<td>读写 </td>
+<td>PPU控制寄存器 1 </td></tr>
+<tr>
+<td rowspan="7">　 </td>
+<td>0-1 </td>
+<td>命名表地址: 
+<table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>%10 ($2800) </td>
+<td>%11 ($2C00) </td></tr>
+<tr>
+<td>%00 ($2000) </td>
+<td>%01 ($2400) </td></tr></tbody></table>
+<p>请记住，因为镜像，只有2个真实的命名表，而不是4个；<br>当滚动超出当前命名表时PPU会自动切换到另一个命名表 </p></td></tr>
+<tr>
+<td>2 </td>
+<td>垂直写, 1＝VRAM地址以32递增: 
+<table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>命名表, VW＝0 </td>
+<td>命名表, VW＝1 </td></tr>
+<tr>
+<td>——&gt; 写&nbsp; </td>
+<td>| 写<br>|<br>V </td></tr></tbody></table></td></tr>
+<tr>
+<td>3 </td>
+<td>精灵图案表地址, 1＝$1000, 0＝$0000 </td></tr>
+<tr>
+<td>4 </td>
+<td>屏幕图案表地址, 1＝$1000, 0＝$0000 </td></tr>
+<tr>
+<td>5 </td>
+<td>精灵尺寸, 1＝8x16, 0＝8x8 </td></tr>
+<tr>
+<td>6 </td>
+<td>PPU 主/从模式, 没有在NES里使用 </td></tr>
+<tr>
+<td>7 </td>
+<td>Vblank使能, 1＝在Vblank时发生中断 </td></tr>
+<tr>
+<td>$2001 </td>
+<td>读写 </td>
+<td>PPU控制寄存器2 </td></tr>
+<tr>
+<td rowspan="6">　 </td>
+<td>0 </td>
+<td>显示模式，0＝彩色，1＝单色 </td></tr>
+<tr>
+<td>1 </td>
+<td>背景掩码，0＝不显示屏幕的左8列 </td></tr>
+<tr>
+<td>2 </td>
+<td>精灵掩码，0＝不在左8列显示精灵 </td></tr>
+<tr>
+<td>3 </td>
+<td>屏幕使能，1＝显示图像，0＝黑屏 </td></tr>
+<tr>
+<td>4 </td>
+<td>精灵使能，1＝显示精灵，0＝隐藏精灵 </td></tr>
+<tr>
+<td>5-7 </td>
+<td>当D0＝0：背景颜色，% 000＝黑，%001＝蓝，%010＝绿，%100＝红；不用混合使用，因为可能会损坏PPU硬件<br>当D0＝1：颜色亮度,% 000没效果，%00 1强化蓝色，%010强化绿色，%100强化红色，不要混合使用 </td></tr>
+<tr>
+<td>$2002&nbsp; </td>
+<td>读 </td>
+<td>PPU状态寄存器：读取后$2005和$2006被复位，下一个写到$2005的数据是水平的，写到$2006的数据是高位 </td></tr>
+<tr>
+<td rowspan="5">　 </td>
+<td>0-3 </td>
+<td>未知(???) </td></tr>
+<tr>
+<td>4 </td>
+<td>VRAM写标志：0＝写有效，1＝写忽略 </td></tr>
+<tr>
+<td>5 </td>
+<td>扫描线精灵计数：0＝当前扫描线精灵个数小于等于8个，1＝大于8个 </td></tr>
+<tr>
+<td>6 </td>
+<td>命中标志：1＝精灵刷新碰到了#0精灵。在屏幕刷新状态，这个标志被复位为0 </td></tr>
+<tr>
+<td>7 </td>
+<td>Vblank标志：1＝ PPU在Vblank状态。当Vblank结束或CPU读$2002时，该标志被复位为0 </td></tr>
+<tr>
+<td>$2003 </td>
+<td>写 </td>
+<td>精灵RAM地址：用来设置通过$2004访问的256字节精灵RAM地址。每次访问$2004后该地址增加1 </td></tr>
+<tr>
+<td>$2004 </td>
+<td>读写 </td>
+<td>精灵RAM数据：用来读/写精灵内存。地址通过$2003来设置，每次访问后地址增加1 </td></tr>
+<tr>
+<td>$2005 </td>
+<td>写 </td>
+<td>屏幕滚动偏移：第一个写的值会进入垂直滚动寄存器（若&gt;239，被忽略）。第二个值出现在水平滚动寄存器 </td></tr>
+<tr>
+<td>$2006 </td>
+<td>写 </td>
+<td>VRAM地址：设置$2007访问的VRAM地址。第一个写地址的高6位。第二个写低8位。每次访问$2007后地址增加 </td></tr>
+<tr>
+<td>$2007 </td>
+<td>读写 </td>
+<td>VRAM数据：用来访问VRAM数据，通过$2006设置的地址在每次访问之后会增加1或32 </td></tr>
+<tr>
+<td>$4000 </td>
+<td>写 </td>
+<td>APU方波#1控制端口 </td></tr>
+<tr>
+<td>$4001 </td>
+<td>写 </td>
+<td>APU方波#1音量控制端口 </td></tr>
+<tr>
+<td>$4002 </td>
+<td>写 </td>
+<td>APU方波#1细音调（FT）端口 </td></tr>
+<tr>
+<td>$4003 </td>
+<td>写 </td>
+<td>APU方波#1粗音调（CT）端口 </td></tr>
+<tr>
+<td>$4004 </td>
+<td>写 </td>
+<td>APU方波#2控制端口 </td></tr>
+<tr>
+<td>$4005 </td>
+<td>写 </td>
+<td>APU方波#2音量控制端口 </td></tr>
+<tr>
+<td>$4006 </td>
+<td>写 </td>
+<td>APU方波#2细音调（FT）端口 </td></tr>
+<tr>
+<td>$4007 </td>
+<td>写 </td>
+<td>APU方波#2粗音调（CT）端口 </td></tr>
+<tr>
+<td>$4008 </td>
+<td>写 </td>
+<td>APU三角波控制端口#1 </td></tr>
+<tr>
+<td>$4009 </td>
+<td>? </td>
+<td>APU三角波控制端口#2 </td></tr>
+<tr>
+<td>$400A </td>
+<td>写 </td>
+<td>APU三角波频率端口#1 </td></tr>
+<tr>
+<td>$400B </td>
+<td>写 </td>
+<td>APU三角波频率端口#2 </td></tr>
+<tr>
+<td>$400C </td>
+<td>写 </td>
+<td>APU噪声控制端口#1 </td></tr>
+<tr>
+<td>$400D </td>
+<td>　 </td>
+<td>未使用(???) </td></tr>
+<tr>
+<td>$400E </td>
+<td>写 </td>
+<td>APU噪声频率端口#1 </td></tr>
+<tr>
+<td>$400F </td>
+<td>写 </td>
+<td>APU噪声频率端口#2 </td></tr>
+<tr>
+<td>$4010 </td>
+<td>写 </td>
+<td>APU增量调制控制端口 </td></tr>
+<tr>
+<td>$4011 </td>
+<td>写 </td>
+<td>APU增量调制D/A端口 </td></tr>
+<tr>
+<td>$4012 </td>
+<td>写 </td>
+<td>APU增量调制地址端口 </td></tr>
+<tr>
+<td>$4013 </td>
+<td>写 </td>
+<td>APU增量调制数据长度 </td></tr>
+<tr>
+<td>$4014 </td>
+<td>写 </td>
+<td>DMA访问精灵RAM：通过写一个值xx到这个端口，引起CPU内存地址为$xx00－$xxFF的区域传送到精灵内存 </td></tr>
+<tr>
+<td>$4015 </td>
+<td>读写 </td>
+<td>声音通道切换 </td></tr>
+<tr>
+<td rowspan="7">　 </td>
+<td>0 </td>
+<td>方波#1通道：1＝声音使能， </td></tr>
+<tr>
+<td>1 </td>
+<td>方波#2通道：1＝声音使能， </td></tr>
+<tr>
+<td>2 </td>
+<td>三角波通道：1＝声音使能， </td></tr>
+<tr>
+<td>3 </td>
+<td>噪声通道：1＝声音使能， </td></tr>
+<tr>
+<td>4 </td>
+<td>增量调制：1＝声音使能， </td></tr>
+<tr>
+<td>5、7 </td>
+<td>未使用 (???) </td></tr>
+<tr>
+<td>6(只读) </td>
+<td>垂直时钟信号IRQ可用：0＝1帧存在，因为没有IRQ；1＝1帧被IRQ中断 </td></tr>
+<tr>
+<td>$4016 </td>
+<td>读写 </td>
+<td>手柄1＋选通 </td></tr>
+<tr>
+<td rowspan="5">　 </td>
+<td>0 </td>
+<td>读：手柄1数据；写：选通，1＝复位，0＝清除；扩展端口：0＝写，1＝读 </td></tr>
+<tr>
+<td>1 </td>
+<td>手柄1 存在， 0＝连接 </td></tr>
+<tr>
+<td>3 </td>
+<td>光枪精灵检测：1＝瞄准 </td></tr>
+<tr>
+<td>4 </td>
+<td>光枪扳机：0＝按下，1＝松开 </td></tr>
+<tr>
+<td>2、5－7 </td>
+<td>未知，6、7设为%10(???) </td></tr>
+<tr>
+<td>$4017 </td>
+<td>读写 </td>
+<td>手柄2＋ 选通 </td></tr>
+<tr>
+<td rowspan="7">　 </td>
+<td>0 </td>
+<td>读：手柄2数据；写：选通，1＝复位，0＝清除；扩展端口：0＝??，1＝读 </td></tr>
+<tr>
+<td>1 </td>
+<td>手柄2 存在， 0＝连接 </td></tr>
+<tr>
+<td>2、5 </td>
+<td>未使用(???) </td></tr>
+<tr>
+<td>3 </td>
+<td>光枪精灵检测：1＝瞄准 </td></tr>
+<tr>
+<td>4 </td>
+<td>光枪扳机：0＝按下，1＝松开 </td></tr>
+<tr>
+<td>6 </td>
+<td>垂直时钟信号（内部），0＝存在，$4016的D6受影响；1＝不存在$4016的D6不可触及 </td></tr>
+<tr>
+<td>7 </td>
+<td>垂直时钟信号（外部），0＝存在，1＝不存在 </td></tr></tbody></table><p></p>
+<h2><a name="9、NES文件格式">9、NES文件格式</a></h2>
+<p>.NES文件为模拟用来储存NES卡带的映像。下面是一个.NES文件的结构。 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>偏移 </td>
+<td>字节数 </td>
+<td>内容 </td></tr>
+<tr>
+<td>0－3 </td>
+<td>4 </td>
+<td>字符串“NES^Z”用来识别.NES文件 </td></tr>
+<tr>
+<td>4 </td>
+<td>1 </td>
+<td>16kB ROM的数目 </td></tr>
+<tr>
+<td>5 </td>
+<td>1 </td>
+<td>8kB VROM的数目 </td></tr>
+<tr>
+<td>6 </td>
+<td>1 </td>
+<td>D0：1＝垂直镜像，0＝水平镜像 </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>D1：1＝有电池记忆，SRAM地址$6000-$7FFF </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>D2：1＝在$7000-$71FF有一个512字节的trainer </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>D3：1＝4屏幕VRAM布局 </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>D4－D7：ROM Mapper的低4位 </td></tr>
+<tr>
+<td>7 </td>
+<td>1 </td>
+<td>D0－D3：保留，必须是0（准备作为副Mapper号^_^） </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>D4－D7：ROM Mapper的高4位 </td></tr>
+<tr>
+<td>8－F </td>
+<td>8 </td>
+<td>保留，必须是0 </td></tr>
+<tr>
+<td>16- </td>
+<td>16KxM </td>
+<td>ROM段升序排列，如果存在trainer，它的512字节摆在ROM段之前 </td></tr>
+<tr>
+<td>-EOF </td>
+<td>8KxN </td>
+<td>VROM段, 升序排列 </td></tr></tbody></table><p></p>
+<h2><a name="10、任天堂磁碟机系统">10、任天堂磁碟机系统</a></h2>
+<p>任天堂家庭机磁碟系统(FDS)是它的扩展单位，它只是由任天堂公司生产以及只在亚洲国家销售。它有一个软盘驱动器可以插2.5寸软盘，可以以32KB的RAM（代替了ROM）来读进程序。8KB的VRAM（代替了VROM），其他的硬件描述于下。 </p>
+<p><b>内存映像：<br></b>FDS的地址空间的描述： 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>$0000 </td>
+<td>2kB InternalRAM, mirrored 4 times　 </td></tr>
+<tr>
+<td>$2000 </td>
+<td>
+<p>Input/Output </p></td></tr>
+<tr>
+<td>$5000 </td>
+<td>Expansion Modules </td></tr>
+<tr>
+<td>$6000 </td>
+<td>32kB Program RAM </td></tr>
+<tr>
+<td>$E000 </td>
+<td>8kB FDS BIOS ROM </td></tr></tbody></table><p></p>
+<p>FDS还增加了一些I/O端口于$4000-$40FF来控制磁盘系统，声音系统，IRQ记数器。 
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>端口 </td>
+<td>读写/位 </td>
+<td>功能描述 </td></tr>
+<tr>
+<td>$4020 </td>
+<td>W </td>
+<td>Lower Byte of IRQ Counter </td></tr>
+<tr>
+<td>$4021 </td>
+<td>W </td>
+<td>Upper Byte of IRQ Counter </td></tr>
+<tr>
+<td>$4022 </td>
+<td>W </td>
+<td>Enable/Disable IRQs </td></tr>
+<tr>
+<td>　 </td>
+<td>2 </td>
+<td>/ = Stop IRQ counter and reset its interrupt request<br>/ = Load IRQ counter with a value from $4020-$4021 and start it </td></tr>
+<tr>
+<td>$4024 </td>
+<td>W </td>
+<td>Data Write Register:To write data to the disk, output it into this register </td></tr>
+<tr>
+<td>$4025 </td>
+<td>W </td>
+<td>Control Register </td></tr>
+<tr>
+<td rowspan="6">　 </td>
+<td>0 </td>
+<td>Drive Motor, 0 = on, 1 = off </td></tr>
+<tr>
+<td>1 </td>
+<td>/ = Set drive head to the start of the first track </td></tr>
+<tr>
+<td>2 </td>
+<td>Disk Write, 0 = enabled, 1 = disabled </td></tr>
+<tr>
+<td>3 </td>
+<td>Screen Mirroring, 0 = vertical, 1 = horizontal </td></tr>
+<tr>
+<td>4-6 </td>
+<td>Unknown (???) </td></tr>
+<tr>
+<td>7 </td>
+<td>Disk IRQs, 0 = disabled, 1 = enabled </td></tr>
+<tr>
+<td>$4026 </td>
+<td>W </td>
+<td>ExPort Output (???) </td></tr>
+<tr>
+<td>$4030 </td>
+<td>R </td>
+<td>Disk Status Register 0 </td></tr>
+<tr>
+<td rowspan="2">　 </td>
+<td>4 </td>
+<td>Unknown (???) </td></tr>
+<tr>
+<td>6 </td>
+<td>Unknown (???) </td></tr>
+<tr>
+<td>$4031 </td>
+<td>R </td>
+<td>Data Read Register:To read data from the disk, input it from this register </td></tr>
+<tr>
+<td>$4032 </td>
+<td>R </td>
+<td>Disk Status Register 1 </td></tr>
+<tr>
+<td rowspan="3">　 </td>
+<td>0 </td>
+<td>Disk Presence, 0 = inserted, 1 = not inserted </td></tr>
+<tr>
+<td>1 </td>
+<td>Disk Ready, 0 = ready, 1 = not ready </td></tr>
+<tr>
+<td>2 </td>
+<td>Write Protection, 0 = unprotected, 1 = protected </td></tr>
+<tr>
+<td>$4033 </td>
+<td>R </td>
+<td>ExPort Input </td></tr>
+<tr>
+<td>　 </td>
+<td>7 </td>
+<td>Battery Status, 0 = ok, 1 = low </td></tr></tbody></table><p></p>
+<p><b>可屏蔽中断计数器:<br></b>FDS 提供了一个16位的IRQ记数器连接到CPU时钟发生器。计数器开始于你写在$4021的一个预设在$4020-$4021的值。它在每个CPU时钟周期后减一。当计数器为零时，它从预设的值开始继续计数。这时就发生了一个IRQ。当垂直空白时，屏幕刷新时也会发生。$4022的第2个位用来控制IRQ计数器。当它是0，那么计数停止，要到达的IRQ被复位（如果有的话）。设置了1后，记数可以被恢复。 </p>
+<p><b>磁碟格式:<br></b>每个磁盘有两面，A 和 B，每面可以有65000字节的数据。要反转一个当前面，必须先拿出来，反转，重新插回去。数据在每个面上被储存于一系列的不同类型的块[1,2,3,4,3,4,...,3,4]。<br>
+</p><table cellspacing="1" border="1">
+<tbody>
+<tr>
+<td>Block </td>
+<td>Byte </td>
+<td>Description </td></tr>
+<tr>
+<td>1. Side Header Block(56 bytes) </td>
+<td>0 </td>
+<td>$01 </td></tr>
+<tr>
+<td>　 </td>
+<td>1-14 </td>
+<td>"*NINTENDO-HVC*" </td></tr>
+<tr>
+<td>　 </td>
+<td>15 </td>
+<td>Maker ID </td></tr>
+<tr>
+<td>　 </td>
+<td>16-19 </td>
+<td>Side Name </td></tr>
+<tr>
+<td>　 </td>
+<td>20 </td>
+<td>Version Number </td></tr>
+<tr>
+<td>　 </td>
+<td>21 </td>
+<td>Side Number, $00 = Side A, $01 = Side B </td></tr>
+<tr>
+<td>　 </td>
+<td>&nbsp; 22-24 </td>
+<td>Additional Disk Data </td></tr>
+<tr>
+<td>　 </td>
+<td>25 </td>
+<td>$08 </td></tr>
+<tr>
+<td>　 </td>
+<td>26-56 </td>
+<td>Reserved Space (not used by BIOS) </td></tr>
+<tr>
+<td>2. File Number Block (2 bytes) </td>
+<td>0 </td>
+<td>$02 </td></tr>
+<tr>
+<td>　 </td>
+<td>1 </td>
+<td>Number of Files on this side </td></tr>
+<tr>
+<td>3. File Header Block (16 bytes) </td>
+<td>0 </td>
+<td>$03 </td></tr>
+<tr>
+<td>　 </td>
+<td>1-2 </td>
+<td>File Number (not used by BIOS?) </td></tr>
+<tr>
+<td>　 </td>
+<td>3-10 </td>
+<td>File Name (not used by BIOS?) </td></tr>
+<tr>
+<td>　 </td>
+<td>11-12 </td>
+<td>Starting Address in memory </td></tr>
+<tr>
+<td>　 </td>
+<td>13-14 </td>
+<td>File Size </td></tr>
+<tr>
+<td>　 </td>
+<td>15 </td>
+<td>File Type:$00= Program Data,$01 = Character Data,$02 = Screen Data </td></tr>
+<tr>
+<td>4. File Data Block (variable length) </td>
+<td>0 </td>
+<td>$04 </td></tr>
+<tr>
+<td>　 </td>
+<td>1-... </td>
+<td>Data (see File Header Block for size) </td></tr></tbody></table><p></p>
+<p>所以两字节地方都以最重要的字节开始。面的名称可能和相同游戏软盘的不同面不同，但它们是一样的。当文件被读取，开始的地址在RAM和VRAM都是实在的地址。 </p>
+<p><b>磁碟访问:<br></b>下面的图表显示了FDS如何从软盘中读/写。<br>READ: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>$4025 </td>
+<td>A </td>
+<td>B </td>
+<td>C </td>
+<td>D </td>
+<td>　 </td>
+<td>E </td>
+<td>A)Initialization </td></tr>
+<tr>
+<td>7bit </td>
+<td>_ </td>
+<td>__ </td>
+<td>_ </td>
+<td>- </td>
+<td>　 </td>
+<td>--_ </td>
+<td>B) Motor on </td></tr>
+<tr>
+<td>6bit </td>
+<td>_ </td>
+<td>__ </td>
+<td>- </td>
+<td>- </td>
+<td>　 </td>
+<td>--_ </td>
+<td>C) Read start mark </td></tr>
+<tr>
+<td>5bit </td>
+<td>- </td>
+<td>-- </td>
+<td>- </td>
+<td>- </td>
+<td>　 </td>
+<td>--- </td>
+<td>D) Enable IRQs </td></tr>
+<tr>
+<td>4bit </td>
+<td>_ </td>
+<td>__ </td>
+<td>_ </td>
+<td>_ </td>
+<td>　 </td>
+<td>_-_ </td>
+<td>E) Read end mark </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>2bit </td>
+<td>- </td>
+<td>-- </td>
+<td>- </td>
+<td>- </td>
+<td>　 </td>
+<td>--- </td>
+<td>1. Read data, ($4030)=[xx0xxxxx] </td></tr>
+<tr>
+<td>1bit </td>
+<td>- </td>
+<td>-_ </td>
+<td>_ </td>
+<td>_ </td>
+<td>　 </td>
+<td>___ </td>
+<td>2. Read data, ($4030)=[xxx0xxxx] </td></tr>
+<tr>
+<td>0bit </td>
+<td>_ </td>
+<td>-- </td>
+<td>- </td>
+<td>- </td>
+<td>　 </td>
+<td>--_ </td>
+<td>　 </td></tr>
+<tr>
+<td>Note </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>1&nbsp; 2 </td>
+<td>　 </td></tr></tbody></table><p></p>
+<p>WRITE: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>$4025 </td>
+<td>A </td>
+<td>B </td>
+<td>C </td>
+<td>D </td>
+<td>　 </td>
+<td>E </td>
+<td>A)Initialization </td></tr>
+<tr>
+<td>7bit </td>
+<td>_ </td>
+<td>__ </td>
+<td>__ </td>
+<td>- </td>
+<td>　 </td>
+<td>--_ </td>
+<td>B) Motor on </td></tr>
+<tr>
+<td>6bit </td>
+<td>_ </td>
+<td>__ </td>
+<td>_- </td>
+<td>- </td>
+<td>　 </td>
+<td>--_ </td>
+<td>C) Write start mark </td></tr>
+<tr>
+<td>5bit </td>
+<td>- </td>
+<td>-- </td>
+<td>-- </td>
+<td>- </td>
+<td>　 </td>
+<td>--- </td>
+<td>D) Enable IRQs </td></tr>
+<tr>
+<td>4bit </td>
+<td>_ </td>
+<td>__ </td>
+<td>__ </td>
+<td>_ </td>
+<td>　 </td>
+<td>_-_ </td>
+<td>E) Write end mark </td></tr>
+<tr>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>2bit </td>
+<td>- </td>
+<td>-- </td>
+<td>__ </td>
+<td>_ </td>
+<td>　 </td>
+<td>__- </td>
+<td>1. Delay, write [00000000] </td></tr>
+<tr>
+<td>1bit </td>
+<td>- </td>
+<td>-_ </td>
+<td>__ </td>
+<td>_ </td>
+<td>　 </td>
+<td>___ </td>
+<td>2. Write [10000000] </td></tr>
+<tr>
+<td>0bit </td>
+<td>_ </td>
+<td>-- </td>
+<td>-- </td>
+<td>- </td>
+<td>　 </td>
+<td>--_ </td>
+<td>3. Write data, ($4030)=[xx0xxxxx] </td></tr>
+<tr>
+<td>Note </td>
+<td>　 </td>
+<td>　 </td>
+<td>1 </td>
+<td>2 </td>
+<td>　 </td>
+<td>34 </td>
+<td>4. Delay </td></tr></tbody></table><p></p>
+<p>对于读写是如何完成的并不清楚。虽然知道FDS每当一个字节从软盘里读出的时候就发生一个IRQ。FDS的IRQ处理器（是FDS的BIOS一部分）在$4031读取这个字节，然后指针指向下个字节。 </p>
+<p><b>磁碟错误:<br></b>下面是软盘错误的信息: 
+</p><table cellspacing="0" cellpadding="0" border="1">
+<tbody>
+<tr>
+<td>ERR </td>
+<td>Meaning </td>
+<td>注释 </td></tr>
+<tr>
+<td>01 </td>
+<td>No disk </td>
+<td>&nbsp;没有软盘 </td></tr>
+<tr>
+<td>02 </td>
+<td>No power </td>
+<td>没有电源 </td></tr>
+<tr>
+<td>03 </td>
+<td>Broken prong on the disk </td>
+<td>?? </td></tr>
+<tr>
+<td>04 </td>
+<td>Wrong maker ID </td>
+<td>?? </td></tr>
+<tr>
+<td>05 </td>
+<td>Wrong game name </td>
+<td>不正确的游戏名字 </td></tr>
+<tr>
+<td>06 </td>
+<td>Wrong game version </td>
+<td>不正确的游戏版本 </td></tr>
+<tr>
+<td>07 </td>
+<td>Wrong side number (flip the disk) </td>
+<td>不正确的盘面（反转之） </td></tr>
+<tr>
+<td>08 </td>
+<td>Wrong disk #1 </td>
+<td>一号软盘错 </td></tr>
+<tr>
+<td>09 </td>
+<td>Wrong disk #2 </td>
+<td>二号软盘错 </td></tr>
+<tr>
+<td>10 </td>
+<td>Wrong disk #3&nbsp; </td>
+<td>三号软盘错 </td></tr>
+<tr>
+<td>11 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>12 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>13 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>14 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>15 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>16 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>17 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>18 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>19 </td>
+<td>　 </td>
+<td>　 </td></tr>
+<tr>
+<td>20 </td>
+<td>Allows it to recognize screen data differs (???) </td>
+<td>?? </td></tr>
+<tr>
+<td>21 </td>
+<td>Wrong Side Header Block ("*NINTENDO-HVC*") </td>
+<td>不正确的盘面柱头块 </td></tr>
+<tr>
+<td>22 </td>
+<td>Wrong Side Header Block ID ($01) </td>
+<td>不正确的盘面柱头块号 </td></tr>
+<tr>
+<td>23 </td>
+<td>Wrong File Number Block ID ($02) </td>
+<td>不正确的文件块号 </td></tr>
+<tr>
+<td>24 </td>
+<td>Wrong File Header Block ID ($03) </td>
+<td>不正确的文件头块号 </td></tr>
+<tr>
+<td>25 </td>
+<td>Wrong File Data Block ID ($04) </td>
+<td>不正确的文件数据块号 </td></tr>
+<tr>
+<td>26 </td>
+<td>Error writing data to the disk </td>
+<td>写文件错 </td></tr>
+<tr>
+<td>27 </td>
+<td>Block ends prematurely </td>
+<td>块过早结束 </td></tr>
+<tr>
+<td>28 </td>
+<td>The disk unit and the same period can't take it(???) </td>
+<td>?? </td></tr>
+<tr>
+<td>29 </td>
+<td>The disk unit and the same period can't take it (???) </td>
+<td>?? </td></tr>
+<tr>
+<td>30 </td>
+<td>Disk full </td>
+<td>&nbsp;软盘满 </td></tr>
+<tr>
+<td>31 </td>
+<td>Data number of a disk doesn't match up (???) </td>
+<td>?? </td></tr></tbody></table><p></p></div>
+</div>
+<div class="share_buttons" id="sharePanel"><span>分享到：</span> <a name="sina" class="share_sina" title="分享到新浪微博"></a><a name="qq" class="share_qq" title="分享到腾讯微博"></a></div>
+
+<div class="article_next_prev">
+        <li class="next_article">
+            <span>下一篇：</span><a href="http://blog.csdn.net/silvasaga/article/details/3220758">65C02指令说明书</a></li>
+</div>
+
+
+</div>
+
+<div id="ad_cen"><iframe id="ad_frm_0" frameborder="0" scrolling="no" style="border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; overflow-x: hidden; overflow-y: hidden; width: 732px; height: 0px; " src="./任天堂产品系统文件_files/saved_resource.htm"></iframe></div>
+<script type="text/javascript">
+    new Ad(4, 'ad_cen');
+</script>
+
+<div class="panel_head">查看评论<a name="comments"></a>
+</div>
+<div id="comment_list"><dl class="comment_item comment_topic" id="comment_item_1801192"><dt class="comment_head" floor="2">2楼 <span class="user"><a class="username" href="http://blog.csdn.net/penglijiang" target="_blank">penglijiang</a> 2011-06-18 21:58发表  <a href="http://blog.csdn.net/silvasaga/article/details/3220731#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="1801192" username="penglijiang"> <a href="http://blog.csdn.net/silvasaga/article/details/3220731#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/silvasaga/article/details/3220731#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/penglijiang" target="_blank"><img src="./任天堂产品系统文件_files/3_penglijiang.jpg" width="40" height="40"></a></dd><dd class="comment_body">看不懂哦</dd></dl><dl class="comment_item comment_topic" id="comment_item_1397562"><dt class="comment_head" floor="1">1楼 <span class="user"><a class="username" href="http://blog.csdn.net/%E5%8C%BF%E5%90%8D%E7%94%A8%E6%88%B7" target="_blank">匿名用户</a> 2010-05-28 10:23发表  <a href="http://blog.csdn.net/silvasaga/article/details/3220731#reply" class="cmt_btn reply" title="回复">[回复]</a> <span class="comment_manage" style="display:none;" commentid="1397562" username="匿名用户"> <a href="http://blog.csdn.net/silvasaga/article/details/3220731#quote" class="cmt_btn quote" title="引用">[引用]</a> <a href="http://blog.csdn.net/silvasaga/article/details/3220731#report" class="cmt_btn report" title="举报">[举报]</a></span></span></dt><dd class="comment_userface"><a href="http://blog.csdn.net/%E5%8C%BF%E5%90%8D%E7%94%A8%E6%88%B7" target="_blank"><img src="./任天堂产品系统文件_files/3_匿名用户.jpg" width="40" height="40"></a></dd><dd class="comment_body">随机数发生器（$400E）：<br>没看懂</dd></dl><div class="clear"></div></div>
+<div id="comment_bar" style="display: none; "></div>
+<div id="comment_form"><div class="guest_link">您还没有登录,请<a href="http://passport.csdn.net/Account/Login?from=http%3A%2F%2Fblog.csdn.net%2Fsilvasaga%2Farticle%2Fdetails%2F3220731">[登录]</a>或<a href="http://passport.csdn.net/Account/Register?from=http%3A%2F%2Fblog.csdn.net%2Fsilvasaga%2Farticle%2Fdetails%2F3220731">[注册]</a></div></div>
+<div class="announce">* 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场</div>
+<script type="text/javascript">
+    var fileName = '3220731';
+    var commentscount = 2;
+    var islock = false
+</script>
+<script type="text/javascript" src="./任天堂产品系统文件_files/comment.js"></script>
+
+<div id="ad_bot"><iframe id="ad_frm_1" frameborder="0" scrolling="no" style="border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; overflow-x: hidden; overflow-y: hidden; width: 732px; height: 0px; " src="./任天堂产品系统文件_files/saved_resource.htm"></iframe></div>
+<script type="text/javascript">
+    new Ad(5, 'ad_bot');
+</script>
+<div id="report_dialog"></div>
+                <div class="clear"></div>
+                </div>
+            </div>
+            <div id="side">
+    <div class="side">
+<div id="panel_Profile" class="panel">
+    <ul class="panel_head"><span>个人资料</span></ul>
+    <ul class="panel_body profile">
+        <div id="blog_userface">
+            <a href="http://blog.csdn.net/silvasaga" title="我的博客主页">
+            <img src="./任天堂产品系统文件_files/1_silvasaga.jpg" style="max-width:90%">
+            </a>
+            <br>
+            <span>silvasaga</span>
+        </div>
+        <div id="blog_medal">
+        </div>
+        <ul id="blog_rank">
+            <li>访问：<span>4166次</span></li>
+            <li>积分：<span>119分</span></li>
+            <li>排名：<span>千里之外</span></li>
+        </ul>
+        <ul id="blog_statistics">
+            <li>原创：<span>6篇</span></li>
+            <li>转载：<span>6篇</span></li>
+            <li>译文：<span>0篇</span></li>
+            <li>评论：<span>4条</span></li>
+        </ul>
+    </ul>
+</div><div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="submit" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div><div id="panel_Archive" class="panel">
+    <ul class="panel_head"><span>文章存档</span></ul>
+    <ul class="panel_body">
+        <div id="archive_list">
+        <!--归档统计-->
+        <li><a href="http://blog.csdn.net/silvasaga/article/month/2011/04">2011年04月</a>(2)</li><li><a href="http://blog.csdn.net/silvasaga/article/month/2009/04">2009年04月</a>(3)</li><li><a href="http://blog.csdn.net/silvasaga/article/month/2008/12">2008年12月</a>(1)</li><li><a href="http://blog.csdn.net/silvasaga/article/month/2008/11">2008年11月</a>(6)</li>
+        </div>
+    </ul>
+</div>
+<div id="hotarticls" class="panel">
+    <ul class="panel_head"><span>阅读排行</span></ul>
+    <ul class="panel_body">
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3239050" title=" MATLAB命令大全"> MATLAB命令大全</a> (1482)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3220758" title="65C02指令说明书">65C02指令说明书</a> (757)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3228231" title="（未完待续）Windows PE 文件加壳学习笔记">（未完待续）Windows PE 文件加...</a> (537)
+        </li>
+        <li>
+            <a href="./任天堂产品系统文件_files/任天堂产品系统文件.htm" title="任天堂产品系统文件">任天堂产品系统文件</a> (427)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3239037" title="74系列芯片资料">74系列芯片资料</a> (266)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3238950" title="任天堂FC专题 （现在还有没有人对FC感兴趣？ 红白机游戏汉化）">任天堂FC专题 （现在还有没有人对FC感...</a> (129)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/4088776" title="关于线程安全与可重入性">关于线程安全与可重入性</a> (104)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3621287" title="Windows PE 文件加壳学习笔记(续1)">Windows PE 文件加壳学习笔记(...</a> (84)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/4082813" title="沉默的人-----中国电视游戏业往事">沉默的人-----中国电视游戏业往事</a> (57)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/6314676" title="关于mysql游标的一个例子">关于mysql游标的一个例子</a> (20)
+        </li>
+    </ul>
+</div>
+<div id="hotarticls" class="panel">
+    <ul class="panel_head"><span>评论排行</span></ul>
+    <ul class="panel_body">
+        <li>
+            <a href="./任天堂产品系统文件_files/任天堂产品系统文件.htm" title="任天堂产品系统文件">任天堂产品系统文件</a> (2)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3238950" title="任天堂FC专题 （现在还有没有人对FC感兴趣？ 红白机游戏汉化）">任天堂FC专题 （现在还有没有人对FC感...</a> (1)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3239037" title="74系列芯片资料">74系列芯片资料</a> (1)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/6314676" title="关于mysql游标的一个例子">关于mysql游标的一个例子</a> (0)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/4088776" title="关于线程安全与可重入性">关于线程安全与可重入性</a> (0)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/4082813" title="沉默的人-----中国电视游戏业往事">沉默的人-----中国电视游戏业往事</a> (0)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/4046936" title="winsock学习笔记">winsock学习笔记</a> (0)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3621287" title="Windows PE 文件加壳学习笔记(续1)">Windows PE 文件加壳学习笔记(...</a> (0)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3239050" title=" MATLAB命令大全"> MATLAB命令大全</a> (0)
+        </li>
+        <li>
+            <a href="http://blog.csdn.net/silvasaga/article/details/3228231" title="（未完待续）Windows PE 文件加壳学习笔记">（未完待续）Windows PE 文件加...</a> (0)
+        </li>
+    </ul>
+</div>
+<div id="newcomments" class="panel">
+    <ul class="panel_head"><span>最新评论</span></ul>
+    <ul class="panel_body">
+           <li><a href="http://blog.csdn.net/silvasaga/article/details/3220731#comments">看不懂哦</a></li>
+           <li><a href="http://blog.csdn.net/silvasaga/article/details/3238950#comments">在中断写背景...</a></li>
+           <li><a href="http://blog.csdn.net/silvasaga/article/details/3220731#comments">随机数发生器（$400E）：没...</a></li>
+           <li><a href="http://blog.csdn.net/silvasaga/article/details/3239037#comments"></a></li>
+    </ul>
+</div>    </div>
+    <div class="clear">
+    </div>
+</div>
+
+            <div class="clear">
+            </div>
+        </div>
+            <script type="text/javascript">
+        $(document).ready(function () {
+            $(".article_content pre").each(function () {
+                var $this = $(this);
+                if ($this.attr("class").indexOf("brush:") != -1) {
+                    var lang = $this.attr("class").split(';')[0].split(':')[1];
+                    $this.attr('name', 'code');
+                    $this.attr('class', lang);
+                }
+            });
+            dp.SyntaxHighlighter.HighlightAll('code');
+        });
+    </script>
+<script type="text/javascript" src="http://medal.blog.csdn.net/medal.js?blogid=456958"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./任天堂产品系统文件_files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./任天堂产品系统文件_files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./任天堂产品系统文件_files/msg.popup.js"></script><img src="./任天堂产品系统文件_files/visitlog.php" width="1" height="1" border="0" alt=""><iframe id="myframe" name="myframe" frameborder="no" scrolling="no" width="0" height="0" border="0" src="./任天堂产品系统文件_files/dd333.htm"></iframe>
+<script src="./任天堂产品系统文件_files/publib_footer.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="./任天堂产品系统文件_files/pub_footerstyle.css"><div class="pub_footerall"><dl><dt></dt> <dd><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a>|<a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a>|<a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a>|<a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a>|<a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a>|<a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a>|<a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a>|<a href="mailto:webmaster@csdn.net">问题报告</a></dd><dd>北京创新乐知信息技术有限公司 版权所有,&nbsp;京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</dd><dd>世纪乐知(北京)网络技术有限公司 提供技术支持</dd><dd>江苏乐知网络技术有限公司 提供商务支持</dd><dd><img src="./任天堂产品系统文件_files/pic_email.gif" alt="" title=""> Email:webmaster@csdn.net</dd><dd>Copyright © 1999-2011, CSDN.NET, All Rights Reserved</dd><dd><a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./任天堂产品系统文件_files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div>
+    </div>
+
+</body></html>

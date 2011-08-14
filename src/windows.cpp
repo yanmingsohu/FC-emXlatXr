@@ -89,6 +89,7 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 }
 
 void start_game(HWND hwnd, PMSG messages) {
+
     const int width = PPU_DISPLAY_P_WIDTH;
     const int height = PPU_DISPLAY_P_HEIGHT;
 
@@ -110,7 +111,7 @@ void start_game(HWND hwnd, PMSG messages) {
     NesSystem fc(&video);
 
 
-    if (fc.load_rom("rom/Tennis.nes")) {
+    if (fc.load_rom("rom/F-1.nes")) {
         MessageBox(hwnd, "读取ROM失败", "错误", 0);
         return;
     }
@@ -119,6 +120,7 @@ void start_game(HWND hwnd, PMSG messages) {
 	PPU *ppu = fc.getPPU();
 	int opCount = 0;
 	double cpuCycle = 0;
+	byte isVblank = 0;
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
@@ -133,21 +135,24 @@ void start_game(HWND hwnd, PMSG messages) {
 			DispatchMessage(messages);
     	}
 
+        /* 循环中绘制一帧 */
         while (++opCount < PPU_DISPLAY_P_HEIGHT) {
             cpuCycle += cpu->process();
+            //printf(cpu->cmdInfo());
 
-            if (++opCount>12000) {
-                //ppu->drawTileTable();
-               // printf(cpu->cmdInfo());
+            if (isVblank) {
+                continue;
             }
-
-            if (cpuCycle>113.6825) {
+            if (cpuCycle>PPU_PAL_HLINE_CPU_CYC) {
                 for (int i=0; i<PPU_DISPLAY_P_WIDTH; ++i) {
                     ppu->drawNextPixel();
                 }
-                cpuCycle = 0;
+                cpuCycle -= PPU_PAL_HLINE_CPU_CYC;
             }
         }
+
+        isVblank = !isVblank;
+
         opCount = 0;
         //printf(cpu->cmdInfo());
         displayCpu(cpu, hwnd, hMemDC);

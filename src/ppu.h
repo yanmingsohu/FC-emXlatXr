@@ -7,6 +7,9 @@
 
 #define PPU_DISPLAY_P_WIDTH     256
 #define PPU_DISPLAY_P_HEIGHT    240
+#define PPU_PAL_HLINE_CPU_CYC   113.6825    /* 每行扫描线的cpu周期 */
+#define PPU_PAL_VBLANK_TIME     1612        /* 微妙                */
+#define PPU_P_VBLANK_CPU_CYC    0 /* 垂直消隐的cpu周期  */
 
 #define PPU_DISPLAY_N_WIDTH     256
 #define PPU_DISPLAY_N_HEIGHT    224
@@ -67,7 +70,11 @@ private:
     word bgRomOffset;       /* 背景字库首地址                      */
     enum { t8x8, t8x16 } spriteType;
 
-    byte *NMI;
+    byte *NMI;              /* cpu的NMI地址线，用来向cpu发送NMI    */
+    byte sendNMI;           /* 是否在刷新一帧后发送NMI             */
+    byte preheating;        /* PPU预热期为3                        */
+    byte vblankTime;        /* 如果处于垂直消隐时期则为1           */
+
     byte bkleftCol;         /* 背景显示左一列                      */
     byte spleftCol;         /* 卡通显示左一列                      */
     byte bkAllDisp;         /* 背景全显示                          */

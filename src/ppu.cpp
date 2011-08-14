@@ -108,7 +108,7 @@ inline void PPU::control_2000(byte data) {
     spRomOffset = _BIT(3) ? 0x1000 : 0;
     bgRomOffset = _BIT(4) ? 0x1000 : 0;
     spriteType  = _BIT(5) ? t8x16  : t8x8;
-    *NMI        = _BIT(7) ? 1      : 0;
+    sendNMI     = _BIT(7) ? 1      : 0;
     // D6位的作用??
 }
 
@@ -134,7 +134,7 @@ byte PPU::readState(word addr) {
         r = 0;
         if ( spOverflow ) r |= ( 1<<5 );
         if ( spClash    ) r |= ( 1<<6 );
-        if ( *NMI       ) r |= ( 1<<7 );
+        if ( vblankTime ) r |= ( 1<<7 );
         break;
 
     case 7: /* 0x2007 写数据寄存器          */
@@ -238,6 +238,7 @@ void PPU::reset() {
     spOverflow = 0;
     spClash    = 0;
     *NMI       = 0;
+    preheating = 3;
 }
 
 void PPU::setNMI(byte* cpu_nmi) {
@@ -280,6 +281,8 @@ void PPU::drawNextPixel() {
     static word X = 0;
     static word Y = 0;
 
+    vblankTime = 0;
+
     /*-----------------| 绘制背景 |-------------------*/
     word nameIdx = (X/8) + (Y/8*32);
     word tileIdx = bg0->name[nameIdx];
@@ -311,8 +314,13 @@ printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
         X=0;
         if (++Y>=PPU_DISPLAY_P_HEIGHT) {
             Y=0;
-            *NMI = 1;
+            if (sendNMI || preheating) {
+                *NMI = 1;
+                preheating >>= 1;
+                printf("发送中断到CPU\n");
+            }
             //printf("一帧完成\n");
+            vblankTime = 1;
         }
     }
 }

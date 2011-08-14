@@ -46,11 +46,12 @@ public:
     bool loadNes(nes_file* rom);
     /* 读取程序段 addr=(0x8000-0xFFFF)                     */
     byte readRom(const word addr);
-    /* 读取vrom程序段, 暂时未实现 addr=(0x0000-0x1FFF)    */
+    /* 读取vrom程序段, 暂时未实现 addr=(0x0000-0x1FFF)     */
     byte readVRom(const word addr);
     /* 在向内存写数据时执行换页操作                        */
     void checkSwitch(const word addr, const byte value);
-
+    /* 返回vrom的长度(字节)                                */
+    int  vromSize();
 };
 
 #endif // MMC_H_INCLUDED

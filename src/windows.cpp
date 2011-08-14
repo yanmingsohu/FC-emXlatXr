@@ -109,6 +109,7 @@ void start_game(HWND hwnd, PMSG messages) {
     WindowsVideo video(hMemDC);
     NesSystem fc(&video);
 
+
     if (fc.load_rom("rom/Tennis.nes")) {
         MessageBox(hwnd, "¶ÁÈ¡ROMÊ§°Ü", "´íÎó", 0);
         return;
@@ -116,6 +117,8 @@ void start_game(HWND hwnd, PMSG messages) {
 
 	cpu_6502* cpu = fc.getCpu();
 	PPU *ppu = fc.getPPU();
+	int opCount = 0;
+	double cpuCycle = 0;
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
@@ -129,11 +132,25 @@ void start_game(HWND hwnd, PMSG messages) {
 			/* Send message to WindowProcedure */
 			DispatchMessage(messages);
     	}
-        cpu->process();
-        ppu->drawNextPixel();
 
+        while (++opCount < PPU_DISPLAY_P_HEIGHT) {
+            cpuCycle += cpu->process();
+
+            if (++opCount>12000) {
+                //ppu->drawTileTable();
+               // printf(cpu->cmdInfo());
+            }
+
+            if (cpuCycle>113.6825) {
+                for (int i=0; i<PPU_DISPLAY_P_WIDTH; ++i) {
+                    ppu->drawNextPixel();
+                }
+                cpuCycle = 0;
+            }
+        }
+        opCount = 0;
         //printf(cpu->cmdInfo());
-        //displayCpu(cpu, hwnd, hMemDC);
+        displayCpu(cpu, hwnd, hMemDC);
         BitBlt(hdc, 0, 0, width, height, hMemDC, 0, 0, SRCCOPY);
     }
 
@@ -169,7 +186,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
 
     sprintf(buf, "op count: %09ld", opCount);
     TextOut(hdc, x+=xIn, y, buf, 19);
-
+return;
     TextOut(hdc, 0, opy, cpu->cmdInfo(), 25);
     if ((opy+=10) > PPU_DISPLAY_P_HEIGHT) {
         opy = 30;

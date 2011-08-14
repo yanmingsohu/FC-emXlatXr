@@ -824,7 +824,7 @@ command_6502 command_list_6502[] = {
 /****************************************************************************/
 
 cpu_6502::cpu_6502(memory* ram)
-        : NMI(0), IRQ(0), RES(1), ram(ram)
+        : NMI_idle(1), NMI(0), IRQ(0), RES(1), ram(ram)
 {
 }
 
@@ -930,13 +930,14 @@ inline byte cpu_6502::reset() {
         PCH    = ram->read(0xFFFD);
         PCL    = ram->read(0xFFFC);
 
+        NMI_idle = 1;
         return CPU_RESET_CYC;
     }
     return 0;
 }
 
 inline byte cpu_6502::irq() {
-    if (IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
+    if (NMI_idle && IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
         IRQ = 0;
         jump(0xFFFE);
         return CPU_INTERRUPT_CYC;
@@ -945,9 +946,18 @@ inline byte cpu_6502::irq() {
 }
 
 inline byte cpu_6502::nmi() {
-    if (NMI) {
-        NMI = 0;
+if (!NMI_idle) {
+    //printf(cmdInfo());
+}
+    if (!NMI) {
+        NMI_idle = 1;
+    }
+    if (NMI && NMI_idle) {
+        //NMI = 0;
+        NMI_idle = 0;
         jump(0xFFFA);
+printf("NMIÖÐ¶Ï\n");
+printf(debug());
         return CPU_NMI_CYC;
     }
     return 0;

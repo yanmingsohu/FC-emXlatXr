@@ -48,12 +48,12 @@ void memory::write(const word offset, const byte data) {
         ram[offset%0x0800] = data;
         return;
     }
-    if (offset<0x2008) {    /* PPU 寄存器                      */
+    if (offset<0x4000) {    /* PPU 寄存器                      */
         ppu->controlWrite(offset, data);
         return;
     }
     if (offset>=0x8000) {
-        printf("MEM::向程序段写入数据: 0x%x = 0x%x \n", offset, data);
+        printf("MEM::错误,向程序段写入数据: 0x%x = 0x%x \n", offset, data);
     }
     mmc->checkSwitch(offset, data);
 }

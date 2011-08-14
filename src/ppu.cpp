@@ -6,7 +6,7 @@
 #define BLK(x)      (x), (x+32), (x+64)
 
 /* 颜色映射, 索引为FC系统颜色, 值为RGB颜色 */
-T_COLOR ppu_color_index[0x40] = {
+T_COLOR ppu_color_table[0x40] = {
      WHI(0x7F)
     ,DC(0x000080, 0x200000)
     ,DC(0x800000, 0x002000)
@@ -244,20 +244,75 @@ void PPU::setNMI(byte* cpu_nmi) {
     NMI = cpu_nmi;
 }
 
+void PPU::drawTileTable() {
+    byte dataH, dataL;
+    byte colorIdx;
+    int x=0, y=0;
+
+    for (int p=0; p<512; ++p) {
+        for (int i=0; i<8; ++i) {
+            dataL = mmc->readVRom(p * 16 + i);
+            dataH = mmc->readVRom(p * 16 + i + 8);
+
+            for (int d=8; d>=1; --d) {
+                colorIdx = 0;
+                if (dataL>>d & 1) {
+                    colorIdx |= 1;
+                }
+                if (dataH>>d & 1) {
+                    colorIdx |= 2;
+                }
+                video->drawPixel(x++, y, ppu_color_table[colorIdx]);
+            }
+            x-= 8;
+            y++;
+        }
+        x+= 8;
+        y-= 8;
+        if (p && p%32==0) {
+            x = 0;
+            y+= 8;
+        }
+    }
+}
+
 void PPU::drawNextPixel() {
     static word X = 0;
     static word Y = 0;
-    static int c = 0xFF0000;
 
-    //video->drawPixel(X, Y, c);
+    /*-----------------| 绘制背景 |-------------------*/
+    word nameIdx = (X/8) + (Y/8*32);
+    word tileIdx = bg0->name[nameIdx];
+    word tileAddr= tileIdx + bgRomOffset + Y%8;
 
-    if (++X>=PPU_DISPLAY_N_WIDTH) {
+    byte tile0 = mmc->readVRom(tileAddr    );
+    byte tile1 = mmc->readVRom(tileAddr + 8);
+    byte tileX = 1<<(7 - X%8);
+    tile0 &= tileX;
+    tile1 &= tileX;
+
+if (tileIdx&&0)
+printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
+       , X, Y, nameIdx, tileIdx, bgRomOffset);
+
+    byte paletteIdx = 0;
+    if (tile0) paletteIdx |= 0x01;
+    if (tile1) paletteIdx |= 0x02;
+
+    if (paletteIdx) {
+        byte attrIdx = X/8 + Y/8;
+        paletteIdx |= bg0->attribute[attrIdx] << 2;
+        byte colorIdx = bkPalette[paletteIdx];
+        video->drawPixel(X, Y, ppu_color_table[colorIdx]);
+    }
+    /*----------------| end |-------------------------*/
+
+    if (++X>=PPU_DISPLAY_P_WIDTH) {
         X=0;
-        if (++Y>=PPU_DISPLAY_N_HEIGHT) {
+        if (++Y>=PPU_DISPLAY_P_HEIGHT) {
             Y=0;
-            c = c>>1 | 0xA00000;
             *NMI = 1;
-            printf("一帧完成\n");
+            //printf("一帧完成\n");
         }
     }
 }

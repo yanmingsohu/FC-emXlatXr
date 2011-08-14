@@ -4,10 +4,12 @@
 #include "mmc.h"
 #include "video.h"
 
-#define PPU_DISPLAY_N_WIDTH     256
-#define PPU_DISPLAY_N_HEIGHT    224
+
 #define PPU_DISPLAY_P_WIDTH     256
 #define PPU_DISPLAY_P_HEIGHT    240
+
+#define PPU_DISPLAY_N_WIDTH     256
+#define PPU_DISPLAY_N_HEIGHT    224
 
 #define PPU_VMIRROR_VERTICAL    0x01
 #define PPU_VMIRROR_HORIZONTAL  0x00
@@ -103,6 +105,8 @@ public:
     void setNMI(byte* cpu_nmi);
     /* 绘制一个像素                                                */
     void drawNextPixel();
+    /* 立即绘制背景字库                                            */
+    void drawTileTable();
 };
 
 #endif // PPU_H_INCLUDED

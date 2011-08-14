@@ -82,7 +82,7 @@ _LOAD_SUCCESS:
     printf(cpu->debug());
 }
 
-int main()
+int __main()
 {
     welcome();
     test();

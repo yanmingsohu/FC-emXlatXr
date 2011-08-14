@@ -92,3 +92,7 @@ void MMC::checkSwitch(const word addr, const byte value) {
         sw->sw_page(sw, addr, value);
     }
 }
+
+int MMC::vromSize() {
+    return rom->vrom_size * 8 * 1024;
+}

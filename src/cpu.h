@@ -9,7 +9,10 @@ struct command_6502;
 struct command_parm;
 
 struct cpu_6502 {
+private:
+    byte NMI_idle;            /* NMI空闲则为1                        */
 
+public:
 #define CPU_NTSC            1.7897725
 #define CPU_PAL             1.773447
 
@@ -100,13 +103,13 @@ struct command_parm {
      * 于是,可以用cpu指令减去偏移得到该指令的寻址类型  */
     inline byte read(const byte addressing_mode);
 
-    /* 按照内存寻址方式把value写入到该地址            */
+    /* 按照内存寻址方式把value写入到该地址             */
     inline void write(const byte addressing_mode, byte value);
 
-    /* 按照内存寻址方式读取该地址的数据               */
+    /* 按照内存寻址方式读取该地址的数据                */
     inline word getAddr(const byte addressing_mode);
 
-    /* --| 寻址算法定义, 函数返回地址             |-- */
+    /* --| 寻址算法定义, 函数返回地址              |-- */
     word  abs   ();
     word  absX  ();
     word  absY  ();

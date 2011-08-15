@@ -108,6 +108,8 @@ HDC createCanvas(HDC hdc) {
 }
 
 void start_game(HWND hwnd, PMSG messages) {
+#define ROM  "rom/F-1.nes"
+//#define ROM  "rom/Tennis.nes"
 
     HDC hdc = GetDC(hwnd);
 	HDC hMemDC = createCanvas(hdc);
@@ -115,7 +117,7 @@ void start_game(HWND hwnd, PMSG messages) {
     WindowsVideo video(hMemDC);
     NesSystem fc(&video);
 
-    if (fc.load_rom("rom/F-1.nes")) {
+    if (fc.load_rom(ROM)) {
         MessageBox(hwnd, "¶ÁÈ¡ROMÊ§°Ü", "´íÎó", 0);
         return;
     }
@@ -137,8 +139,9 @@ void start_game(HWND hwnd, PMSG messages) {
     	}
 
         fc.drawFrame();
+        //fc.getPPU()->drawTileTable();
 
-        displayCpu(cpu, hwnd, hMemDC);
+        //displayCpu(cpu, hwnd, hMemDC);
         BitBlt(hdc, 0, 0, PPU_DISPLAY_P_WIDTH,
                PPU_DISPLAY_P_HEIGHT, hMemDC, 0, 0, SRCCOPY);
     }
@@ -149,7 +152,6 @@ void start_game(HWND hwnd, PMSG messages) {
 
 void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
     static long frameC = 0;
-    static int opy = 50;
     static clock_t time = clock();
 
     int x = 0;
@@ -158,6 +160,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
 	char buf[128];
 
     frameC++;
+
     if (frameC>672) {
         //MessageBox(hwnd, "debug", "wait....", 0);
         //cpu->showCmds(1);

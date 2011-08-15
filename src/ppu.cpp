@@ -1,5 +1,6 @@
 #include "ppu.h"
-#include "stdio.h"
+#include <stdio.h>
+#include <string.h>
 
 #define DC(b, x)    (b), (b+x), (b+x+x), (b+x+x+x)
 #define WHI(x)      (x + (x<<8) +(x<<16))
@@ -277,53 +278,83 @@ void PPU::drawTileTable() {
     }
 }
 
-void PPU::drawNextPixel() {
-    static word X = 0;
-    static word Y = 0;
+void PPU::drawSprite() {
+    byte dataH, dataL;
+    byte colorIdx;
+    int  i;
 
-    vblankTime = 0;
+    for (int sp=63; sp>=0; --sp) {
+        i = sp * 4;
+        byte x    = spWorkRam[i  ];
+        byte y    = spWorkRam[i+3];
+        byte tile = spWorkRam[i+1];
 
-    /*-----------------| 绘制背景 |-------------------*/
-    word nameIdx = (X/8) + (Y/8*32);
-    word tileIdx = bg0->name[nameIdx];
-    word tileAddr= tileIdx + bgRomOffset + Y%8;
+        word tileAddr =  tile*16;
+
+        for (int r=0; r<8; ++r) {
+            dataL   = mmc->readVRom(tileAddr + r    );
+            dataH   = mmc->readVRom(tileAddr + r + 8);
+
+            for (int d=8; d>=1; --d) {
+                colorIdx = 0;
+                if (dataL>>d & 1) {
+                    colorIdx |= 1;
+                }
+                if (dataH>>d & 1) {
+                    colorIdx |= 2;
+                }
+                video->drawPixel(x++, y, ppu_color_table[colorIdx]);
+            }
+            x-=8;
+            y++;
+        }
+    }
+}
+
+void PPU::drawPixel(int X, int Y) {
+/*-----------------| 绘制背景 |-------------------*/
+    word nameIdx = (X/8) * (Y/8);
+    word tileIdx = bg2->name[nameIdx];
+    word tileAddr= bgRomOffset + tileIdx*16 + Y%8;
 
     byte tile0 = mmc->readVRom(tileAddr    );
     byte tile1 = mmc->readVRom(tileAddr + 8);
     byte tileX = 1<<(7 - X%8);
-    tile0 &= tileX;
-    tile1 &= tileX;
 
-/*
-if (tileIdx&&0)
+
+ if (tileIdx&&0)
 printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
-       , X, Y, nameIdx, tileIdx, bgRomOffset); */
+       , X, Y, nameIdx, tileIdx, bgRomOffset);
 
     byte paletteIdx = 0;
-    if (tile0) paletteIdx |= 0x01;
-    if (tile1) paletteIdx |= 0x02;
+    if (tile0 & tileX) paletteIdx |= 0x01;
+    if (tile1 & tileX) paletteIdx |= 0x02;
 
     if (paletteIdx) {
         byte attrIdx = X/8 + Y/8;
         paletteIdx |= bg0->attribute[attrIdx] << 2;
         byte colorIdx = bkPalette[paletteIdx];
-        video->drawPixel(X, Y, ppu_color_table[colorIdx]);
+        video->drawPixel(X, Y, ppu_color_table[paletteIdx]);
     }
-    /*----------------| end |-------------------------*/
+/*----------------| end |-------------------------*/
+}
 
-    if (++X>=PPU_DISPLAY_P_WIDTH) {
-        X=0;
-        if (++Y>=PPU_DISPLAY_P_HEIGHT) {
-            Y=0;
-            if (sendNMI || preheating) {
-                *NMI = 1;
-                preheating >>= 1;
+void PPU::oneFrameOver() {
+    if (sendNMI || preheating) {
+        *NMI = 1;
+        preheating >>= 1;
 #ifdef NMI_DEBUG
-                printf("PPU::发送中断到CPU\n");
+        printf("PPU::发送中断到CPU\n");
 #endif
-            }
-            //printf("PPU::一帧完成\n");
-            vblankTime = 1;
-        }
     }
+    //printf("PPU::一帧完成\n");
+    vblankTime = 1;
+}
+
+void PPU::startNewFrame() {
+    vblankTime = 0;
+}
+
+void PPU::copySprite(byte *data) {
+    memcpy(spWorkRam, data, 256);
 }

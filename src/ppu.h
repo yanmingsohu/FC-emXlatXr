@@ -147,10 +147,18 @@ public:
     void swithMirror(byte type);
     /* 设置cpu的NMI地址线                                          */
     void setNMI(byte* cpu_nmi);
-    /* 绘制一个像素                                                */
-    void drawNextPixel();
     /* 立即绘制背景字库                                            */
     void drawTileTable();
+    /* 绘制指定位置的像素                                          */
+    void drawPixel(int x, int y);
+    /* 当一帧绘制完成时调用以发送中断, 系统预热时也需要调用两次    */
+    void oneFrameOver();
+    /* 当开始绘制一幅新的帧时,该方法被调用                         */
+    void startNewFrame();
+    /* 复制256字节的数据到精灵Ram                                  */
+    void copySprite(byte *data);
+    /* 绘制一帧中的精灵 */
+    void drawSprite();
 };
 
 #endif // PPU_H_INCLUDED

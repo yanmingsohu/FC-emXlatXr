@@ -8,7 +8,7 @@ const int test_command = 800;
 
 class CmdVideo : public Video {
     void drawPixel(int x, int y, T_COLOR color) {
-        printf("(%x,%x)=%x\t", x, y, color);
+        //printf("::draw pixel:(%02x,%02x)=%08x\n", x, y, color);
     }
 };
 
@@ -16,7 +16,7 @@ void test() {
 
     using std::string;
 
-    string filename = "rom/Tennis.nes"; //"rom/Dr_Mario.nes";
+    string filename = "rom/F-1.nes";//"rom/Tennis.nes"; //"rom/Dr_Mario.nes";
 
     CmdVideo video;
     NesSystem fc(&video);
@@ -58,19 +58,20 @@ _LOAD_SUCCESS:
 
     cpu_6502* cpu = fc.getCpu();
     PPU *ppu = fc.getPPU();
+    cpu->showCmds(0);
 
     int c=0;
 
     clock_t s = clock();
 
     for (;;) {
-        if (cpu->process() || c++<test_command) {
-            //printf(cpu->cmdInfo());
-            for (int dmp=0; dmp<100; ++dmp) {
-                ppu->drawNextPixel();
-            }
-        } else {
-            break;
+        ++c;
+        fc.drawFrame();
+
+        if (c>=676) { // 672 676
+            cpu->showCmds(1);
+            printf("%d\n", c);
+            system("pause");
         }
     }
 
@@ -82,7 +83,7 @@ _LOAD_SUCCESS:
     printf(cpu->debug());
 }
 
-int __main()
+int $$main()
 {
     welcome();
     test();

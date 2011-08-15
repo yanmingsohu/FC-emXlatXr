@@ -52,8 +52,12 @@ void memory::write(const word offset, const byte data) {
         ppu->controlWrite(offset, data);
         return;
     }
+    if (offset==0x4014) {   /* OAM DMA 寄存器                  */
+        ppu->copySprite(ram + data);
+        return;
+    }
     if (offset>=0x8000) {
-        printf("MEM::错误,向程序段写入数据: 0x%x = 0x%x \n", offset, data);
+        printf("MEM::向程序段写入数据: 0x%x = 0x%x \n", offset, data);
     }
     mmc->checkSwitch(offset, data);
 }

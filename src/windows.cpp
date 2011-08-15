@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <time.h>
 #include "nes_sys.h"
 #include "ppu.h"
 
@@ -88,14 +89,10 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
     return messages.wParam;
 }
 
-void start_game(HWND hwnd, PMSG messages) {
-
-    const int width = PPU_DISPLAY_P_WIDTH;
-    const int height = PPU_DISPLAY_P_HEIGHT;
-
-    HDC hdc = GetDC(hwnd);
-	HDC hMemDC = CreateCompatibleDC(hdc);
-    HBITMAP hBitmap = CreateCompatibleBitmap(hdc, width, height);
+HDC createCanvas(HDC hdc) {
+    HDC hMemDC = CreateCompatibleDC(hdc);
+    HBITMAP hBitmap = CreateCompatibleBitmap(
+            hdc, PPU_DISPLAY_P_WIDTH, PPU_DISPLAY_P_HEIGHT);
     SelectObject(hMemDC, hBitmap);
 
     HFONT font = CreateFont(10, 0, 0, 0, 100
@@ -107,9 +104,16 @@ void start_game(HWND hwnd, PMSG messages) {
     SetTextColor(hMemDC, RGB(255, 255, 255));
     SetBkColor(hMemDC, RGB(0, 0, 0));
 
+    return hMemDC;
+}
+
+void start_game(HWND hwnd, PMSG messages) {
+
+    HDC hdc = GetDC(hwnd);
+	HDC hMemDC = createCanvas(hdc);
+
     WindowsVideo video(hMemDC);
     NesSystem fc(&video);
-
 
     if (fc.load_rom("rom/F-1.nes")) {
         MessageBox(hwnd, "∂¡»°ROM ß∞‹", "¥ÌŒÛ", 0);
@@ -117,10 +121,7 @@ void start_game(HWND hwnd, PMSG messages) {
     }
 
 	cpu_6502* cpu = fc.getCpu();
-	PPU *ppu = fc.getPPU();
-	int opCount = 0;
-	double cpuCycle = 0;
-	byte isVblank = 0;
+    cpu->showCmds(0);
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
@@ -135,44 +136,32 @@ void start_game(HWND hwnd, PMSG messages) {
 			DispatchMessage(messages);
     	}
 
-        /* —≠ª∑÷–ªÊ÷∆“ª÷° */
-        while (++opCount < PPU_DISPLAY_P_HEIGHT) {
-            cpuCycle += cpu->process();
-            //printf(cpu->cmdInfo());
+        fc.drawFrame();
 
-            if (isVblank) {
-                continue;
-            }
-            if (cpuCycle>PPU_PAL_HLINE_CPU_CYC) {
-                for (int i=0; i<PPU_DISPLAY_P_WIDTH; ++i) {
-                    ppu->drawNextPixel();
-                }
-                cpuCycle -= PPU_PAL_HLINE_CPU_CYC;
-            }
-        }
-
-        isVblank = !isVblank;
-
-        opCount = 0;
-        //printf(cpu->cmdInfo());
         displayCpu(cpu, hwnd, hMemDC);
-        BitBlt(hdc, 0, 0, width, height, hMemDC, 0, 0, SRCCOPY);
+        BitBlt(hdc, 0, 0, PPU_DISPLAY_P_WIDTH,
+               PPU_DISPLAY_P_HEIGHT, hMemDC, 0, 0, SRCCOPY);
     }
 
-    DeleteObject(hBitmap);
     DeleteDC(hMemDC);
     ReleaseDC(hwnd, hdc);
 }
 
 void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
-    static long opCount = 0;
+    static long frameC = 0;
     static int opy = 50;
+    static clock_t time = clock();
 
     int x = 0;
 	int y = 0;
 	int xIn = 50;
 	char buf[128];
-    opCount++;
+
+    frameC++;
+    if (frameC>672) {
+        //MessageBox(hwnd, "debug", "wait....", 0);
+        //cpu->showCmds(1);
+    }
 
     sprintf(buf, "A: %02X", cpu->A);
     TextOut(hdc, x, y, buf, 5);
@@ -189,13 +178,12 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
     sprintf(buf, "FG: %02X", cpu->FLAGS);
     TextOut(hdc, x+=xIn, y, buf, 6);
 
-    sprintf(buf, "op count: %09ld", opCount);
-    TextOut(hdc, x+=xIn, y, buf, 19);
-return;
-    TextOut(hdc, 0, opy, cpu->cmdInfo(), 25);
-    if ((opy+=10) > PPU_DISPLAY_P_HEIGHT) {
-        opy = 30;
-    }
+    double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
+
+    sprintf(buf, "frame: %09ld", frameC);
+    TextOut(hdc, x+=xIn, y, buf, 16);
+    sprintf(buf, "rate : %02lf/s", frameC/utime);
+    TextOut(hdc, x, y-10, buf, 11);
 }
 
 
@@ -206,7 +194,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     switch (message)                  /* handle the messages */
     {
         case WM_DESTROY:
-            PostQuitMessage (0);       /* send a WM_QUIT to the message queue */
+            PostQuitMessage (0);      /* send a WM_QUIT to the message queue */
             break;
         default:                      /* for messages that we don't deal with */
             return DefWindowProc (hwnd, message, wParam, lParam);

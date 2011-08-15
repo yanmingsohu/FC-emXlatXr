@@ -19,6 +19,41 @@ NesSystem::~NesSystem() {
     delete rom;
 }
 
+void NesSystem::drawFrame() {
+    static int cpu_cyc = 0;
+
+    int line = 0;
+
+    while (line++<PPU_DISPLAY_P_HEIGHT) {
+        /* 绘制一行 */
+        int ppu_cyc = 0, cyc = 0;
+
+        while (cpu_cyc<P_HLINE_CPU_CYC) {
+            cyc = cpu->process();
+            cpu_cyc += cyc;
+            ppu_cyc += cyc;
+
+            if (ppu_cyc>=P_PIXEL_CPU_CYC) {
+                ppu->drawNextPixel();
+                ppu_cyc -= P_PIXEL_CPU_CYC;
+            }
+        }
+        cpu_cyc -= P_HLINE_CPU_CYC;
+
+        /* 水平消隐周期 */
+        while (cpu_cyc<P_HBLANK_CPU_CYC) {
+            cpu_cyc += cpu->process();
+        }
+        cpu_cyc -= P_HBLANK_CPU_CYC;
+    }
+
+    /* 垂直消隐周期 */
+    while (cpu_cyc<P_VBLANK_CPU_CYC) {
+        cpu_cyc += cpu->process();
+    }
+    cpu_cyc -= P_VBLANK_CPU_CYC;
+}
+
 int NesSystem::load_rom(string filename) {
     int res = ::load_rom(rom, &filename);
 

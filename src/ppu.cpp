@@ -187,7 +187,7 @@ inline byte PPU::read() {
 
 inline void PPU::write(byte data) {
     if (ppu_ram_p<0x2000) {
-        printf("PPU: can't write vrom %x.", ppu_ram_p);
+        printf("PPU: can't write vrom $%04x=%02x.\n", ppu_ram_p, data);
         return;
     } else
 
@@ -294,9 +294,10 @@ void PPU::drawNextPixel() {
     tile0 &= tileX;
     tile1 &= tileX;
 
+/*
 if (tileIdx&&0)
 printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
-       , X, Y, nameIdx, tileIdx, bgRomOffset);
+       , X, Y, nameIdx, tileIdx, bgRomOffset); */
 
     byte paletteIdx = 0;
     if (tile0) paletteIdx |= 0x01;
@@ -317,9 +318,11 @@ printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
             if (sendNMI || preheating) {
                 *NMI = 1;
                 preheating >>= 1;
-                printf("发送中断到CPU\n");
+#ifdef NMI_DEBUG
+                printf("PPU::发送中断到CPU\n");
+#endif
             }
-            //printf("一帧完成\n");
+            //printf("PPU::一帧完成\n");
             vblankTime = 1;
         }
     }

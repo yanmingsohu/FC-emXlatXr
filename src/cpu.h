@@ -9,16 +9,20 @@ struct command_6502;
 struct command_parm;
 
 struct cpu_6502 {
+
 private:
-    byte NMI_idle;            /* NMI空闲则为1                        */
+    byte NMI_idle;               /* NMI空闲则为1                     */
+#ifdef SHOW_CPU_OPERATE
+    byte showCmd;
+#endif
 
 public:
-#define CPU_NTSC            1.7897725
-#define CPU_PAL             1.773447
+#define CPU_NTSC      1789772.5  /* Hz */
+#define CPU_PAL       1773447
 
-#define CPU_INTERRUPT_CYC   8 /* 中断命令的执行周期                  */
-#define CPU_RESET_CYC       6 /* 复位命令执行周期                    */
-#define CPU_NMI_CYC        17 /* 不可屏蔽中断执行周期                */
+#define CPU_INTERRUPT_CYC   8    /* 中断命令的执行周期               */
+#define CPU_RESET_CYC       6    /* 复位命令执行周期                 */
+#define CPU_NMI_CYC        17    /* 不可屏蔽中断执行周期             */
 
     byte A; 	              /* 累加器                              */
     byte Y;	    	          /* 索引暂存器                          */
@@ -75,6 +79,12 @@ public:
                                 /* 如果a与b的最高位不同,则v=1否则为0
                                  * b是参与运算之前的累加器的值       */
     void    clearV();
+
+#ifdef SHOW_CPU_OPERATE
+    void showCmds(byte show) {   /* 是否在命令结束后显示相关信息      */
+        showCmd = show;
+    }
+#endif
 };
 
 /* 向命令处理函数传递参数          */
@@ -109,7 +119,7 @@ struct command_parm {
     /* 按照内存寻址方式读取该地址的数据                */
     inline word getAddr(const byte addressing_mode);
 
-    /* --| 寻址算法定义, 函数返回地址              |-- */
+    /*-----| 寻址算法定义, 函数返回地址 |--------------*/
     word  abs   ();
     word  absX  ();
     word  absY  ();

@@ -50,6 +50,9 @@ void cpu_command_BRK(command_6502* cmd, command_parm* parm) {
 /* 从中断过程中返回 */
 void cpu_command_RTI(command_6502* cmd, command_parm* parm) {
     parm->cpu->rti();
+#ifdef NMI_DEBUG
+    printf("CPU::中断返回\n");
+#endif
 }
 
 /* value & x == true, 则设置'进位'位 */
@@ -511,6 +514,14 @@ void cpu_command_STA(command_6502* cmd, command_parm* parm) {
     case 0x81:
         parm->write(parm->op - 0x81, parm->cpu->A);
     }
+/*  if (parm->p1==0x24) {
+        word adr = parm->getAddr(parm->op - 0x81);
+        printf(parm->cpu->debug());
+
+        byte v1 = parm->ram->read(parm->p1);
+        byte v2 = parm->ram->read(parm->p1+1);
+        printf(">> ADDR : %x  | %x \n", adr, v2<<8 | v1);
+    } */
 }
 
 /* 把Y寄存器存入内存 */
@@ -911,6 +922,9 @@ byte cpu_6502::process() {
     parm.ram = parm.cpu->ram;
     PC += opp->len;
 
+#ifdef SHOW_CPU_OPERATE
+    if (showCmd) printf(cmdInfo());
+#endif
     opp->op_func(opp, &parm);
 
     cpu_cyc += nmi();
@@ -946,18 +960,14 @@ inline byte cpu_6502::irq() {
 }
 
 inline byte cpu_6502::nmi() {
-if (!NMI_idle) {
-    //printf(cmdInfo());
-}
-    if (!NMI) {
-        NMI_idle = 1;
-    }
     if (NMI && NMI_idle) {
         //NMI = 0;
         NMI_idle = 0;
         jump(0xFFFA);
-printf("NMI中断\n");
-printf(debug());
+#ifdef NMI_DEBUG
+        printf("CPU::NMI中断\n");
+        printf(debug());
+#endif
         return CPU_NMI_CYC;
     }
     return 0;
@@ -967,6 +977,8 @@ inline void cpu_6502::rti() {
     FLAGS = pop();
     PCL   = pop();
     PCH   = pop();
+    NMI   = 0;
+    NMI_idle = 1;
 }
 
 inline void cpu_6502::jump(word addr) {

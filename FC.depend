@@ -23,51 +23,53 @@
 1312386882 e:\c-project\fc\cpu.h
 	"type.h"
 
-1313135120 source:f:\c-project\fc\src\main.cpp
+1313365955 source:f:\c-project\fc\src\main.cpp
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
 	<string>
 	"nes_sys.h"
 
-1313136275 f:\c-project\fc\src\cpu.h
+1313390261 f:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 	"ppu.h"
 
-1313137024 f:\c-project\fc\src\type.h
+1313392962 f:\c-project\fc\src\type.h
 
-1313137134 f:\c-project\fc\src\mem.h
+1313365955 f:\c-project\fc\src\mem.h
 	"type.h"
 	"rom.h"
 	"mmc.h"
 	"ppu.h"
 
-1313136428 source:f:\c-project\fc\src\mem.cpp
+1313365955 source:f:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
+	<stdio.h>
 
-1313136294 source:f:\c-project\fc\src\cpu.cpp
+1313394150 source:f:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
 	"stdlib.h"
 
-1313135195 source:f:\c-project\fc\src\rom.cpp
+1313365955 source:f:\c-project\fc\src\rom.cpp
 	"rom.h"
 	<stdio.h>
 	<stdlib.h>
 
-1313123156 f:\c-project\fc\src\rom.h
+1313365955 f:\c-project\fc\src\rom.h
 	"type.h"
 	"string"
 
-1313134717 f:\c-project\fc\src\nes_sys.h
+1313374723 f:\c-project\fc\src\nes_sys.h
 	"cpu.h"
 	"mem.h"
 	"rom.h"
+	"video.h"
 
-1313136639 source:f:\c-project\fc\src\nes_sys.cpp
+1313389268 source:f:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	<stdio.h>
 
@@ -171,28 +173,32 @@
 	"stdio.h"
 	"stdlib.h"
 
-1313131513 source:f:\c-project\fc\src\windows.cpp
+1313394053 source:f:\c-project\fc\src\windows.cpp
 	<windows.h>
 	<stdio.h>
+	<time.h>
 	"nes_sys.h"
 	"ppu.h"
 
-1313118454 source:f:\c-project\fc\src\type.cpp
+1313393048 source:f:\c-project\fc\src\type.cpp
 	"type.h"
 	<stdio.h>
 
-1313137152 source:f:\c-project\fc\src\mmc.cpp
+1313365955 source:f:\c-project\fc\src\mmc.cpp
 	"mmc.h"
 	"type.h"
+	"stdio.h"
 
-1313137097 f:\c-project\fc\src\mmc.h
+1313365955 f:\c-project\fc\src\mmc.h
 	"rom.h"
 
-1313114177 source:f:\c-project\fc\src\ppu.cpp
+1313391099 source:f:\c-project\fc\src\ppu.cpp
 	"ppu.h"
+	"stdio.h"
 
-1313137419 f:\c-project\fc\src\ppu.h
+1313389361 f:\c-project\fc\src\ppu.h
 	"mmc.h"
+	"video.h"
 
 1313273660 e:\c-project\fc\src\mmc.h
 	"rom.h"
@@ -251,4 +257,7 @@
 	<stdio.h>
 	"nes_sys.h"
 	"ppu.h"
+
+1313365955 f:\c-project\fc\src\video.h
+	"type.h"
 

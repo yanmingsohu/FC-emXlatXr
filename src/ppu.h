@@ -4,12 +4,8 @@
 #include "mmc.h"
 #include "video.h"
 
-
 #define PPU_DISPLAY_P_WIDTH     256
 #define PPU_DISPLAY_P_HEIGHT    240
-#define PPU_PAL_HLINE_CPU_CYC   113.6825    /* 每行扫描线的cpu周期 */
-#define PPU_PAL_VBLANK_TIME     1612        /* 微妙                */
-#define PPU_P_VBLANK_CPU_CYC    0 /* 垂直消隐的cpu周期  */
 
 #define PPU_DISPLAY_N_WIDTH     256
 #define PPU_DISPLAY_N_HEIGHT    224
@@ -18,6 +14,21 @@
 #define PPU_VMIRROR_HORIZONTAL  0x00
 #define PPU_VMIRROR_SINGLE      0x03
 #define PPU_VMIRROR_4_LAYOUT    0x08
+
+/*---------------------------------------| PAL Info |-------------*/
+#define P_HLINE_CPU_CYC       1024       /* 每行绘制周期          */
+#define P_HBLANK_CPU_CYC       338       /* 每行水平消隐周期      */
+#define P_VLINE_COUNT          312       /* 每帧扫描线            */
+#define P_VBLANK_CPU_CYC     35469       /* 垂直消隐周期          */
+
+/* 每帧周期    */
+#define P_FRAME_CPU_CYC       \
+            ( (P_HLINE_CPU_CYC+P_HBLANK_CPU_CYC) * P_VLINE_COUNT )
+
+/* 每像素周期  */
+#define P_PIXEL_CPU_CYC       \
+            ( P_HLINE_CPU_CYC / PPU_DISPLAY_P_WIDTH )
+/*----------------------------------------------------------------*/
 
 struct BackGround {
 
@@ -43,6 +54,32 @@ struct BackGround {
     }
 };
 
+/*----------------------------------------| vrom 映射 |----*
+ * 每屏 32列 x 30行 个图形单元, 可显示960个单元            *
+ * 每个图形单元8x8点阵,16字节,每个库保存256个图形单元      *
+ * 每屏同显64个卡通单元(一个页0x100字节)                   *
+ * 卡通定义在内存中, 4字节: 1.Y 2.字库序号 3.形状 4.X      *
+ *                                                         *
+ * $0000-$0FFF 卡通图形库                                  *
+ * $1000-$1FFF 背景字符图形                                *
+-*----------------------------------------| vram 映射 |----*
+ * $2000-$23BF 背景第一页映射 960(字节)个图形单元          *
+ * $23C0-$23FF 背景第一页配色区 64(字节)个配色单元         *
+ *                                            (一个映射1KB)*
+ * $2400-$27BF 背景第二页映射                              *
+ * $27C0-$27FF 背景第二页配色区 0x7FF 2KB                  *
+ *                                                         *
+ * $2800-$2BBF 背景第三页映射                              *
+ * $2BC0-$2BFF 背景第三页配色区 0xBFF 3KB                  *
+ *                                                         *
+ * $2C00-$2FBF 背景第四页映射                              *
+ * $2FC0-$2FFF 背景第四页配色区 0xFFF 4KB                  *
+ *                                                         *
+ * $3000-$3EFF $2000 - $2EFF 的镜像                        *
+ * $3F00-$3F1F 背景卡通配色代码数据 各16字节               *
+ * $3F20-$3FFF 为空  $3F00-$3F1F 的7次镜像                 *
+ * $4000-$FFFF $0000 - $3FFF 的镜像。                      *
+-*----------------------------------------| vram 映射 |----*/
 struct PPU {
 
 private:

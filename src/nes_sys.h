@@ -25,6 +25,9 @@ public:
 
     cpu_6502* getCpu();
     PPU *getPPU();
+
+    /* ªÊ÷∆“ª÷° */
+    void drawFrame();
 };
 
 

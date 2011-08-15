@@ -10,3 +10,15 @@ void welcome() {
 "|*----------------------------------------------------------------------|+_+|-*|" \
     "\n");
 }
+
+void printArr(byte* arr, int offset, int len) {
+
+    if (offset%16!=0) printf("\n0x%X: ", offset);
+
+    for (int i=offset; i<len+offset; ++i) {
+        if (i%16==0) printf("\n0x%X: ", i);
+        printf(" %02X", arr[i]);
+    }
+
+    printf("\n");
+}

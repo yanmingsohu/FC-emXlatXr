@@ -37,7 +37,6 @@ void NesSystem::drawFrame() {
 
             if (ppu_cyc>=P_PIXEL_CPU_CYC) {
                 ppu->drawPixel(x++, y);
-            //printf("x:%03d\ty:%03d\t",x,y);
                 ppu_cyc -= P_PIXEL_CPU_CYC;
             }
         }
@@ -52,6 +51,7 @@ void NesSystem::drawFrame() {
     }
     ppu->oneFrameOver();
     ppu->drawSprite();
+
     /* 垂直消隐周期 */
     while (cpu_cyc<P_VBLANK_CPU_CYC) {
         cpu_cyc += cpu->process();

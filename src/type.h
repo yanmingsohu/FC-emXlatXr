@@ -20,6 +20,8 @@ void printArr(byte* arr, int startIdx, int length);
 // #define NMI_DEBUG
 /* 可以显示CPU命令的相关代码                                      */
 #define SHOW_CPU_OPERATE
+/* 访问无效内存时提出警告                                         */
+#define SHOW_ERR_MEM_OPERATE
 /*-----------------------------------------------| END DEBUG |----*/
 
 #endif // TYPE_H_INCLUDED

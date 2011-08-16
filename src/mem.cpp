@@ -53,12 +53,14 @@ void memory::write(const word offset, const byte data) {
         return;
     }
     if (offset==0x4014) {   /* OAM DMA 寄存器                  */
-        ppu->copySprite(ram + data);
+        ppu->copySprite(ram + (data<<8));
         return;
     }
+#ifdef SHOW_ERR_MEM_OPERATE
     if (offset>=0x8000) {
         printf("MEM::向程序段写入数据: 0x%x = 0x%x \n", offset, data);
     }
+#endif
     mmc->checkSwitch(offset, data);
 }
 

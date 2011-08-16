@@ -90,8 +90,9 @@ public:
 /* 向命令处理函数传递参数          */
 struct command_parm {
 
-    memory   *ram;
-    cpu_6502 *cpu;
+    command_6502 *cmd;
+    memory       *ram;
+    cpu_6502     *cpu;
 
     byte op;  /* 命令的代码         */
     byte p1;  /* 第一个参数(如果有) */
@@ -147,8 +148,8 @@ struct command_6502 {
     , vt_op_ind   /* 间接5                   */
     } type;
 
-    /* 指向处理函数的指针, cmd 是命令描述    */
-    void (*op_func)(command_6502* cmd, command_parm* parm);
+    /* 指向处理函数的指针,                   */
+    void (*op_func)(command_parm* parm);
 };
 
 

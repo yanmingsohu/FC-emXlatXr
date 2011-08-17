@@ -36,7 +36,7 @@ void NesSystem::drawFrame() {
             ppu_cyc += cyc;
 
             if (ppu_cyc>=P_PIXEL_CPU_CYC) {
-                ppu->drawPixel(x++, y);
+            //    ppu->drawPixel(x++, y);
                 ppu_cyc -= P_PIXEL_CPU_CYC;
             }
         }
@@ -51,12 +51,14 @@ void NesSystem::drawFrame() {
     }
     ppu->oneFrameOver();
     ppu->drawSprite();
-
+//cpu->showCmds(1);
     /* 垂直消隐周期 */
     while (cpu_cyc<P_VBLANK_CPU_CYC) {
         cpu_cyc += cpu->process();
     }
+//cpu->showCmds(0);
     cpu_cyc -= P_VBLANK_CPU_CYC;
+    ppu->drawBackGround(0);
 }
 
 int NesSystem::load_rom(string filename) {
@@ -90,4 +92,8 @@ cpu_6502* NesSystem::getCpu() {
 
 PPU* NesSystem::getPPU() {
     return ppu;
+}
+
+memory* NesSystem::getMem() {
+    return ram;
 }

@@ -110,6 +110,7 @@ HDC createCanvas(HDC hdc) {
 void start_game(HWND hwnd, PMSG messages) {
 #define ROM  "rom/F-1.nes"
 //#define ROM  "rom/Tennis.nes"
+//#define ROM "rom/test.nes"
 
     HDC hdc = GetDC(hwnd);
 	HDC hMemDC = createCanvas(hdc);
@@ -140,8 +141,9 @@ void start_game(HWND hwnd, PMSG messages) {
 
         fc.drawFrame();
         //fc.getPPU()->drawTileTable();
+        //fc.getPPU()->drawBackGround();
 
-        //displayCpu(cpu, hwnd, hMemDC);
+        displayCpu(cpu, hwnd, hMemDC);
         BitBlt(hdc, 0, 0, PPU_DISPLAY_P_WIDTH,
                PPU_DISPLAY_P_HEIGHT, hMemDC, 0, 0, SRCCOPY);
     }
@@ -160,11 +162,6 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
 	char buf[128];
 
     frameC++;
-
-    if (frameC>672) {
-        //MessageBox(hwnd, "debug", "wait....", 0);
-        //cpu->showCmds(1);
-    }
 
     sprintf(buf, "A: %02X", cpu->A);
     TextOut(hdc, x, y, buf, 5);
@@ -189,18 +186,17 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
     TextOut(hdc, x, y-10, buf, 11);
 }
 
-
 /*  This function is called by the Windows function DispatchMessage()  */
 
 LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)                  /* handle the messages */
+    switch (message)              /* handle the messages */
     {
-        case WM_DESTROY:
-            PostQuitMessage (0);      /* send a WM_QUIT to the message queue */
-            break;
-        default:                      /* for messages that we don't deal with */
-            return DefWindowProc (hwnd, message, wParam, lParam);
+    case WM_DESTROY:
+        PostQuitMessage (0);      /* send a WM_QUIT to the message queue */
+        break;
+    default:                      /* for messages that we don't deal with */
+        return DefWindowProc (hwnd, message, wParam, lParam);
     }
 
     return 0;

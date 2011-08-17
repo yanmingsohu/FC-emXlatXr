@@ -129,7 +129,7 @@ struct command_parm {
     word  zpgY  ();
     word  $zpg$Y();
     word  $zpgX$();
-    word  $$$(byte x, byte y);
+    word  $$$   (byte x, byte y);
 };
 
 struct command_6502 {

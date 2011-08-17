@@ -157,8 +157,10 @@ public:
     void startNewFrame();
     /* 复制256字节的数据到精灵Ram                                  */
     void copySprite(byte *data);
-    /* 绘制一帧中的精灵 */
+    /* 绘制一帧中的精灵                                            */
     void drawSprite();
+    /* 绘制背景图层                                                */
+    void drawBackGround(int id=0);
 };
 
 #endif // PPU_H_INCLUDED

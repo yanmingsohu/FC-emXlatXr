@@ -168,7 +168,6 @@ void cpu_command_ROR(command_parm* parm) {
 /* N=M7, V=M6, Z=(Ö´ÐÐ½á¹û==0) */
 void cpu_command_BIT(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte a = cpu->A;
     byte b = 0;
 
     switch (parm->op) {
@@ -177,12 +176,11 @@ void cpu_command_BIT(command_parm* parm) {
         b = parm->read(parm->op - 0x20);
     }
 
-    cpu->FLAGS &= 0xFF ^ (CPU_FLAGS_NEGATIVE & CPU_FLAGS_OVERFLOW);
-    cpu->FLAGS |= b    & (CPU_FLAGS_NEGATIVE & CPU_FLAGS_OVERFLOW);
+    byte _FF = CPU_FLAGS_NEGATIVE | CPU_FLAGS_OVERFLOW;
+    cpu->FLAGS &= 0xFF ^ _FF;
+    cpu->FLAGS |= b    & _FF;
 
-    a &= b;
-
-    cpu->checkZ(a);
+    cpu->checkZ(cpu->A & b);
 }
 
 /* a<b, n=1; z=0; c=0 *
@@ -190,16 +188,16 @@ void cpu_command_BIT(command_parm* parm) {
  * a>b, n=0; z=0; c=1 */
 HELP_FNC void cmp_op(command_parm* parm, byte a, byte b) {
     if (a>b) {
-        CLE_FLAGS(CPU_FLAGS_NEGATIVE & CPU_FLAGS_ZERO);
+        CLE_FLAGS(CPU_FLAGS_NEGATIVE | CPU_FLAGS_ZERO);
         SET_FLAGS(CPU_FLAGS_CARRY);
     }
     else if (a<b) {
-        CLE_FLAGS(CPU_FLAGS_CARRY & CPU_FLAGS_ZERO);
+        CLE_FLAGS(CPU_FLAGS_CARRY | CPU_FLAGS_ZERO);
         SET_FLAGS(CPU_FLAGS_NEGATIVE);
     }
     else {
         CLE_FLAGS(CPU_FLAGS_NEGATIVE);
-        SET_FLAGS(CPU_FLAGS_CARRY & CPU_FLAGS_ZERO);
+        SET_FLAGS(CPU_FLAGS_CARRY | CPU_FLAGS_ZERO);
     }
 }
 
@@ -213,9 +211,8 @@ void cpu_command_CMP(command_parm* parm) {
     case 0xD5:
     case 0xD1:
     case 0xC1:
-        byte a = parm->cpu->A;
         byte b = parm->read(parm->op - 0xC1);
-        cmp_op(parm, a, b);
+        cmp_op(parm, parm->cpu->A, b);
     }
 }
 
@@ -278,7 +275,7 @@ void cpu_command_ORA(command_parm* parm) {
     case 0x11:
     case 0x01:
         cpu_6502 *cpu = parm->cpu;
-        cpu->A &= parm->read(parm->op - 0x01);
+        cpu->A |= parm->read(parm->op - 0x01);
         cpu->checkNZ(cpu->A);
     }
 }
@@ -935,7 +932,7 @@ byte cpu_6502::process() {
     return cpu_cyc;
 }
 
-inline byte cpu_6502::reset() {
+byte cpu_6502::reset() {
     if (RES) {
         IRQ    = 0;
         NMI    = 0;
@@ -1069,7 +1066,11 @@ inline byte command_parm::read(const byte addressing_mode) {
     if (addressing_mode==ADD_MODE_acc) {
         return cpu->A;
     }
-    return ram->read( getAddr(addressing_mode) );
+word addr = getAddr(addressing_mode);
+byte value = ram->read( addr );
+//printf("CPU::read address:%04X value:%X\n", addr, value);
+return value;
+    //return ram->read( getAddr(addressing_mode) );
 }
 
 inline void command_parm::write(const byte addressing_mode, byte value) {
@@ -1081,6 +1082,7 @@ inline void command_parm::write(const byte addressing_mode, byte value) {
         cpu->A = value;
         return;
     }
+//printf("CPU::write address:%04X value:%X\n", getAddr(addressing_mode), value);
     cpu->ram->write(getAddr(addressing_mode), value);
 }
 

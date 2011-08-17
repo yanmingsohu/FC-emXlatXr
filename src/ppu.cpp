@@ -48,16 +48,18 @@ void PPU::controlWrite(word addr, byte data) {
 
     case 0: /* 0x2000                      */
         control_2000(data);
+printf("PPU::write addr 2000:%X\n", data);
         break;
     case 1: /* 0x2001                      */
         control_2001(data);
+printf("PPU::write addr 2001:%X\n", data);
         break;
     case 3: /* 0x2003 修改卡通工作内存指针 */
         spWorkOffset = data;
-printf("修改精灵指针:%x\n", data);
+printf("PPU::修改精灵指针:%x\n", data);
         break;
     case 4: /* 0x2004 写入卡通工作内存     */
-printf("写入精灵数据: %x = %x\n", spWorkOffset, data);
+printf("PPU::写入精灵数据: %x = %x\n", spWorkOffset, data);
         spWorkRam[spWorkOffset++] = data;
         break;
 
@@ -71,6 +73,7 @@ printf("写入精灵数据: %x = %x\n", spWorkOffset, data);
             winY |= data;
             w2005 = wX;
         }
+printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
         break;
 
     case 6: /* 0x2006 PPU地址指针           */
@@ -82,11 +85,11 @@ printf("写入精灵数据: %x = %x\n", spWorkOffset, data);
             ppu_ram_p = (ppu_ram_p & 0xFF00) | data;
             ppuSW = pH;
         }
-printf("修改PPU指针:%04x\n", ppu_ram_p);
+printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
         break;
 
     case 7: /* 0x2007 写数据寄存器          */
-printf("向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
+printf("PPU::向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
         write(data);
         break;
     }
@@ -135,6 +138,10 @@ byte PPU::readState(word addr) {
 
     case 2: /* 0x2002                       */
         r = 0;
+        if (preheating) {
+            preheating >>= 1;
+            vblankTime = 1;
+        }
         if ( spOverflow ) r |= ( 1<<5 );
         if ( spClash    ) r |= ( 1<<6 );
         if ( vblankTime ) r |= ( 1<<7 );
@@ -143,11 +150,11 @@ byte PPU::readState(word addr) {
         w2005      = wX;
         break;
 
-    case 7: /* 0x2007 写数据寄存器          */
+    case 7: /* 0x2007 读数据寄存器          */
         r = read();
         break;
     }
-
+printf("PPU::read:%X, return:%X\n", addr, r);
     return r;
 }
 
@@ -194,7 +201,7 @@ inline byte PPU::read() {
 inline void PPU::write(byte data) {
     if (ppu_ram_p<0x2000) {
 #ifdef SHOW_ERR_MEM_OPERATE
-        printf("PPU: can't write vrom $%04x=%02x.\n", ppu_ram_p, data);
+        printf("PPU::can't write VROM $%04x=%02x.\n", ppu_ram_p, data);
 //        return;
 #endif
     } else
@@ -285,6 +292,47 @@ void PPU::drawTileTable() {
     }
 }
 
+void PPU::drawBackGround(int id) {
+    byte dataH, dataL;
+    byte colorIdx;
+    int x=0, y=0;
+
+    for (int j=0; j<960; ++j) {
+        byte p = bg[id].name[j];
+
+        for (int i=0; i<8; ++i) {
+            dataL = mmc->readVRom(p * 16 + i + bgRomOffset);
+            dataH = mmc->readVRom(p * 16 + i + bgRomOffset + 8);
+
+            for (int d=7; d>=0; --d) {
+                colorIdx = 0;
+                if (dataL>>d & 1) {
+                    colorIdx |= 1;
+                }
+                if (dataH>>d & 1) {
+                    colorIdx |= 2;
+                }
+
+                if (colorIdx) {
+                    byte attrIdx = x/8 + y/8;// 问题的关键,溢出
+                    colorIdx |= bg[id].attribute[attrIdx] << 2;
+                    colorIdx = bkPalette[colorIdx];
+                    video->drawPixel(x++, y, ppu_color_table[colorIdx]);
+            printf("%x\t", colorIdx);
+                }
+            }
+            x-= 8;
+            y++;
+        }
+        x+= 8;
+        y-= 8;
+        if (x>=256) {
+            x = 0;
+            y+= 8;
+        }
+    }
+}
+
 void PPU::drawSprite() {
     byte dataH, dataL;
     byte colorIdx;
@@ -320,6 +368,7 @@ void PPU::drawSprite() {
     }
 }
 
+/* 这个方法的实现还是有问题 */
 void PPU::drawPixel(int X, int Y) {
 /*-----------------| 绘制背景 |-------------------*/
     word nameIdx = (X/8) * (Y/8);
@@ -330,7 +379,7 @@ void PPU::drawPixel(int X, int Y) {
     byte tile1 = mmc->readVRom(tileAddr + 8);
     byte tileX = 1<<(7 - X%8);
 /*
- if (tileIdx&&0)
+if (tileIdx&&0)
 printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
        , X, Y, nameIdx, tileIdx, bgRomOffset);
 */
@@ -342,15 +391,14 @@ printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
         byte attrIdx = X/8 + Y/8;
         paletteIdx |= bg0->attribute[attrIdx] << 2;
         byte colorIdx = bkPalette[paletteIdx];
-        video->drawPixel(X, Y, ppu_color_table[paletteIdx]);
+        video->drawPixel(X, Y, ppu_color_table[colorIdx]);
     }
 /*----------------| end |-------------------------*/
 }
 
 void PPU::oneFrameOver() {
-    if (sendNMI || preheating) {
+    if (sendNMI) {
         *NMI = 1;
-        preheating >>= 1;
 #ifdef NMI_DEBUG
         printf("PPU::发送中断到CPU\n");
 #endif

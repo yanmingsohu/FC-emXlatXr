@@ -61,7 +61,9 @@ _LOAD_SUCCESS:
     cpu_6502 *cpu = fc.getCpu();
     PPU      *ppu = fc.getPPU();
     memory   *ram = fc.getMem();
+#ifdef SHOW_CPU_OPERATE
     cpu->showCmds(0);
+#endif
 
     int c        = 0;
     int frameIrq = 0;
@@ -159,11 +161,7 @@ void testCommand() {
 int __main()
 {
     welcome();
-
-    if (!(0 & CPU_FLAGS_ZERO)) {
-        printf("jump\n");
-    }
-    testCore();
+    //testCore();
     //testCommand();
     system("pause");
     return 0;

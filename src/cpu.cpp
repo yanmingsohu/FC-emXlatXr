@@ -1066,11 +1066,15 @@ inline byte command_parm::read(const byte addressing_mode) {
     if (addressing_mode==ADD_MODE_acc) {
         return cpu->A;
     }
-word addr = getAddr(addressing_mode);
-byte value = ram->read( addr );
-//printf("CPU::read address:%04X value:%X\n", addr, value);
-return value;
-    //return ram->read( getAddr(addressing_mode) );
+#ifdef SHOW_CPU_MEMORY_ADDRESSING
+    word addr = getAddr(addressing_mode);
+    byte value = ram->read( addr );
+    printf("CPU::read address:%04X value:%X\n", addr, value);
+    return value;
+#endif
+#ifndef SHOW_CPU_MEMORY_ADDRESSING
+    return ram->read( getAddr(addressing_mode) );
+#endif
 }
 
 inline void command_parm::write(const byte addressing_mode, byte value) {
@@ -1082,8 +1086,14 @@ inline void command_parm::write(const byte addressing_mode, byte value) {
         cpu->A = value;
         return;
     }
-//printf("CPU::write address:%04X value:%X\n", getAddr(addressing_mode), value);
+#ifdef SHOW_CPU_MEMORY_ADDRESSING
+    word addr = getAddr(addressing_mode);
+    printf("CPU::write address:%04X value:%X\n", addr, value);
+    cpu->ram->write(addr, value);
+#endif
+#ifndef SHOW_CPU_MEMORY_ADDRESSING
     cpu->ram->write(getAddr(addressing_mode), value);
+#endif
 }
 
 inline word command_parm::getAddr(const byte addressing_mode) {

@@ -135,6 +135,11 @@ private:
     byte read();            /* 读数据                              */
     BackGround* swBg();     /* 依据ppu_ram_p的值得到相应的背景指针 */
 
+    /* 依据x,y的位置从attr属性表中取得颜色的高两位                 */
+    byte bgHBit(int x, int y, byte *attr);
+    /* 依据x,y的位置从attr属性表中取得颜色的低两位                 */
+    byte gtLBit(int x, int y, byte tileIdx, word vromOffset);
+
 public:
     PPU(MMC *mmc, Video *video);
 

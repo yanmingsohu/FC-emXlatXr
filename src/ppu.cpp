@@ -48,18 +48,26 @@ void PPU::controlWrite(word addr, byte data) {
 
     case 0: /* 0x2000                      */
         control_2000(data);
-printf("PPU::write addr 2000:%X\n", data);
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::write addr 2000:%X\n", data);
+#endif
         break;
     case 1: /* 0x2001                      */
         control_2001(data);
-printf("PPU::write addr 2001:%X\n", data);
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::write addr 2001:%X\n", data);
+#endif
         break;
     case 3: /* 0x2003 修改卡通工作内存指针 */
         spWorkOffset = data;
-printf("PPU::修改精灵指针:%x\n", data);
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::修改精灵指针:%x\n", data);
+#endif
         break;
     case 4: /* 0x2004 写入卡通工作内存     */
-printf("PPU::写入精灵数据: %x = %x\n", spWorkOffset, data);
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::写入精灵数据: %x = %x\n", spWorkOffset, data);
+#endif
         spWorkRam[spWorkOffset++] = data;
         break;
 
@@ -73,7 +81,9 @@ printf("PPU::写入精灵数据: %x = %x\n", spWorkOffset, data);
             winY |= data;
             w2005 = wX;
         }
-printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
+#endif
         break;
 
     case 6: /* 0x2006 PPU地址指针           */
@@ -85,11 +95,15 @@ printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
             ppu_ram_p = (ppu_ram_p & 0xFF00) | data;
             ppuSW = pH;
         }
-printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
+#endif
         break;
 
     case 7: /* 0x2007 写数据寄存器          */
-printf("PPU::向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
+#endif
         write(data);
         break;
     }
@@ -154,7 +168,9 @@ byte PPU::readState(word addr) {
         r = read();
         break;
     }
-printf("PPU::read:%X, return:%X\n", addr, r);
+#ifdef SHOW_PPU_REGISTER
+    printf("PPU::read:%X, return:%X\n", addr, r);
+#endif
     return r;
 }
 
@@ -202,8 +218,8 @@ inline void PPU::write(byte data) {
     if (ppu_ram_p<0x2000) {
 #ifdef SHOW_ERR_MEM_OPERATE
         printf("PPU::can't write VROM $%04x=%02x.\n", ppu_ram_p, data);
-//        return;
 #endif
+        return;
     } else
 
     if (ppu_ram_p<0x3EFF) {
@@ -292,108 +308,82 @@ void PPU::drawTileTable() {
     }
 }
 
+byte PPU::gtLBit(int x, int y, byte tileIdx, word vromOffset) {
+    byte paletteIdx = 0;
+    word tileAddr = vromOffset + (tileIdx << 4) + y % 8;
+
+    byte tile0 = mmc->readVRom(tileAddr    );
+    byte tile1 = mmc->readVRom(tileAddr + 8);
+    byte tileX = 1<<(7 - x % 8);
+
+    if (tile0 & tileX) paletteIdx |= 0x01;
+    if (tile1 & tileX) paletteIdx |= 0x02;
+
+    return paletteIdx;
+}
+
+byte PPU::bgHBit(int x, int y, byte *attrTable) {
+    byte attrIdx = DIV32(x) + (DIV32(y)<<3);
+    byte attrBit = DIV16(x%32) | (DIV16(y%32) << 1);
+    byte attr = attrTable[attrIdx] >> (attrBit<<1);
+    return (attr & 0x3) << 2;
+}
+
 void PPU::drawBackGround(int id) {
     byte dataH, dataL;
-    byte colorIdx;
-    int x=0, y=0;
+    int x = 0, y = 0;
 
-    for (int j=0; j<960; ++j) {
-        byte p = bg[id].name[j];
+    while (y<240) {
+        while (x<256) {
+            word nameIdx = (x/8) + (y/8*32);
+            word tileIdx = bg0->name[nameIdx];
+            byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
 
-        for (int i=0; i<8; ++i) {
-            dataL = mmc->readVRom(p * 16 + i + bgRomOffset);
-            dataH = mmc->readVRom(p * 16 + i + bgRomOffset + 8);
-
-            for (int d=7; d>=0; --d) {
-                colorIdx = 0;
-                if (dataL>>d & 1) {
-                    colorIdx |= 1;
-                }
-                if (dataH>>d & 1) {
-                    colorIdx |= 2;
-                }
-
-                if (colorIdx) {
-                    byte attrIdx = x/8 + y/8;// 问题的关键,溢出
-                    colorIdx |= bg[id].attribute[attrIdx] << 2;
-                    colorIdx = bkPalette[colorIdx];
-                    video->drawPixel(x++, y, ppu_color_table[colorIdx]);
-            printf("%x\t", colorIdx);
-                }
+            if (paletteIdx) {
+                paletteIdx |= bgHBit(x, y, bg[id].attribute);
+                video->drawPixel(x, y, ppu_color_table[ bkPalette[paletteIdx] ]);
             }
-            x-= 8;
-            y++;
+            x++;
         }
-        x+= 8;
-        y-= 8;
-        if (x>=256) {
-            x = 0;
-            y+= 8;
-        }
+        x=0;
+        y++;
     }
 }
 
 void PPU::drawSprite() {
     byte dataH, dataL;
     byte colorIdx;
-    int  i;
-    for (int sp=63; sp>=0; --sp) {
-        i = sp * 4;
-        byte x    = spWorkRam[i  ];
-        byte y    = spWorkRam[i+3] - 1;
+    byte paletteIdx;
+
+    for (int i=63<<2; i>=0; i-=4) {
+        byte by   = spWorkRam[i  ];
         byte tile = spWorkRam[i+1];
         byte ctrl = spWorkRam[i+2];
-        word tileAddr =  tile*16;
+        byte bx   = spWorkRam[i+3];
 
-        for (int r=0; r<8; ++r) {
-            dataL   = mmc->readVRom(tileAddr + r    );
-            dataH   = mmc->readVRom(tileAddr + r + 8);
+        for (int y=by; y<by+8; ++y) {
+            for (int x=bx; x<bx+8; ++x) {
+                paletteIdx = gtLBit(x, y, tile, spRomOffset);
 
-            for (int d=7; d>=0; --d) {
-                colorIdx = 0;
-                if (dataL>>d & 1) {
-                    colorIdx |= 1;
+                if (paletteIdx) {
+                    paletteIdx |= ((ctrl & 0x03) << 2);
+                    video->drawPixel(x, y, ppu_color_table[ spPalette[paletteIdx] ]);
                 }
-                if (dataH>>d & 1) {
-                    colorIdx |= 2;
-                }
-                //if (colorIdx) {
-                    colorIdx |= ((ctrl & 0x03) << 2);
-                    video->drawPixel(x++, y, ppu_color_table[colorIdx]);
-                //}
             }
-            x-=8;
-            y++;
         }
     }
 }
 
-/* 这个方法的实现还是有问题 */
 void PPU::drawPixel(int X, int Y) {
-/*-----------------| 绘制背景 |-------------------*/
-    word nameIdx = (X/8) * (Y/8);
+    word nameIdx = DIV8(X) + (DIV8(Y)<<5);
     word tileIdx = bg0->name[nameIdx];
-    word tileAddr= bgRomOffset + tileIdx*16 + Y%8;
-
-    byte tile0 = mmc->readVRom(tileAddr    );
-    byte tile1 = mmc->readVRom(tileAddr + 8);
-    byte tileX = 1<<(7 - X%8);
-/*
-if (tileIdx&&0)
-printf("x:%03d \t y:%03d \t nameIdx:%d \t tileIdx:%d \t bgoff:%d\n"
-       , X, Y, nameIdx, tileIdx, bgRomOffset);
-*/
-    byte paletteIdx = 0;
-    if (tile0 & tileX) paletteIdx |= 0x01;
-    if (tile1 & tileX) paletteIdx |= 0x02;
+    byte paletteIdx = gtLBit(X, Y, tileIdx, bgRomOffset);
 
     if (paletteIdx) {
-        byte attrIdx = X/8 + Y/8;
-        paletteIdx |= bg0->attribute[attrIdx] << 2;
+        paletteIdx |= bgHBit(X, Y, bg0->attribute);
         byte colorIdx = bkPalette[paletteIdx];
         video->drawPixel(X, Y, ppu_color_table[colorIdx]);
     }
-/*----------------| end |-------------------------*/
 }
 
 void PPU::oneFrameOver() {

@@ -53,6 +53,9 @@ void memory::write(const word offset, const byte data) {
         return;
     }
     if (offset==0x4014) {   /* OAM DMA ¼Ä´æÆ÷                  */
+#ifdef SHOW_PPU_REGISTER
+        printf("MEM::ÏòPPU´«ËÍOAM,ram:%04X", data<<8);
+#endif
         ppu->copySprite(ram + (data<<8));
         return;
     }

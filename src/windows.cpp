@@ -124,7 +124,9 @@ void start_game(HWND hwnd, PMSG messages) {
     }
 
 	cpu_6502* cpu = fc.getCpu();
+#ifdef SHOW_CPU_OPERATE
     cpu->showCmds(0);
+#endif
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)

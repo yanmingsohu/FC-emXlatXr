@@ -81,7 +81,7 @@ public:
     void    clearV();
 
 #ifdef SHOW_CPU_OPERATE
-    void showCmds(byte show) {   /* 是否在命令结束后显示相关信息      */
+    inline void showCmds(byte show) {   /* 是否在命令结束后显示相关信息      */
         showCmd = show;
     }
 #endif

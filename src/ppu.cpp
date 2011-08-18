@@ -330,7 +330,6 @@ byte PPU::bgHBit(int x, int y, byte *attrTable) {
 }
 
 void PPU::drawBackGround(int id) {
-    byte dataH, dataL;
     int x = 0, y = 0;
 
     while (y<240) {
@@ -351,8 +350,6 @@ void PPU::drawBackGround(int id) {
 }
 
 void PPU::drawSprite() {
-    byte dataH, dataL;
-    byte colorIdx;
     byte paletteIdx;
 
     for (int i=63<<2; i>=0; i-=4) {

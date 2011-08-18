@@ -3,26 +3,14 @@
 #include <time.h>
 #include "nes_sys.h"
 #include "ppu.h"
+#include "winvideo.cpp"
 
 
 /*  Declare Windows procedure  */
-LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
-void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc);
-void start_game(HWND hwnd, PMSG messages);
-
-
-class WindowsVideo : public Video {
-private:
-    HDC hdc;
-
-public:
-    WindowsVideo(HDC hMemDC) : hdc(hMemDC) {
-    }
-
-    void drawPixel(int x, int y, T_COLOR color) {
-        SetPixel(hdc, x, y, color);
-    }
-};
+LRESULT CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM);
+void    displayCpu                 (cpu_6502*, HWND);
+void    start_game                 (HWND hwnd, PMSG messages);
+int     initWindow                 (HWND*, HINSTANCE, int);
 
 
 /*  Make the class name into a global variable  */
@@ -37,11 +25,22 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 {
     welcome();
 
-    const int width = PPU_DISPLAY_P_WIDTH;
-    const int height = PPU_DISPLAY_P_HEIGHT;
-
     HWND hwnd;               /* This is the handle for our window */
     MSG messages;            /* Here messages to the application are saved */
+
+    if (!initWindow(&hwnd, hThisInstance, nCmdShow)) {
+        return -1;
+    }
+
+    start_game(hwnd, &messages);
+
+    /* The program return-value is 0 - The value that PostQuitMessage() gave */
+    return messages.wParam;
+}
+
+int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
+    const int width = 800;
+    const int height = 600;
     WNDCLASSEX wincl;        /* Data structure for the windowclass */
 
     /* The Window structure */
@@ -66,15 +65,15 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
         return 0;
 
     /* The class is registered, let's create the program*/
-    hwnd = CreateWindowEx (
+    *hwnd = CreateWindowEx (
            0,                   /* Extended possibilites for variation */
            szClassName,         /* Classname */
            titleName,           /* Title Text */
            WS_OVERLAPPEDWINDOW, /* default window */
            CW_USEDEFAULT,       /* Windows decides the position */
            CW_USEDEFAULT,       /* where the window ends up on the screen */
-           width + 20,          /* The programs width */
-           height + 40,         /* and height in pixels */
+           width,               /* The programs width */
+           height,              /* and height in pixels */
            HWND_DESKTOP,        /* The window is a child-window to desktop */
            NULL,                /* No menu */
            hThisInstance,       /* Program Instance handler */
@@ -82,41 +81,17 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
            );
 
     /* Make the window visible on the screen */
-    ShowWindow(hwnd, nCmdShow);
-    start_game(hwnd, &messages);
-
-    /* The program return-value is 0 - The value that PostQuitMessage() gave */
-    return messages.wParam;
+    ShowWindow(*hwnd, nCmdShow);
+    return 1;
 }
 
-HDC createCanvas(HDC hdc) {
-    HDC hMemDC = CreateCompatibleDC(hdc);
-    HBITMAP hBitmap = CreateCompatibleBitmap(
-            hdc, PPU_DISPLAY_P_WIDTH, PPU_DISPLAY_P_HEIGHT);
-    SelectObject(hMemDC, hBitmap);
-
-    HFONT font = CreateFont(10, 0, 0, 0, 100
-				, FALSE, FALSE, FALSE, GB2312_CHARSET
-				, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
-				, PROOF_QUALITY, DEFAULT_PITCH, "ËÎÌå" );
-
-    SelectObject(hMemDC, font);
-    SetTextColor(hMemDC, RGB(255, 255, 255));
-    SetBkColor(hMemDC, RGB(0, 0, 0));
-
-    return hMemDC;
-}
-
-void start_game(HWND hwnd, PMSG messages) {
 #define ROM  "rom/F-1.nes"
-//#define ROM  "rom/Tennis.nes"
+//#define ROM "rom/Tennis.nes"
 //#define ROM "rom/test.nes"
+void start_game(HWND hwnd, PMSG messages) {
 
-    HDC hdc = GetDC(hwnd);
-	HDC hMemDC = createCanvas(hdc);
-
-    WindowsVideo video(hMemDC);
-    NesSystem fc(&video);
+    Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
+    NesSystem fc(video);
 
     if (fc.load_rom(ROM)) {
         MessageBox(hwnd, "¶ÁÈ¡ROMÊ§°Ü", "´íÎó", 0);
@@ -145,25 +120,26 @@ void start_game(HWND hwnd, PMSG messages) {
         //fc.getPPU()->drawTileTable();
         //fc.getPPU()->drawBackGround();
 
-        displayCpu(cpu, hwnd, hMemDC);
-        BitBlt(hdc, 0, 0, PPU_DISPLAY_P_WIDTH,
-               PPU_DISPLAY_P_HEIGHT, hMemDC, 0, 0, SRCCOPY);
+        displayCpu(cpu, hwnd);
+        video->refresh();
     }
 
-    DeleteDC(hMemDC);
-    ReleaseDC(hwnd, hdc);
+    delete video;
 }
 
-void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
+void displayCpu(cpu_6502* cpu, HWND hwnd) {
     static long frameC = 0;
     static clock_t time = clock();
 
-    int x = 0;
-	int y = 0;
-	int xIn = 50;
-	char buf[128];
-
     frameC++;
+    if (frameC%20!=0) return;
+
+    HDC hdc = GetDC(hwnd);
+    int x = 300;
+	int y = 0;
+	int xIn = 70;
+	int yIn = 18;
+	char buf[128];
 
     sprintf(buf, "A: %02X", cpu->A);
     TextOut(hdc, x, y, buf, 5);
@@ -171,8 +147,8 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
     TextOut(hdc, x+=xIn, y, buf, 5);
     sprintf(buf, "Y: %02X", cpu->Y);
     TextOut(hdc, x+=xIn, y, buf, 5);
-    y = 10;
-    x = 0;
+    y += yIn;
+    x = 300;
     sprintf(buf, "SP: %02X", cpu->SP);
     TextOut(hdc, x, y, buf, 6);
     sprintf(buf, "PC: %04X", cpu->PC);
@@ -185,7 +161,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd, HDC hdc) {
     sprintf(buf, "frame: %09ld", frameC);
     TextOut(hdc, x+=xIn, y, buf, 16);
     sprintf(buf, "rate : %02lf/s", frameC/utime);
-    TextOut(hdc, x, y-10, buf, 11);
+    TextOut(hdc, x, y-yIn, buf, 11);
 }
 
 /*  This function is called by the Windows function DispatchMessage()  */

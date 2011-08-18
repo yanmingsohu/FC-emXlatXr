@@ -2,22 +2,16 @@
 webServer.depend
 webServer.layout
 config/*.*
+bin/*
+obj/*
 
-*.class
-*.exe
 *.dll
-*.jar
-*.lib
-*.zip
 *.db
 *.lnk
-*.nes
 
 *.exp
 *.pdb
-*.obj
 *.idb
 *.pch
 *.dep
 *.manifest
-*.o

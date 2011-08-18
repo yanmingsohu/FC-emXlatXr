@@ -15,9 +15,12 @@
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="dx81sdk" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="dx81sdk\ddraw.lib" />
+					<Add library="dx81sdk\d3dx.lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -45,6 +48,7 @@
 		<Unit filename="src\type.h" />
 		<Unit filename="src\video.h" />
 		<Unit filename="src\windows.cpp" />
+		<Unit filename="src\winvideo.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="src\cpu.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="25819" topLine="1081" />
+	<File name="src\cpu.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="8322" topLine="378" />
 	</File>
 	<File name="src\cpu.h" open="0" top="0" tabpos="5">
 		<Cursor position="3780" topLine="34" />
@@ -29,7 +29,7 @@
 		<Cursor position="229" topLine="0" />
 	</File>
 	<File name="src\ppu.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="6227" topLine="240" />
+		<Cursor position="966" topLine="0" />
 	</File>
 	<File name="src\ppu.h" open="0" top="0" tabpos="1">
 		<Cursor position="155" topLine="0" />
@@ -49,10 +49,10 @@
 	<File name="src\video.h" open="1" top="0" tabpos="4">
 		<Cursor position="347" topLine="0" />
 	</File>
-	<File name="src\windows.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="3508" topLine="81" />
+	<File name="src\windows.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="3653" topLine="88" />
 	</File>
-	<File name="src\winvideo.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="4433" topLine="124" />
+	<File name="src\winvideo.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="3719" topLine="99" />
 	</File>
 </CodeBlocks_layout_file>

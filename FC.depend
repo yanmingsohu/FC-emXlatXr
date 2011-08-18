@@ -75,41 +75,43 @@
 	"nes_sys.h"
 	<stdio.h>
 
-1313412860 source:e:\c-project\fc\src\main.cpp
+1313667364 source:e:\c-project\fc\src\main.cpp
 	<stdio.h>
 	<stdlib.h>
+	<conio.h>
 	<time.h>
 	<string>
 	"nes_sys.h"
+	"cpu.h"
 
-1313409013 e:\c-project\fc\src\nes_sys.h
+1313667364 e:\c-project\fc\src\nes_sys.h
 	"cpu.h"
 	"mem.h"
 	"rom.h"
 	"video.h"
 
-1313418738 source:e:\c-project\fc\src\mem.cpp
+1313667364 source:e:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
 	<stdio.h>
 
-1313145626 e:\c-project\fc\src\mem.h
+1313667364 e:\c-project\fc\src\mem.h
 	"type.h"
 	"rom.h"
 	"mmc.h"
 	"ppu.h"
 
-1313411986 e:\c-project\fc\src\type.h
+1313667364 e:\c-project\fc\src\type.h
 
 1313152763 e:\c-project\fc\src\rom.h
 	"type.h"
 	"string"
 
-1313419737 source:e:\c-project\fc\src\nes_sys.cpp
+1313667364 source:e:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	<stdio.h>
 
-1313409013 e:\c-project\fc\src\cpu.h
+1313667364 e:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 	"ppu.h"
@@ -119,7 +121,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1313409013 source:e:\c-project\fc\src\cpu.cpp
+1313667577 source:e:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
@@ -209,7 +211,7 @@
 1313273660 e:\c-project\fc\src\mmc.h
 	"rom.h"
 
-1313418862 e:\c-project\fc\src\ppu.h
+1313667364 e:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
@@ -218,23 +220,24 @@
 	"type.h"
 	"stdio.h"
 
-1313419838 source:e:\c-project\fc\src\ppu.cpp
+1313667606 source:e:\c-project\fc\src\ppu.cpp
 	"ppu.h"
-	"stdio.h"
+	<stdio.h>
 	<string.h>
 
-1313409013 source:e:\c-project\fc\src\type.cpp
+1313667364 source:e:\c-project\fc\src\type.cpp
 	"type.h"
 	<stdio.h>
 
-1313420027 source:e:\c-project\fc\src\windows.cpp
+1313676208 source:e:\c-project\fc\src\windows.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
 	"nes_sys.h"
 	"ppu.h"
+	"winvideo.cpp"
 
-1313215797 e:\c-project\fc\src\video.h
+1313667364 e:\c-project\fc\src\video.h
 	"type.h"
 
 1313300576 e:\fc\src\mmc.h
@@ -282,6 +285,23 @@
 	<objbase.h>
 
 1313657835 f:\c-project\fc\src\winvideo.cpp
+	"video.h"
+	"ppu.h"
+	"ddraw.h"
+	<windows.h>
+	<stdio.h>
+
+1313677242 e:\c-project\fc\src\winvideo.cpp
+	"video.h"
+	"ppu.h"
+	"ddraw.h"
+	<windows.h>
+	<stdio.h>
+
+1313667364 e:\c-project\fc\dx81sdk\ddraw.h
+	<objbase.h>
+
+1313677242 source:e:\c-project\fc\src\winvideo.cpp
 	"video.h"
 	"ppu.h"
 	"ddraw.h"

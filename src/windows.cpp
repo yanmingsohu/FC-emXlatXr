@@ -90,7 +90,7 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
 //#define ROM "rom/test.nes"
 void start_game(HWND hwnd, PMSG messages) {
 
-    Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
+    Video *video = new WindowsVideo(hwnd); // WindowsVideo | DirectXVideo
     NesSystem fc(video);
 
     if (fc.load_rom(ROM)) {

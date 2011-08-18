@@ -393,7 +393,9 @@ void cpu_command_ADC(command_parm* parm) {
     }
 
     result += cpu->A;
-    result += (cpu->FLAGS & CPU_FLAGS_CARRY) ? 1 : 0;
+    if (cpu->FLAGS & CPU_FLAGS_CARRY) {
+        ++result;
+    }
 
     if (result>0xFF) {
         SET_FLAGS(CPU_FLAGS_CARRY);
@@ -428,7 +430,9 @@ void cpu_command_SBC(command_parm* parm) {
     }
 
     result -= cpu->A;
-    result -= (cpu->FLAGS & CPU_FLAGS_CARRY) ? 1 : 0;
+    if (cpu->FLAGS & CPU_FLAGS_CARRY) {
+        --result;
+    }
 
     if (((signed short int)result)>=0) {
         SET_FLAGS(CPU_FLAGS_CARRY);

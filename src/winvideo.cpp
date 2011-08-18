@@ -121,7 +121,7 @@ public:
             return;
         }
 
-        if ( lpDDSBack->GetDC(&hdc) ) {
+        if ( lpDDSPrimary->GetDC(&hdc) ) {
             printf("DX::crate DC fail.\n");
             return;
         }
@@ -167,3 +167,5 @@ public:
         }
     }
 };
+
+// GetAsyncKeyState(virtual key code)°´ÏÂ=0x8000

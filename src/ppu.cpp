@@ -2,40 +2,30 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DC(b, x)    (b), (b+x), (b+x+x), (b+x+x+x)
-#define WHI(x)      (x + (x<<8) +(x<<16))
-#define BLK(x)      (x), (x+32), (x+64)
-
+#define H(a) 0x##a
 /* 颜色映射, 索引为FC系统颜色, 值为RGB颜色 */
 T_COLOR ppu_color_table[0x40] = {
-     WHI(0x7F)
-    ,DC(0x000080, 0x200000)
-    ,DC(0x800000, 0x002000)
-    ,DC(0x008000, 0x000020)
-    ,BLK(0)
+     H(808080), H(003da6), H(0012b0), H(440096)
+    ,H(a1005e), H(c70028), H(ba0600), H(8c1700)
+    ,H(5c2f00), H(104500), H(054a00), H(00472e)
+    ,H(004166), H(000000), H(050505), H(050505)
 
-    ,WHI(0xA9)
-    ,DC(0x0000FF, 0x200000)
-    ,DC(0xFF0000, 0x002000)
-    ,DC(0x00FF00, 0x000020)
-    ,BLK(8)
+    ,H(c7c7c7), H(0077ff), H(2155ff), H(8237fa)
+    ,H(eb2fb5), H(ff2950), H(ff2200), H(d63200)
+    ,H(c46200), H(358000), H(058f00), H(008a55)
+    ,H(0099cc), H(212121), H(090909), H(090909)
 
-    ,WHI(0xD3)
-    ,DC(0x4040FF, 0x200000)
-    ,DC(0xFF4040, 0x002000)
-    ,DC(0x40FF40, 0x000020)
-    ,BLK(16)
+    ,H(ffffff), H(0fd7ff), H(69a2ff), H(d480ff)
+    ,H(ff45f3), H(ff618b), H(ff8833), H(ff9c12)
+    ,H(fabc20), H(9fe30e), H(2bf035), H(0cf0a4)
+    ,H(05fbff), H(5e5e5e), H(0d0d0d), H(0d0d0d)
 
-    ,WHI(0xFF)
-    ,DC(0x8080FF, 0x200000)
-    ,DC(0xFF8080, 0x002000)
-    ,DC(0x80FF80, 0x000020)
-    ,BLK(24)
+    ,H(ffffff), H(a6fcff), H(b3ecff), H(daabeb)
+    ,H(ffa8f9), H(ffabb3), H(ffd2b0), H(ffefa6)
+    ,H(fff79c), H(d7e895), H(a6edaf), H(a2f2da)
+    ,H(99fffc), H(dddddd), H(111111), H(111111)
 };
-
-#undef DC
-#undef WHI
-#undef BLK
+#undef H
 
 PPU::PPU(MMC *_mmc, Video *_video)
     : addr_add(1), ppuSW(pH), w2005(wX), mmc(_mmc)

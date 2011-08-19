@@ -16,6 +16,7 @@ int     initWindow                 (HWND*, HINSTANCE, int);
 /*  Make the class name into a global variable  */
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName[ ] = "FC 模拟器 DEmo. -=CatfoOD=-";
+static bool active = 1;
 
 
 int WINAPI WinMain (HINSTANCE hThisInstance,
@@ -90,7 +91,7 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
 //#define ROM "rom/test.nes"
 void start_game(HWND hwnd, PMSG messages) {
 
-    Video *video = new WindowsVideo(hwnd); // WindowsVideo | DirectXVideo
+    Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
     NesSystem fc(video);
 
     if (fc.load_rom(ROM)) {
@@ -121,7 +122,7 @@ void start_game(HWND hwnd, PMSG messages) {
         //fc.getPPU()->drawBackGround();
 
         displayCpu(cpu, hwnd);
-        video->refresh();
+        if (active) video->refresh();
     }
 
     delete video;
@@ -170,6 +171,22 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 {
     switch (message)              /* handle the messages */
     {
+    case WM_ACTIVATE:
+        {
+        switch((LOWORD(wParam)))
+            {
+            case WA_ACTIVE:
+            case WA_CLICKACTIVE:
+                // 活动, 可以继续向主页面绘画了.
+                active = true;
+                break;
+            case WA_INACTIVE:
+                // 不活动, 停止向主页面绘画.
+                active = false;
+                break;
+            }
+        }
+        break;
     case WM_DESTROY:
         PostQuitMessage (0);      /* send a WM_QUIT to the message queue */
         break;

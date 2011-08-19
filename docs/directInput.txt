@@ -1,0 +1,255 @@
+
+ 		
+　
+樊一鹏  
+
+　
+DirectInput 键盘编程入门
+
+
+　　游戏编程可不仅仅是图形程序的开发工作，实际上包含了许多方面，本文所要讲述的就是关于如何使用 DirectInput 来对键盘编程的问题。
+
+　　在 DOS 时代，我们一般都习惯于接管键盘中断来加入自己的处理代码。但这一套生存方式在万恶的 Windows 社会下是行不通的，我们只能靠领 API 或者 DirectInput 的救济金过活。
+
+　　在 Windows 的 API 中，有一个 GetAsyncKeyState() 的函数可以返回一个指定键的当前状态是按下还是松开。这个函数还能返回该指定键在上次调用 GetAsyncKeyState() 函数以后，是否被按下过。虽然这个函数听上去很不错，但现在领这种救济金的程序员是越来越少了。原因无它，只因为 DirectInput 的救济金比这丰厚，而且看上去似乎更专业？
+
+　　为了早日成为职业的救济金用户，我们就从学习 DirectInput 的键盘编程开始吧。
+
+DIRECTINPUT 的初始化
+
+　　前面讲 DirectDraw 时，曾经提到，微软是按 COM 来设计DirectX的，所以就有了一个 DIRECTINPUT 对象来表示输入设备，而某个具体的设备由 DIRECTINPUTDEVICE 对象来表示。
+
+　　实际的建立过程是先创建一个 DIRECTINPUT 对象，然后在通过此对象的 CreateDevice 方法来创建 DIRECTINPUTDEVICE 对象。
+
+　　示例如下：
+
+#include <dinput.h>
+
+#define DINPUT_BUFFERSIZE 16
+
+LPDIRECTINPUT           lpDirectInput;  // DirectInput object
+LPDIRECTINPUTDEVICE     lpKeyboard;     // DirectInput device
+
+BOOL InitDInput(HWND hWnd)
+{
+    HRESULT hr;
+
+    // 创建一个 DIRECTINPUT 对象
+    hr = DirectInputCreate(hInstanceCopy, DIRECTINPUT_VERSION, &lpDirectInput, NULL);
+
+    if FAILED(hr)
+    {
+        // 失败
+        return FALSE;
+    }
+
+    // 创建一个 DIRECTINPUTDEVICE 界面
+    hr = lpDirectInput->CreateDevice(GUID_SysKeyboard, &lpKeyboard, NULL);
+    if FAILED(hr)
+    {
+        // 失败
+        return FALSE;
+    }
+
+    // 设定为通过一个 256 字节的数组返回查询状态值
+    hr = lpKeyboard->SetDataFormat(&c_dfDIKeyboard);
+    if FAILED(hr)
+    {
+        // 失败
+        return FALSE;
+    }
+
+    // 设定协作模式
+    hr = lpKeyboard->SetCooperativeLevel(hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+    if FAILED(hr)
+    {
+        // 失败
+        return FALSE;
+    }
+
+    // 设定缓冲区大小
+    // 如果不设定，缓冲区大小默认值为 0，程序就只能按立即模式工作
+    // 如果要用缓冲模式工作，必须使缓冲区大小超过 0
+    DIPROPDWORD     property;
+
+    property.diph.dwSize = sizeof(DIPROPDWORD);
+    property.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    property.diph.dwObj = 0;
+    property.diph.dwHow = DIPH_DEVICE;
+    property.dwData = DINPUT_BUFFERSIZE;
+
+    hr = lpKeyboard->SetProperty(DIPROP_BUFFERSIZE, &property.diph);
+
+    if FAILED(hr)
+    {
+        // 失败
+        return FALSE;
+    }
+
+
+    hr = lpKeyboard->Acquire();
+    if FAILED(hr)
+    {
+        // 失败
+        return FALSE;
+    }
+
+    return TRUE;
+}
+　　在这段代码中，我们首先定义了 lpDirectInput 和 lpKeyboard 两个指针，前者用来指向 DIRECTINPUT 对象，后者指向一个 DIRECTINPUTDEVICE 界面。
+
+　　通过 DirectInputCreate(), 我们为 lpDirectInput 创建了一个 DIRECTINPUT 对象。然后我们调用 CreateDevice 来建立一个 DIRECTINPUTDEVICE 界面。参数 GUID_SysKeyboard 指明了建立的是键盘对象。
+
+　　接下来 SetDataFormat 设定数据格式，SetCooperativeLevel 设定协作模式，SetProperty 设定缓冲区模式。因为这些函数方法的参数很多，我就不逐个去详细解释其作用了，请直接查看 DirectX 的帮助信息，那里面写得非常清楚。
+
+　　完成这些工作以后，我们便调用 DIRECTINPUTDEVICE 对象的 Acquire 方法来激活对设备的访问权限。在此要特别说明一点，任何一个 DIRECTINPUT 设备，如果未经 Acquire，是无法进行访问的。还有，当系统切换到别的进程时，必须用 Unacquire 方法来释放访问权限，在系统切换回本进程时再调用 Acquire 来重新获得访问权限。
+
+　　所以，我们通常要在 WindowProc 中做如下处理：
+
+long FAR PASCAL WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch(message)
+    {
+    case WM_ACTIVATEAPP:
+        if(bActive)
+        {
+            if(lpKeyboard) lpKeyboard->Acquire();
+        }
+        else
+        {
+            if(lpKeyboard) lpKeyboard->Unacquire();
+        }
+    break;
+    ...
+}
+
+　　哦，对了，前一段例程中还提到了立即模式和缓冲模式。在 DirectINPUT 中，这两种工作模式是有区别的。
+
+　　如果使用立即模式的话，在查询数据时，只能返回查询时的设备状态。而缓冲模式则将记录所有设备状态变化过程。就个人喜好而言，笔者偏好后者，因为这样一般不会丢失任何按键信息。对应的，如果在使用前者时的查询频度太低，则很难保证采集数据的完整性。
+
+DIRECTINPUT 的数据查询
+
+　　立即模式的数据查询比较简单，请看下面的示例：
+
+BYTE diks[256]; // DirectInput keyboard state buffer 键盘状态数据缓冲区
+
+HRESULT UpdateInputState(void)
+{
+    if(lpKeyboard != NULL)      // 如果 lpKeyboard 对象界面存在
+    {
+        HRESULT hr;
+
+        hr = DIERR_INPUTLOST;   // 为循环检测做准备
+
+        // if input is lost then acquire and keep trying
+        while(hr == DIERR_INPUTLOST)
+        {
+            // 读取输入设备状态值到状态数据缓冲区
+            hr = lpKeyboard->GetDeviceState(sizeof(diks), &diks);
+
+            if(hr == DIERR_INPUTLOST)
+            {
+                // DirectInput 报告输入流被中断
+                // 必须先重新调用 Acquire 方法，然后再试一次
+                hr = lpKeyboard->Acquire();
+                if(FAILED(hr))
+                    return hr;
+            }
+        }
+
+        if(FAILED(hr))
+            return hr;
+    }
+
+    return S_OK;
+}
+
+　　在上面的示例中，关键处就是使用 GetDeviceState 方法来读取输入设备状态值以及对异常情况的处理。通过使用 GetDeviceState 方法，我们把输入设备的状态值放在了一个 256 字节的数组里。如果该数组中某个数组元素的最高位为 1，则表示相应编码的那个键此时正被按下。例如，如果 diks[1]&0x80>0，那么就表示 ESC 键正被按下。
+
+　　学会了立即模式的数据查询以后，下面我们开始研究缓冲模式的情况：
+
+HRESULT UpdateInputState(void)
+{
+    DWORD   i;
+
+    if(lpKeyboard != NULL)
+    {
+        DIDEVICEOBJECTDATA  didod[DINPUT_BUFFERSIZE];  // Receives buffered data
+        DWORD               dwElements;
+        HRESULT             hr;
+
+        hr = DIERR_INPUTLOST;
+
+        while(hr != DI_OK)
+        {
+            dwElements = DINPUT_BUFFERSIZE;
+            hr = lpKeyboard->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), didod, &dwElements, 0);
+            if (hr != DI_OK)
+            {
+                // 发生了一个错误
+                // 这个错误有可能是 DI_BUFFEROVERFLOW 缓冲区溢出错误
+                // 但不管是哪种错误，都意味着同输入设备的联系被丢失了
+
+                // 这种错误引起的最严重的后果就是如果你按下一个键后还未松开时
+                // 发生了错误，就会丢失后面松开该键的消息。这样一来，你的程序
+                // 就可能以为该键尚未被松开，从而发生一些意想不到的情况
+
+                // 现在这段代码并未处理该错误
+
+                // 解决该问题的一个办法是，在出现这种错误时，就去调用一次
+                // GetDeviceState()，然后把结果同程序最后所记录的状态进行
+                // 比较，从而修正可能发生的错误
+
+                hr = lpKeyboard->Acquire();
+                if(FAILED(hr))
+                return hr;
+            }
+        }
+
+        if(FAILED(hr))
+            return hr;
+    }
+
+    // GetDeviceData() 同 GetDeviceState() 不一样，调用它之后，
+    // dwElements 将指明此次调用共读取到了几条缓冲区记录
+
+    // 我们再用一个循环来处理每条记录
+
+    for(int i=0; i<dwElements; i++)
+    {
+        // 此处放入处理代码
+        // didod[i].dwOfs 表示那个键被按下或松开
+        // didod[i].dwData 记录此键的状态，低字节最高位是 1 表示按下，0 表示松开
+        // 一般用 didod[i].dwData&0x80 来测试
+    }
+    return S_OK;
+}
+
+　　其实，每条记录还有 dwTimeStamp 和 dwSequence 两个字段来记录消息发生的时间和序列编号，以便作更复杂的处理。本文是针对初学者写的，就不打算去谈论这些内容了。
+
+DIRECTINPUT 的结束处理
+
+　　我们在使用 DIRECTINPUT 时，还要注意的一件事就是当程序结束时，必须要进行释放处理，其演示代码如下：
+
+void ReleaseDInput(void)
+{
+    if (lpDirectInput)
+    {
+        if(lpKeyboard)
+        {
+            // Always unacquire the device before calling Release().
+            lpKeyboard->Unacquire();
+            lpKeyboard->Release();
+            lpKeyboard = NULL;
+        }
+        lpDirectInput->Release();
+        lpDirectInput = NULL;
+    }
+}
+
+　　这段代码很简单，就是对 DIRECTINPUT 的各个对象去调用 Release 方法来释放资源。这种过程同使用 DIRECTX 的其它部分时是基本上相同的。
+
+　
+
+　
+　

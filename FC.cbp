@@ -19,8 +19,9 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="dx81sdk\ddraw.lib" />
 					<Add library="dx81sdk\d3dx.lib" />
+					<Add library="dx81sdk\ddraw.lib" />
+					<Add directory="dx81sdk" />
 				</Linker>
 			</Target>
 		</Build>

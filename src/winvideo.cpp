@@ -58,13 +58,15 @@ class DirectXVideo : public Video {
 private:
     LPDIRECTDRAW4         lpDD4;                /* DirectDraw对象 */
     LPDIRECTDRAWSURFACE4  lpDDSPrimary;         /* DirectDraw主页面 */
-    LPDIRECTDRAWSURFACE4  lpDDSBack;
-    HDC                   hdc;
     int                   success;
+    T_COLOR               pixel[256*256];
+    HWND                  m_hwnd;
+    DDSURFACEDESC2        ddsd;
+    POINT                 point;
 
 public:
     DirectXVideo(HWND hwnd)
-    :lpDD4(0), lpDDSPrimary(0), lpDDSBack(0), hdc(0), success(0)
+    :lpDD4(0), lpDDSPrimary(0), success(0), m_hwnd(hwnd)
     {
         LPDIRECTDRAW lpDD;
 
@@ -92,7 +94,7 @@ public:
         //if ( lpDD->SetDisplayMode( 640, 480, 8 ) != DD_OK) return FALSE;
 
         // 填充主页面信息
-        DDSURFACEDESC2 ddsd;
+        //DDSURFACEDESC2 ddsd;
         ZeroMemory(&ddsd, sizeof(ddsd));
         ddsd.dwSize         = sizeof(ddsd);
         ddsd.dwFlags        = DDSD_CAPS;
@@ -104,29 +106,6 @@ public:
             return;
         }
 
-        // 设置剪裁
-        LPDIRECTDRAWCLIPPER lpddClipper;
-        lpDD4->CreateClipper(0, &lpddClipper, NULL);
-        lpddClipper->SetHWnd(0, hwnd);
-        lpDDSPrimary->SetClipper(lpddClipper);
-
-        // 创建缓冲页面
-        ddsd.dwFlags        = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT;
-        ddsd.dwWidth        = PPU_DISPLAY_P_WIDTH;
-        ddsd.dwHeight       = PPU_DISPLAY_P_HEIGHT;
-        ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-
-        if ( lpDD4->CreateSurface( &ddsd, &lpDDSBack, NULL ) ) {
-            printf("DX::Create back surface fail.\n");
-            return;
-        }
-
-        if ( lpDDSPrimary->GetDC(&hdc) ) {
-            printf("DX::crate DC fail.\n");
-            return;
-        }
-
-        initHdcColor(hdc);
         success = 1;
     }
 
@@ -135,29 +114,41 @@ public:
     }
 
     void drawPixel(int x, int y, T_COLOR color) {
-        SetPixel(hdc, x, y, color);
+        pixel[x + (y<<8)] = color;
     }
 
     void refresh() {
-        RECT rest;
-        rest.top = 0;
-        rest.left = 0;
-        rest.bottom = 240;
-        rest.right = 256;
-        lpDDSPrimary->Blt(&rest, lpDDSBack, &rest, DDBLT_COLORFILL, NULL);
+        RECT lpDestRect;
+
+        /* 转换坐标点 */
+        point.x = point.y = 0;
+        ClientToScreen(m_hwnd, &point);
+
+        lpDestRect.top    = point.y;
+        lpDestRect.left   = point.x;
+        lpDestRect.bottom = point.y + PPU_DISPLAY_P_HEIGHT;
+        lpDestRect.right  = point.x + PPU_DISPLAY_P_WIDTH;
+
+        if (lpDDSPrimary->Lock(&lpDestRect, &ddsd,
+                 DDLOCK_SURFACEMEMORYPTR, NULL) != DD_OK) {
+            return;
+        }
+
+        UINT *buffer = (UINT*)ddsd.lpSurface;
+        UINT nPitch = ddsd.lPitch >> 2;
+
+        for (int x=0; x<PPU_DISPLAY_P_WIDTH; ++x) {
+            for (int y=0; y<PPU_DISPLAY_P_HEIGHT; ++y) {
+                buffer[y*nPitch + x] = pixel[x + (y<<8)];
+            }
+        }
+
+        lpDDSPrimary->Unlock(&lpDestRect);
     }
 
     ~DirectXVideo() {
-        if (hdc!=NULL) {
-            lpDDSBack->ReleaseDC(hdc);
-            hdc  = NULL;
-        }
-        if (lpDDSBack!=NULL) {
-            lpDDSBack->Release();
-            lpDDSBack = NULL;
-        }
         if( lpDDSPrimary != NULL ) {
-            lpDDSPrimary->SetClipper(NULL);
+            lpDDSPrimary->Restore();
             lpDDSPrimary->Release();
             lpDDSPrimary = NULL;
         }

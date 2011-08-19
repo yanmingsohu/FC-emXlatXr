@@ -20,12 +20,10 @@
 #define P_HBLANK_CPU_CYC       338       /* 每行水平消隐周期      */
 #define P_VLINE_COUNT          312       /* 每帧扫描线            */
 #define P_VBLANK_CPU_CYC     35469       /* 垂直消隐周期          */
-
-/* 每帧周期    */
+                                         /* 每帧周期              */
 #define P_FRAME_CPU_CYC       \
             ( (P_HLINE_CPU_CYC+P_HBLANK_CPU_CYC) * P_VLINE_COUNT )
-
-/* 每像素周期  */
+                                         /* 每像素周期            */
 #define P_PIXEL_CPU_CYC       \
             ( P_HLINE_CPU_CYC / PPU_DISPLAY_P_WIDTH )
 /*----------------------------------------------------------------*/

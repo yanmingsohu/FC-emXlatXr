@@ -5,6 +5,7 @@
 #include "rom.h"
 #include "mmc.h"
 #include "ppu.h"
+#include "pad.h"
 
 /*--------------------------------------------------*
  * $0000-$00FF 系统零页                             *
@@ -21,12 +22,13 @@
 struct memory {
 
 private:
-    MMC *mmc;
-    PPU *ppu;
-    byte ram[0x07FF];
+    MMC     *mmc;
+    PPU     *ppu;
+    PlayPad *pad;
+    byte    ram[0x07FF];
 
 public:
-    memory(MMC *mmc, PPU *_ppu);
+    memory(MMC *mmc, PPU *_ppu, PlayPad* _pad);
     /** 重置内存状态全部清0 */
     void reset();
     /** 可以读取全部地址 */

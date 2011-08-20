@@ -22,7 +22,10 @@ const byte SUCCESS = 0;
 const byte FAILED  = -1;
 
 void welcome();
+/* 把数组内容打印到控制台 */
 void printArr(byte* arr, int startIdx, int length);
+/* 把load_rom方法返回的错误代码转义为消息字符串 */
+char* parseOpenError(int load_err_code);
 
 /*---------------------------| 如果定义则显示相关的DEBUG消息 |----*/
 /* 显示NMI调用与返回的消息                                        */
@@ -34,7 +37,7 @@ void printArr(byte* arr, int startIdx, int length);
 /* 显示访问PPU的消息                                              */
 //#define SHOW_PPU_REGISTER
 /* 显示CPU寻址消息                                                */
-//#define SHOW_CPU_MEMORY_ADDRESSING
+#define SHOW_CPU_MEMORY_ADDRESSING
 /*-----------------------------------------------| END DEBUG |----*/
 
 #endif // TYPE_H_INCLUDED

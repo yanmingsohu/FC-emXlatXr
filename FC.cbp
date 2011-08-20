@@ -34,6 +34,8 @@
 		</Linker>
 		<Unit filename="src\cpu.cpp" />
 		<Unit filename="src\cpu.h" />
+		<Unit filename="src\debug.cpp" />
+		<Unit filename="src\debug.h" />
 		<Unit filename="src\main.cpp" />
 		<Unit filename="src\mem.cpp" />
 		<Unit filename="src\mem.h" />
@@ -41,6 +43,7 @@
 		<Unit filename="src\mmc.h" />
 		<Unit filename="src\nes_sys.cpp" />
 		<Unit filename="src\nes_sys.h" />
+		<Unit filename="src\pad.h" />
 		<Unit filename="src\ppu.cpp" />
 		<Unit filename="src\ppu.h" />
 		<Unit filename="src\rom.cpp" />
@@ -49,7 +52,8 @@
 		<Unit filename="src\type.h" />
 		<Unit filename="src\video.h" />
 		<Unit filename="src\windows.cpp" />
-		<Unit filename="src\winvideo.cpp" />
+		<Unit filename="src\winsys.cpp" />
+		<Unit filename="src\winsys.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

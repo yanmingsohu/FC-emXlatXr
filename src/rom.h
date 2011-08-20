@@ -8,7 +8,7 @@ using std::string;
 
 struct nes_file {
 
-#define NES_FILE_MAGIC      0x1A53454E //4E 45 53 1A
+#define NES_FILE_MAGIC      0x1A53454E // 4E 45 53 1A
 #define NES_FILE_HEAD_LEN   16
 #define NES_FILE_HAS_TRA(x) (x->t1 & 0x04)
 #define NES_FILE_TRA_SIZE   512
@@ -29,9 +29,9 @@ struct nes_file {
 				　   * D4－D7：ROM Mapper的高4位                        */
 	byte zero[8];	/* 保留，必须是0                                    */
 
-	byte trainer[NES_FILE_TRA_SIZE];  /* 7000~71ff共512个字节， Mapper补
-                                       * 丁就放在该地方，ROM的代码来调用
-                                       * 它们。 游戏Trainer代码由菜单程
+	byte trainer[NES_FILE_TRA_SIZE];  /* 7000~71ff共512个字节， Mapper补*
+                                       * 丁就放在该地方，ROM的代码来调用*
+                                       * 它们。 游戏Trainer代码由菜单程 *
                                        * 序加载                         */
 
 	byte *rom;		/* 16KxM  ROM段升序排列，如果存在trainer，

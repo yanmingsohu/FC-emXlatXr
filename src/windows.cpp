@@ -3,7 +3,9 @@
 #include <time.h>
 #include "nes_sys.h"
 #include "ppu.h"
-#include "winvideo.cpp"
+#include "winsys.h"
+
+#include "debug.h"
 
 
 /*  Declare Windows procedure  */
@@ -86,13 +88,14 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
     return 1;
 }
 
-#define ROM  "rom/F-1.nes"
-//#define ROM "rom/Tennis.nes"
+//#define ROM  "rom/F-1.nes"
+#define ROM "rom/Tennis.nes"
 //#define ROM "rom/test.nes"
 void start_game(HWND hwnd, PMSG messages) {
 
+    PlayPad *pad = new WinPad();
     Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
-    NesSystem fc(video);
+    NesSystem fc(video, pad);
 
     if (fc.load_rom(ROM)) {
         MessageBox(hwnd, "¶ÁÈ¡ROMÊ§°Ü", "´íÎó", 0);
@@ -100,9 +103,9 @@ void start_game(HWND hwnd, PMSG messages) {
     }
 
 	cpu_6502* cpu = fc.getCpu();
-#ifdef SHOW_CPU_OPERATE
-    cpu->showCmds(0);
-#endif
+	((WinPad*)pad)->sys = &fc;
+
+    int count = 0;
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
@@ -116,12 +119,14 @@ void start_game(HWND hwnd, PMSG messages) {
 			/* Send message to WindowProcedure */
 			DispatchMessage(messages);
     	}
-
+debugCpu(&fc);
         fc.drawFrame();
         //fc.getPPU()->drawTileTable();
         //fc.getPPU()->drawBackGround();
+        // frame 1680 error
 
         displayCpu(cpu, hwnd);
+
         if (active) video->refresh();
     }
 
@@ -129,10 +134,10 @@ void start_game(HWND hwnd, PMSG messages) {
 }
 
 void displayCpu(cpu_6502* cpu, HWND hwnd) {
-    static long frameC = 0;
+    static long frameC = 0, f2c = 0;
     static clock_t time = clock();
 
-    frameC++;
+    frameC++; f2c++;
     if (frameC%20!=0) return;
 
     HDC hdc = GetDC(hwnd);
@@ -161,8 +166,13 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
 
     sprintf(buf, "frame: %09ld", frameC);
     TextOut(hdc, x+=xIn, y, buf, 16);
-    sprintf(buf, "rate : %02lf/s", frameC/utime);
+    sprintf(buf, "rate : %02lf/s", f2c/utime);
     TextOut(hdc, x, y-yIn, buf, 11);
+
+    if (f2c>50) {
+        time = clock();
+        f2c = 0;
+    }
 }
 
 /*  This function is called by the Windows function DispatchMessage()  */

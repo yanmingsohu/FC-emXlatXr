@@ -836,18 +836,8 @@ command_6502 command_list_6502[] = {
 /****************************************************************************/
 
 cpu_6502::cpu_6502(memory* ram)
-        : NMI_idle(1), NMI(0), IRQ(0), RES(1), ram(ram)
+        : NMI_idle(1), NMI(0), IRQ(0), RES(1), ram(ram), m_showDebug(0)
 {
-}
-
-inline void cpu_6502::push(byte d) {
-    ram->write(SP | 0x0100, d);
-    SP--;
-}
-
-inline byte cpu_6502::pop() {
-    SP++;
-    return ram->read(SP | 0x0100);
 }
 
 char* cpu_6502::debug() {
@@ -925,7 +915,7 @@ byte cpu_6502::process() {
     PC += opp->len;
 
 #ifdef SHOW_CPU_OPERATE
-    if (showCmd) printf(cmdInfo());
+    if (m_showDebug) printf(cmdInfo());
 #endif
     opp->op_func(&parm);
 
@@ -990,6 +980,16 @@ inline void cpu_6502::jump(word addr) {
     PCH    = ram->read(addr+1);
     PCL    = ram->read(addr  );
     FLAGS |= CPU_FLAGS_INTERDICT;
+}
+
+inline void cpu_6502::push(byte d) {
+    ram->write(SP | 0x0100, d);
+    SP--;
+}
+
+inline byte cpu_6502::pop() {
+    SP++;
+    return ram->read(SP | 0x0100);
 }
 
 inline void cpu_6502::checkNZ(byte value) {
@@ -1073,7 +1073,8 @@ inline byte command_parm::read(const byte addressing_mode) {
 #ifdef SHOW_CPU_MEMORY_ADDRESSING
     word addr = getAddr(addressing_mode);
     byte value = ram->read( addr );
-    printf("CPU::read address:%04X value:%X\n", addr, value);
+    cpu->isShowDebug()
+        && printf("CPU::read address:%04X value:%X\n", addr, value);
     return value;
 #endif
 #ifndef SHOW_CPU_MEMORY_ADDRESSING
@@ -1092,7 +1093,8 @@ inline void command_parm::write(const byte addressing_mode, byte value) {
     }
 #ifdef SHOW_CPU_MEMORY_ADDRESSING
     word addr = getAddr(addressing_mode);
-    printf("CPU::write address:%04X value:%X\n", addr, value);
+    cpu->isShowDebug()
+        && printf("CPU::write address:%04X value:%X\n", addr, value);
     cpu->ram->write(addr, value);
 #endif
 #ifndef SHOW_CPU_MEMORY_ADDRESSING

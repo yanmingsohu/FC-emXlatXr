@@ -3,8 +3,8 @@
 #include <stdio.h>
 
 
-memory::memory(MMC *mmc, PPU *_ppu)
-      : mmc(mmc), ppu(_ppu)
+memory::memory(MMC *mmc, PPU *_ppu, PlayPad *_pad)
+      : mmc(mmc), ppu(_ppu), pad(_pad)
 {
 }
 
@@ -29,7 +29,7 @@ byte memory::read(const word offset) {
         return 0;
     }
     if (offset<0x4018) {    /* 输入设备状态寄存器(手柄等)      */
-        return 0;
+        return pad->readPort(offset);
     }
     if (offset<0x401F) {    /* 未用                            */
         return 0;
@@ -57,6 +57,10 @@ void memory::write(const word offset, const byte data) {
         printf("MEM::向PPU传送OAM,ram:%04X", data<<8);
 #endif
         ppu->copySprite(ram + (data<<8));
+        return;
+    }
+    if (offset==0x4016 || offset==0x4017) {
+        pad->writePort(offset, data);
         return;
     }
 #ifdef SHOW_ERR_MEM_OPERATE

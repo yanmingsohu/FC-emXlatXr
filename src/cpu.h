@@ -12,9 +12,8 @@ struct cpu_6502 {
 
 private:
     byte NMI_idle;               /* NMI空闲则为1                     */
-#ifdef SHOW_CPU_OPERATE
-    byte showCmd;
-#endif
+    byte m_showDebug;            /* SHOW_CPU_MEMORY_ADDRESSING,
+                                  * SHOW_CPU_OPERATE 启用后,仍需设置 */
 
 public:
 #define CPU_NTSC      1789772.5  /* Hz */
@@ -80,11 +79,13 @@ public:
                                  * b是参与运算之前的累加器的值       */
     void    clearV();
 
-#ifdef SHOW_CPU_OPERATE
-    inline void showCmds(byte show) {   /* 是否在命令结束后显示相关信息      */
-        showCmd = show;
+    void showDebug(byte show) { /* 是否在命令结束后显示相关信息      */
+        m_showDebug = show;
     }
-#endif
+
+    byte isShowDebug() {
+        return m_showDebug;
+    }
 };
 
 /* 向命令处理函数传递参数          */

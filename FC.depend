@@ -1,310 +1,116 @@
 # depslib dependency file v1.0
-1312345837 source:f:\c-project\__test\main.cpp
-	<iostream>
-	"type.h"
-
-1312345911 f:\c-project\__test\type.h
-
-1312347207 source:f:\c-project\fc\main.cpp
-	<iostream>
-	"type.h"
-
-1312350303 f:\c-project\fc\type.h
-
-1312385924 source:e:\c-project\fc\main.cpp
-	<stdio.h>
-	"cpu.h"
-
-1312386351 e:\c-project\fc\type.h
-
-1312385955 source:e:\c-project\fc\cpu.cpp
-	"type.h"
-
-1312386882 e:\c-project\fc\cpu.h
-	"type.h"
-
-1313625984 source:f:\c-project\fc\src\main.cpp
-	<stdio.h>
-	<stdlib.h>
-	<conio.h>
-	<time.h>
-	<string>
-	"nes_sys.h"
-	"cpu.h"
-
-1313625984 f:\c-project\fc\src\cpu.h
-	"type.h"
-	"mem.h"
-	"ppu.h"
-
-1313625984 f:\c-project\fc\src\type.h
-
-1313548464 f:\c-project\fc\src\mem.h
-	"type.h"
-	"rom.h"
-	"mmc.h"
-	"ppu.h"
-
-1313625984 source:f:\c-project\fc\src\mem.cpp
-	"mem.h"
-	"string.h"
-	<stdio.h>
-
-1313710836 source:f:\c-project\fc\src\cpu.cpp
+1313796284 source:e:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
 	"stdlib.h"
 
-1313365955 source:f:\c-project\fc\src\rom.cpp
+1313763092 e:\c-project\fc\src\mem.h
+	"type.h"
 	"rom.h"
-	<stdio.h>
-	<stdlib.h>
+	"mmc.h"
+	"ppu.h"
+	"pad.h"
 
-1313365955 f:\c-project\fc\src\rom.h
+1313793070 e:\c-project\fc\src\type.h
+
+1313753487 e:\c-project\fc\src\rom.h
 	"type.h"
 	"string"
-
-1313549273 f:\c-project\fc\src\nes_sys.h
-	"cpu.h"
-	"mem.h"
-	"rom.h"
-	"video.h"
-
-1313625984 source:f:\c-project\fc\src\nes_sys.cpp
-	"nes_sys.h"
-	<stdio.h>
-
-1313667364 source:e:\c-project\fc\src\main.cpp
-	<stdio.h>
-	<stdlib.h>
-	<conio.h>
-	<time.h>
-	<string>
-	"nes_sys.h"
-	"cpu.h"
-
-1313667364 e:\c-project\fc\src\nes_sys.h
-	"cpu.h"
-	"mem.h"
-	"rom.h"
-	"video.h"
-
-1313667364 source:e:\c-project\fc\src\mem.cpp
-	"mem.h"
-	"string.h"
-	<stdio.h>
-
-1313667364 e:\c-project\fc\src\mem.h
-	"type.h"
-	"rom.h"
-	"mmc.h"
-	"ppu.h"
-
-1313667364 e:\c-project\fc\src\type.h
-
-1313152763 e:\c-project\fc\src\rom.h
-	"type.h"
-	"string"
-
-1313667364 source:e:\c-project\fc\src\nes_sys.cpp
-	"nes_sys.h"
-	<stdio.h>
-
-1313667364 e:\c-project\fc\src\cpu.h
-	"type.h"
-	"mem.h"
-	"ppu.h"
-
-1313145626 source:e:\c-project\fc\src\rom.cpp
-	"rom.h"
-	<stdio.h>
-	<stdlib.h>
-
-1313667577 source:e:\c-project\fc\src\cpu.cpp
-	"mem.h"
-	"cpu.h"
-	"stdio.h"
-	"stdlib.h"
-
-1313588988 source:e:\fc\src\main.cpp
-	<stdio.h>
-	<stdlib.h>
-	<conio.h>
-	<time.h>
-	<string>
-	"nes_sys.h"
-	"cpu.h"
-
-1313574120 e:\fc\src\nes_sys.h
-	"cpu.h"
-	"mem.h"
-	"rom.h"
-	"video.h"
-
-1313576272 source:e:\fc\src\mem.cpp
-	"mem.h"
-	"string.h"
-	<stdio.h>
-
-1313574120 e:\fc\src\mem.h
-	"type.h"
-	"rom.h"
-	"mmc.h"
-	"ppu.h"
-
-1313589123 e:\fc\src\type.h
-
-1313300576 e:\fc\src\rom.h
-	"type.h"
-	"string"
-
-1313586969 source:e:\fc\src\nes_sys.cpp
-	"nes_sys.h"
-	<stdio.h>
-
-1313576030 e:\fc\src\cpu.h
-	"type.h"
-	"mem.h"
-	"ppu.h"
-
-1313300576 source:e:\fc\src\rom.cpp
-	"rom.h"
-	<stdio.h>
-	<stdlib.h>
-
-1313576932 source:e:\fc\src\cpu.cpp
-	"mem.h"
-	"cpu.h"
-	"stdio.h"
-	"stdlib.h"
-
-1313742272 source:f:\c-project\fc\src\windows.cpp
-	<windows.h>
-	<stdio.h>
-	<time.h>
-	"nes_sys.h"
-	"ppu.h"
-	"winvideo.cpp"
-
-1313549741 source:f:\c-project\fc\src\type.cpp
-	"type.h"
-	<stdio.h>
-
-1313365955 source:f:\c-project\fc\src\mmc.cpp
-	"mmc.h"
-	"type.h"
-	"stdio.h"
-
-1313365955 f:\c-project\fc\src\mmc.h
-	"rom.h"
-
-1313710836 source:f:\c-project\fc\src\ppu.cpp
-	"ppu.h"
-	<stdio.h>
-	<string.h>
-
-1313739095 f:\c-project\fc\src\ppu.h
-	"mmc.h"
-	"video.h"
 
 1313273660 e:\c-project\fc\src\mmc.h
 	"rom.h"
 
-1313667364 e:\c-project\fc\src\ppu.h
+1313748868 e:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
+
+1313667364 e:\c-project\fc\src\video.h
+	"type.h"
+
+1313791983 e:\c-project\fc\src\pad.h
+	<stdio.h>
+
+1313755455 e:\c-project\fc\src\cpu.h
+	"type.h"
+	"mem.h"
+	"ppu.h"
+
+1313749459 source:e:\c-project\fc\src\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	"type.h"
+
+1313792059 source:e:\c-project\fc\src\mem.cpp
+	"mem.h"
+	"string.h"
+	<stdio.h>
 
 1313273763 source:e:\c-project\fc\src\mmc.cpp
 	"mmc.h"
 	"type.h"
 	"stdio.h"
 
+1313795529 source:e:\c-project\fc\src\nes_sys.cpp
+	"nes_sys.h"
+	"debug.h"
+	<stdio.h>
+
+1313794876 e:\c-project\fc\src\nes_sys.h
+	"cpu.h"
+	"mem.h"
+	"rom.h"
+	"video.h"
+	"pad.h"
+
+1313749613 e:\c-project\fc\src\debug.h
+
 1313667606 source:e:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
 
-1313667364 source:e:\c-project\fc\src\type.cpp
-	"type.h"
-	<stdio.h>
-
-1313676208 source:e:\c-project\fc\src\windows.cpp
-	<windows.h>
-	<stdio.h>
-	<time.h>
-	"nes_sys.h"
-	"ppu.h"
-	"winvideo.cpp"
-
-1313667364 e:\c-project\fc\src\video.h
-	"type.h"
-
-1313300576 e:\fc\src\mmc.h
+1313145626 source:e:\c-project\fc\src\rom.cpp
 	"rom.h"
-
-1313588159 e:\fc\src\ppu.h
-	"mmc.h"
-	"video.h"
-
-1313300576 e:\fc\src\video.h
-	"type.h"
-
-1313300576 source:e:\fc\src\mmc.cpp
-	"mmc.h"
-	"type.h"
-	"stdio.h"
-
-1313589678 source:e:\fc\src\ppu.cpp
-	"ppu.h"
 	<stdio.h>
-	<string.h>
+	<stdlib.h>
 
-1313574120 source:e:\fc\src\type.cpp
+1313753545 source:e:\c-project\fc\src\type.cpp
 	"type.h"
+	"rom.h"
 	<stdio.h>
 
-1313589690 source:e:\fc\src\windows.cpp
+1313804074 source:e:\c-project\fc\src\windows.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
 	"nes_sys.h"
 	"ppu.h"
+	"winsys.h"
+	"debug.h"
 
-1313637920 f:\c-project\fc\src\video.h
-	"type.h"
-
-1313744122 source:f:\c-project\fc\src\winvideo.cpp
+1313803927 e:\c-project\fc\src\winsys.h
+	<windows.h>
+	<stdio.h>
 	"video.h"
 	"ppu.h"
 	"ddraw.h"
-	<windows.h>
-	<stdio.h>
-
-1003197090 f:\c-project\fc\dx81sdk\ddraw.h
-	<objbase.h>
-
-1313744213 f:\c-project\fc\src\winvideo.cpp
-	"video.h"
-	"ppu.h"
-	"ddraw.h"
-	<windows.h>
-	<stdio.h>
-
-1313677242 e:\c-project\fc\src\winvideo.cpp
-	"video.h"
-	"ppu.h"
-	"ddraw.h"
-	<windows.h>
-	<stdio.h>
+	"pad.h"
+	"nes_sys.h"
+	"debug.h"
 
 1313667364 e:\c-project\fc\dx81sdk\ddraw.h
 	<objbase.h>
 
-1313677242 source:e:\c-project\fc\src\winvideo.cpp
-	"video.h"
-	"ppu.h"
-	"ddraw.h"
-	<windows.h>
+1313791719 source:e:\c-project\fc\src\winsys.cpp
+	"winsys.h"
+
+1313795571 source:e:\c-project\fc\src\debug.cpp
 	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<time.h>
+	"nes_sys.h"
+	"cpu.h"
 

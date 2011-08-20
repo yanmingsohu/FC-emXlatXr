@@ -1,10 +1,11 @@
 #include "nes_sys.h"
+#include "debug.h"
 #include <stdio.h>
 
-NesSystem::NesSystem(Video* video) {
+NesSystem::NesSystem(Video* video, PlayPad *_pad) : pad(_pad) {
     mmc = new MMC();
     ppu = new PPU(mmc, video);
-    ram = new memory(mmc, ppu);
+    ram = new memory(mmc, ppu, pad);
     cpu = new cpu_6502(ram);
     rom = new nes_file();
     ppu->setNMI(&cpu->NMI);
@@ -17,6 +18,7 @@ NesSystem::~NesSystem() {
     delete ppu;
     delete mmc;
     delete rom;
+    delete pad;
 }
 
 void NesSystem::drawFrame() {
@@ -94,4 +96,15 @@ PPU* NesSystem::getPPU() {
 
 memory* NesSystem::getMem() {
     return ram;
+}
+
+void NesSystem::debug() {
+    static int debuging = 0;
+
+    if (!debuging) {
+        debuging = 1;
+        printf("NES::start step debug.\n");
+        debugCpu(this);
+        debuging = 0;
+    }
 }

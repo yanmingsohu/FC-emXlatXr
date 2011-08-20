@@ -1,19 +1,14 @@
-#include "video.h"
-#include "ppu.h"
-#include "ddraw.h"
+#ifndef WINSYS_H_INCLUDED
+#define WINSYS_H_INCLUDED
+
 #include <windows.h>
-#include <stdio.h>
+#include   <stdio.h>
+#include   "video.h"
+#include     "ppu.h"
+#include   "ddraw.h"
+#include     "pad.h"
 
-static void initHdcColor(HDC hdc) {
-    HFONT font = CreateFont(10, 0, 0, 0, 100
-                , FALSE, FALSE, FALSE, GB2312_CHARSET
-                , OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
-                , PROOF_QUALITY, DEFAULT_PITCH, "宋体" );
-
-    SelectObject(hdc, font);
-    SetTextColor(hdc, RGB(255, 255, 255));
-    SetBkColor(hdc, RGB(0, 0, 0));
-}
+void initHdcColor(HDC hdc);
 
 /* 使用GUI绘图 */
 class WindowsVideo : public Video {
@@ -94,7 +89,6 @@ public:
         //if ( lpDD->SetDisplayMode( 640, 480, 8 ) != DD_OK) return FALSE;
 
         // 填充主页面信息
-        //DDSURFACEDESC2 ddsd;
         ZeroMemory(&ddsd, sizeof(ddsd));
         ddsd.dwSize         = sizeof(ddsd);
         ddsd.dwFlags        = DDSD_CAPS;
@@ -113,7 +107,7 @@ public:
         return success;
     }
 
-    void drawPixel(int x, int y, T_COLOR color) {
+    inline void drawPixel(int x, int y, T_COLOR color) {
         pixel[x + (y<<8)] = color;
     }
 
@@ -137,9 +131,11 @@ public:
         UINT *buffer = (UINT*)ddsd.lpSurface;
         UINT nPitch = ddsd.lPitch >> 2;
 
-        for (int x=0; x<PPU_DISPLAY_P_WIDTH; ++x) {
-            for (int y=0; y<PPU_DISPLAY_P_HEIGHT; ++y) {
-                buffer[y*nPitch + x] = pixel[x + (y<<8)];
+        for (int x=0, y=0;;) {
+            buffer[y*nPitch + x] = pixel[x + (y<<8)];
+            if (++x>=PPU_DISPLAY_P_WIDTH) {
+                x = 0;
+                if (++y>=PPU_DISPLAY_P_HEIGHT) break;
             }
         }
 
@@ -159,4 +155,49 @@ public:
     }
 };
 
-// GetAsyncKeyState(virtual key code)按下=0x8000
+
+#include "nes_sys.h"
+#include "debug.h"
+
+/* 0 : 0x30, 9 : 0x39
+ * A : 0x41, W : 0x57, S : 0x53, D : 0x44
+ * F : 0x46, H : 0x48, J : 0x4A, K : 0x4B */
+class WinPad : public PlayPad {
+
+private:
+    static const byte K_A = 0x41;
+    static const byte K_W = 0x57;
+    static const byte K_S = 0x53;
+    static const byte K_D = 0x44;
+    static const byte K_F = 0x46;
+    static const byte K_H = 0x48;
+    static const byte K_J = 0x4A;
+    static const byte K_K = 0x48;
+
+    byte p1_key_map[8];
+
+public:
+    WinPad() {
+        p1_key_map[FC_PAD_BU_A     ] = K_J;
+        p1_key_map[FC_PAD_BU_B     ] = K_K;
+        p1_key_map[FC_PAD_BU_START ] = K_H;
+        p1_key_map[FC_PAD_BU_SELECT] = K_F;
+        p1_key_map[FC_PAD_BU_UP    ] = K_W;
+        p1_key_map[FC_PAD_BU_DOWN  ] = K_S;
+        p1_key_map[FC_PAD_BU_LEFT  ] = K_A;
+        p1_key_map[FC_PAD_BU_RIGHT ] = K_D;
+    }
+
+NesSystem *sys;
+
+    byte keyPushed(FC_PAD_KEY key, byte id) {
+        //if (key == FC_PAD_BU_START) {
+            //sys->debug();
+            //return 1;
+        //}
+        return (GetAsyncKeyState( p1_key_map[key] ) & 0x8000) ? 1 : 0;
+    }
+
+};
+
+#endif

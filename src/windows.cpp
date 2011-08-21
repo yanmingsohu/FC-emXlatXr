@@ -121,7 +121,7 @@ void start_game(HWND hwnd, PMSG messages) {
 			/* Send message to WindowProcedure */
 			DispatchMessage(messages);
     	}
-        debugCpu(&fc);
+        //debugCpu(&fc);
         fc.drawFrame();
         //fc.getPPU()->drawTileTable();
         // frame 1680 error

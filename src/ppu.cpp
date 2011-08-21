@@ -379,8 +379,8 @@ void PPU::drawSprite() {
 }
 
 void PPU::drawPixel(int X, int Y) {
-    int x = winX;
-    int y = winY;
+    int x = winX + X;
+    int y = winY + Y;
     BackGround *bgs;
 
     if (x<256) {
@@ -388,17 +388,18 @@ void PPU::drawPixel(int X, int Y) {
             bgs = pbg[0];
         } else {
             bgs = pbg[2];
+            y = Y;
         }
     } else {
         if (y<240) {
             bgs = pbg[1];
+            x = X;
         } else {
             bgs = pbg[3];
+            x = X;
+            y = Y;
         }
     }
-
-    x = (x+X)%256;
-    y = (y+Y)%240;
 
     word nameIdx = DIV8(x) + (DIV8(y)<<5);
     word tileIdx = bgs->name[nameIdx];

@@ -16,10 +16,10 @@
 #define PPU_VMIRROR_4_LAYOUT    0x08
 
 /*---------------------------------------| PAL Info |-------------*/
-#define P_VLINE_COUNT            312     /* 每帧扫描线            */
-#define P_HLINE_CPU_CYC         1024     /* 每行绘制周期          */
-#define P_HBLANK_CPU_CYC         338     /* 每行水平消隐周期      */
-#define P_VBLANK_CPU_CYC       35469     /* 垂直消隐周期          */
+#define P_VLINE_COUNT          312       /* 每帧扫描线            */
+#define P_HLINE_CPU_CYC      (1024/12.0) /* 每行绘制周期          */
+#define P_HBLANK_CPU_CYC      (338/12.0) /* 每行水平消隐周期      */
+#define P_VBLANK_CPU_CYC      (683/12.0) /* 垂直消隐周期          */
                                          /* 每帧周期              */
 #define P_FRAME_CPU_CYC       \
             ( (P_HLINE_CPU_CYC+P_HBLANK_CPU_CYC) * P_VLINE_COUNT )

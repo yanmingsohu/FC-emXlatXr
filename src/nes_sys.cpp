@@ -25,19 +25,17 @@ void NesSystem::drawFrame() {
     static int cpu_cyc = 0;
 
     ppu->startNewFrame();
-    int line = 0;
     int x = 0, y = 0;
+    double ppu_cyc = 0, cyc = 0;
 
-    while (line++<PPU_DISPLAY_P_HEIGHT) {
+    while (y<PPU_DISPLAY_P_HEIGHT) {
         /* »æÖÆÒ»ÐÐ */
-        int ppu_cyc = 0, cyc = 0;
-
         while (cpu_cyc<P_HLINE_CPU_CYC) {
             cyc = cpu->process();
             cpu_cyc += cyc;
             ppu_cyc += cyc;
 
-            if (ppu_cyc>=P_PIXEL_CPU_CYC) {
+            while (ppu_cyc>=P_PIXEL_CPU_CYC) {
                 ppu->drawPixel(x++, y);
                 ppu_cyc -= P_PIXEL_CPU_CYC;
             }

@@ -88,23 +88,25 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
     return 1;
 }
 
-//#define ROM  "rom/F-1.nes"
-#define ROM "rom/Tennis.nes"
+#define ROM "rom/F-1.nes"
+//#define ROM "rom/Dr_Mario.nes"
 //#define ROM "rom/test.nes"
 void start_game(HWND hwnd, PMSG messages) {
 
     PlayPad *pad = new WinPad();
     Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
     NesSystem fc(video, pad);
+    int ret = 0;
 
-    if (fc.load_rom(ROM)) {
-        MessageBox(hwnd, "读取ROM失败", "错误", 0);
+    if (ret = fc.load_rom(ROM)) {
+        MessageBox(hwnd, parseOpenError(ret), "错误", 0);
         return;
     }
 
-	cpu_6502* cpu = fc.getCpu();
-	((WinPad*)pad)->sys = &fc;
+    WindowsVideo *bgPanel = new WindowsVideo(hwnd, 512, 480);
+    bgPanel->setOffset(270, 40);
 
+	cpu_6502* cpu = fc.getCpu();
     int count = 0;
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
@@ -119,15 +121,19 @@ void start_game(HWND hwnd, PMSG messages) {
 			/* Send message to WindowProcedure */
 			DispatchMessage(messages);
     	}
-debugCpu(&fc);
+        debugCpu(&fc);
         fc.drawFrame();
         //fc.getPPU()->drawTileTable();
-        //fc.getPPU()->drawBackGround();
         // frame 1680 error
 
         displayCpu(cpu, hwnd);
 
         if (active) video->refresh();
+
+        if (++count%40==0) {
+            //fc.getPPU()->drawBackGround(bgPanel);
+            //bgPanel->refresh();
+        }
     }
 
     delete video;
@@ -192,7 +198,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 break;
             case WA_INACTIVE:
                 // 不活动, 停止向主页面绘画.
-                active = false;
+                //active = false;
                 break;
             }
         }

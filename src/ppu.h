@@ -4,11 +4,11 @@
 #include "mmc.h"
 #include "video.h"
 
-#define PPU_DISPLAY_P_WIDTH     256
-#define PPU_DISPLAY_P_HEIGHT    240
+#define PPU_DISPLAY_P_WIDTH      256
+#define PPU_DISPLAY_P_HEIGHT     240
 
-#define PPU_DISPLAY_N_WIDTH     256
-#define PPU_DISPLAY_N_HEIGHT    224
+#define PPU_DISPLAY_N_WIDTH      256
+#define PPU_DISPLAY_N_HEIGHT     224
 
 #define PPU_VMIRROR_VERTICAL    0x01
 #define PPU_VMIRROR_HORIZONTAL  0x00
@@ -16,10 +16,10 @@
 #define PPU_VMIRROR_4_LAYOUT    0x08
 
 /*---------------------------------------| PAL Info |-------------*/
-#define P_HLINE_CPU_CYC       1024       /* 每行绘制周期          */
-#define P_HBLANK_CPU_CYC       338       /* 每行水平消隐周期      */
-#define P_VLINE_COUNT          312       /* 每帧扫描线            */
-#define P_VBLANK_CPU_CYC     35469       /* 垂直消隐周期          */
+#define P_VLINE_COUNT            312     /* 每帧扫描线            */
+#define P_HLINE_CPU_CYC         1024     /* 每行绘制周期          */
+#define P_HBLANK_CPU_CYC         338     /* 每行水平消隐周期      */
+#define P_VBLANK_CPU_CYC       35469     /* 垂直消隐周期          */
                                          /* 每帧周期              */
 #define P_FRAME_CPU_CYC       \
             ( (P_HLINE_CPU_CYC+P_HBLANK_CPU_CYC) * P_VLINE_COUNT )
@@ -52,7 +52,7 @@ struct BackGround {
     }
 };
 
-/*----------------------------------------| vrom 映射 |----*
+/*----------------------------------------| vrom 映射 |----*-
  * 每屏 32列 x 30行 个图形单元, 可显示960个单元            *
  * 每个图形单元8x8点阵,16字节,每个库保存256个图形单元      *
  * 每屏同显64个卡通单元(一个页0x100字节)                   *
@@ -82,11 +82,7 @@ struct PPU {
 
 private:
     BackGround  bg[4];
-
-    BackGround *bg0;
-    BackGround *bg1;
-    BackGround *bg2;
-    BackGround *bg3;
+    BackGround *pbg[4];
 
     byte bkPalette[16];     /* 背景调色板                          */
     byte spPalette[16];     /* 卡通调色板                          */
@@ -150,20 +146,21 @@ public:
     void swithMirror(byte type);
     /* 设置cpu的NMI地址线                                          */
     void setNMI(byte* cpu_nmi);
-    /* 立即绘制背景字库                                            */
-    void drawTileTable();
-    /* 绘制指定位置的像素                                          */
-    void drawPixel(int x, int y);
     /* 当一帧绘制完成时调用以发送中断, 系统预热时也需要调用两次    */
     void oneFrameOver();
     /* 当开始绘制一幅新的帧时,该方法被调用                         */
     void startNewFrame();
     /* 复制256字节的数据到精灵Ram                                  */
     void copySprite(byte *data);
+
     /* 绘制一帧中的精灵                                            */
     void drawSprite();
-    /* 绘制背景图层                                                */
-    void drawBackGround(int id=0);
+    /* 在video上绘制四个背景 512*480                               */
+    void drawBackGround(Video *v);
+    /* 立即绘制背景字库                                            */
+    void drawTileTable();
+    /* 绘制指定位置的像素                                          */
+    void drawPixel(int x, int y);
 };
 
 #endif // PPU_H_INCLUDED

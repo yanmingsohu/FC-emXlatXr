@@ -8,6 +8,29 @@
 struct command_6502;
 struct command_parm;
 
+/* cpu寻址方式 */
+enum CPU_ADDRESSING_MODE {
+    ADD_MODE_$zpgX$  = 0x00,
+    ADD_MODE_zpg     = 0x04,
+    ADD_MODE_imm     = 0x08,
+    ADD_MODE_abs     = 0x0C,
+    ADD_MODE_$zpg$Y  = 0x10,
+    ADD_MODE_zpgX    = 0x14,
+    ADD_MODE_zpgY    = 0x15,
+    ADD_MODE_absY    = 0x18,
+    ADD_MODE_absX    = 0x1C,
+    ADD_MODE_acc     = 0x28, /* 使用A的值               */
+    ADD_MODE_rel     = 0xEF, /* 相对寻址                */
+    ADD_MODE_not     = 0xFF, /* 无寻址                  */
+
+    ADD_MODE_inX     = 0x00, /* $zpgX$别名              */
+    ADD_MODE_inY     = 0x10, /* $zpgX$别名              */
+    ADD_MODE_zpX     = 0x14, /* zpgX别名                */
+    ADD_MODE_zpY     = 0x15, /* zpgY别名                */
+    ADD_MODE_abY     = 0x18, /* absX别名                */
+    ADD_MODE_abX     = 0x1C, /* absX别名                */
+};
+
 struct cpu_6502 {
 
 private:
@@ -23,15 +46,15 @@ public:
 #define CPU_RESET_CYC       6    /* 复位命令执行周期                 */
 #define CPU_NMI_CYC        17    /* 不可屏蔽中断执行周期             */
 
-    byte A; 	              /* 累加器                              */
-    byte Y;	    	          /* 索引暂存器                          */
-    byte X;	    	          /* 索引暂存器                          */
+    byte A; 	                 /* 累加器                           */
+    byte Y;	    	             /* 索引暂存器                       */
+    byte X;	    	             /* 索引暂存器                       */
 
-    byte SP;		          /* 堆叠指示器 0x0100-0x01FF
-                               * 递减的, 指向'空', 每次1字节         */
+    byte SP;		             /* 堆叠指示器 0x0100-0x01FF
+                                  * 递减的, 指向'空', 每次1字节      */
     union {
         struct { byte PCL; byte PCH; };
-        word PC;              /* 程序计数器,指向下一个要执行的指令   */
+        word PC;                 /* 程序计数器,指向下一个要执行的指令*/
     };
 
 #define CPU_FLAGS_NEGATIVE    (1<<7)  /* 负值                        */
@@ -100,16 +123,6 @@ struct command_parm {
     byte p2;  /* 第二个参数(如果有) */
     word addr;/* 当前指令的地址     */
 
-    static const byte ADD_MODE_$zpgX$  = 0x00;
-    static const byte ADD_MODE_zpg     = 0x04;
-    static const byte ADD_MODE_imm     = 0x08;
-    static const byte ADD_MODE_abs     = 0x0C;
-    static const byte ADD_MODE_$zpg$Y  = 0x10;
-    static const byte ADD_MODE_zpgX    = 0x14;
-    static const byte ADD_MODE_absY    = 0x18;
-    static const byte ADD_MODE_absX    = 0x1C;
-    static const byte ADD_MODE_acc     = 0x28;
-
     /* 按照内存寻址方式返回该地址的上的数据            *
      * 不同寻址类型的相同指令编码品偏移量相同(也有例外)*
      * 于是,可以用cpu指令减去偏移得到该指令的寻址类型  */
@@ -121,7 +134,7 @@ struct command_parm {
     /* 按照内存寻址方式读取该地址的数据                */
     inline word getAddr(const byte addressing_mode);
 
-    /*-----| 寻址算法定义, 函数返回地址 |--------------*/
+    /*---------------| 寻址算法定义, 函数返回地址 |----*/
     word  abs   ();
     word  absX  ();
     word  absY  ();
@@ -139,15 +152,7 @@ struct command_6502 {
     byte    time;
     byte    len;
 
-    /* 这个类型定义实在无意义...被文档忽悠了 */
-    enum {
-      vt_op_not = 0
-    , vt_op_imm   /* 立即1                   */
-    , vt_op_zpg   /* 零页2 , 高位为0x00      */
-    , vt_op_rel   /* 相对3                   */
-    , vt_op_abs   /* 绝对4                   */
-    , vt_op_ind   /* 间接5                   */
-    } type;
+    CPU_ADDRESSING_MODE type;
 
     /* 指向处理函数的指针,                   */
     void (*op_func)(command_parm* parm);

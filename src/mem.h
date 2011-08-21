@@ -7,7 +7,7 @@
 #include "ppu.h"
 #include "pad.h"
 
-/*--------------------------------------------------*
+/*--------------------------------------------------*-
  * $0000-$00FF 系统零页                             *
  * $0100-$01FF 系统堆栈                             *
  * $0200-$03FF 卡通图形定义                         *
@@ -29,13 +29,13 @@ private:
 
 public:
     memory(MMC *mmc, PPU *_ppu, PlayPad* _pad);
-    /** 重置内存状态全部清0 */
+    /** 重置内存状态全部清0                        */
     void reset();
-    /** 可以读取全部地址 */
+    /** 可以读取全部地址                           */
     byte read(const word offset);
-    /** 可以写入全部地址 */
+    /** 可以写入全部地址                           */
     void write(const word offset, const byte data);
-    /** 专门用来读取程序 offset=(0x8000,0xFFFF) */
+    /** 专门用来读取程序 offset=(0x8000,0xFFFF)    */
     byte readPro(const word offset);
 };
 

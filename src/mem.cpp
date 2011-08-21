@@ -54,7 +54,7 @@ void memory::write(const word offset, const byte data) {
     }
     if (offset==0x4014) {   /* OAM DMA 寄存器                  */
 #ifdef SHOW_PPU_REGISTER
-        printf("MEM::向PPU传送OAM,ram:%04X", data<<8);
+        printf("MEM::向PPU传送OAM,ram:%04X\n", data<<8);
 #endif
         ppu->copySprite(ram + (data<<8));
         return;

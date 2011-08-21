@@ -2,8 +2,8 @@
 #include  <stdlib.h>
 #include   <conio.h>
 #include    <time.h>
-#include "nes_sys.h"
 #include     "cpu.h"
+#include "nes_sys.h"
 
 static void cpu_debug_help() {
 printf(
@@ -12,6 +12,7 @@ printf(
 \n| o :frame over                           | m :display memory \
 \n| s :skip 'n' operator,not display        | r :reset cpu \
 \n| i :set operate to send frame IRQ        | d :draw a from \
+\n| g : goto XXXX  \
 \n| x :exit \
 \n------------------------------------------------------------------------------&\n"
 );
@@ -52,6 +53,11 @@ void debugCpu(NesSystem *fc) {
             fc->drawFrame();
         }
 
+        else if (ch=='g') {
+            printf("input IP(16): ");
+            fflush(stdin);
+            scanf("%x", &cpu->FLAGS);
+        }
         else if (ch=='s') {
             printf("input skip number: ");
             fflush(stdin);

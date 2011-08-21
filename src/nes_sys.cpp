@@ -53,12 +53,12 @@ void NesSystem::drawFrame() {
     }
     ppu->drawSprite();
     ppu->oneFrameOver();
+
     /* 垂直消隐周期 */
     while (cpu_cyc<P_VBLANK_CPU_CYC) {
         cpu_cyc += cpu->process();
     }
     cpu_cyc -= P_VBLANK_CPU_CYC;
-    //ppu->drawBackGround(0);
 }
 
 int NesSystem::load_rom(string filename) {

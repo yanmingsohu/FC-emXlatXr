@@ -164,19 +164,15 @@ byte PPU::readState(word addr) {
     return r;
 }
 
-BackGround* PPU::swBg() {
+inline BackGround* PPU::swBg() {
     word offs = (ppu_ram_p % 0x3000 - 0x2000) / 0x400;
-    switch (offs) {
-    case 0:
-        return bg0;
-    case 1:
-        return bg1;
-    case 2:
-        return bg2;
-    case 3:
-        return bg3;
+#ifdef SHOW_ERR_MEM_OPERATE
+    if (offs>=4) {
+        printf("PPU::无效的显存访问%X.\n", ppu_ram_p);
+        return NULL;
     }
-    return NULL;
+#endif
+    return pbg[offs];
 }
 
 inline byte PPU::read() {
@@ -207,7 +203,7 @@ inline byte PPU::read() {
 inline void PPU::write(byte data) {
     if (ppu_ram_p<0x2000) {
 #ifdef SHOW_ERR_MEM_OPERATE
-        printf("PPU::can't write VROM $%04x=%02x.\n", ppu_ram_p, data);
+       printf("PPU::can't write VROM $%04x=%02x.\n", ppu_ram_p, data);
 #endif
         return;
     } else
@@ -233,24 +229,24 @@ void PPU::swithMirror(byte type) {
     switch (type) {
 
     case PPU_VMIRROR_VERTICAL:
-        bg0 = bg2 = &bg[0];
-        bg1 = bg3 = &bg[1];
+        pbg[0] = pbg[2] = &bg[0];
+        pbg[1] = pbg[3] = &bg[1];
     break;
 
     case PPU_VMIRROR_HORIZONTAL:
-        bg0 = bg1 = &bg[0];
-        bg2 = bg3 = &bg[1];
+        pbg[0] = pbg[1] = &bg[0];
+        pbg[2] = pbg[3] = &bg[1];
     break;
 
     case PPU_VMIRROR_SINGLE:
-        bg0 = bg1 = bg2 = bg3 = &bg[0];
+        pbg[0] = pbg[1] = pbg[2] = pbg[3] = &bg[0];
     break;
 
     case PPU_VMIRROR_4_LAYOUT:
-        bg0 = &bg[0];
-        bg1 = &bg[1];
-        bg2 = &bg[2];
-        bg3 = &bg[3];
+        pbg[0] = &bg[0];
+        pbg[1] = &bg[1];
+        pbg[2] = &bg[2];
+        pbg[3] = &bg[3];
     break;
     }
 }
@@ -298,7 +294,7 @@ void PPU::drawTileTable() {
     }
 }
 
-byte PPU::gtLBit(int x, int y, byte tileIdx, word vromOffset) {
+inline byte PPU::gtLBit(int x, int y, byte tileIdx, word vromOffset) {
     byte paletteIdx = 0;
     word tileAddr = vromOffset + (tileIdx << 4) + y % 8;
 
@@ -312,30 +308,51 @@ byte PPU::gtLBit(int x, int y, byte tileIdx, word vromOffset) {
     return paletteIdx;
 }
 
-byte PPU::bgHBit(int x, int y, byte *attrTable) {
-    byte attrIdx = DIV32(x) + (DIV32(y)<<3);
+inline byte PPU::bgHBit(int x, int y, byte *attrTable) {
+    byte attrIdx = DIV32(x)    + (DIV32(y)    << 3);
     byte attrBit = DIV16(x%32) | (DIV16(y%32) << 1);
-    byte attr = attrTable[attrIdx] >> (attrBit<<1);
+    byte attr    = attrTable[attrIdx] >> (attrBit<<1);
     return (attr & 0x3) << 2;
 }
 
-void PPU::drawBackGround(int id) {
-    int x = 0, y = 0;
+void PPU::drawBackGround(Video *panel) {
+    int x  = 0, y  = 0;
+    int bx = 0, by = 0;
+    int bgIdx = 0;
 
-    while (y<240) {
-        while (x<256) {
-            word nameIdx = (x/8) + (y/8*32);
-            word tileIdx = bg0->name[nameIdx];
-            byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
+    for (;;) {
+        word nameIdx = (x/8) + (y/8*32);
+        word tileIdx = pbg[bgIdx]->name[nameIdx];
+        byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
 
-            if (paletteIdx) {
-                paletteIdx |= bgHBit(x, y, bg[id].attribute);
-                video->drawPixel(x, y, ppu_color_table[ bkPalette[paletteIdx] ]);
-            }
-            x++;
+        if (paletteIdx) {
+            paletteIdx |= bgHBit(x, y, pbg[bgIdx]->attribute);
+            panel->drawPixel(bx + x, by + y, ppu_color_table[ bkPalette[paletteIdx] ]);
         }
-        x=0;
-        y++;
+
+        if (++x>=256) {
+            x = 0;
+            if (++y>=240) {
+                y = 0;
+                ++bgIdx;
+
+                if (bgIdx==1) {
+                    bx = 256;
+                    by = 0;
+                }
+                else if (bgIdx==2) {
+                    bx = 0;
+                    by = 240;
+                }
+                else if (bgIdx==3) {
+                    bx = 256;
+                    by = 240;
+                }
+                else {
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -362,12 +379,34 @@ void PPU::drawSprite() {
 }
 
 void PPU::drawPixel(int X, int Y) {
-    word nameIdx = DIV8(X) + (DIV8(Y)<<5);
-    word tileIdx = bg0->name[nameIdx];
-    byte paletteIdx = gtLBit(X, Y, tileIdx, bgRomOffset);
+    int x = winX;
+    int y = winY;
+    BackGround *bgs;
+
+    if (x<256) {
+        if (y<240) {
+            bgs = pbg[0];
+        } else {
+            bgs = pbg[2];
+        }
+    } else {
+        if (y<240) {
+            bgs = pbg[1];
+        } else {
+            bgs = pbg[3];
+        }
+    }
+
+    x = (x+X)%256;
+    y = (y+Y)%240;
+
+    word nameIdx = DIV8(x) + (DIV8(y)<<5);
+    word tileIdx = bgs->name[nameIdx];
+
+    byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
 
     if (paletteIdx) {
-        paletteIdx |= bgHBit(X, Y, bg0->attribute);
+        paletteIdx |= bgHBit(x, y, bgs->attribute);
         byte colorIdx = bkPalette[paletteIdx];
         video->drawPixel(X, Y, ppu_color_table[colorIdx]);
     }
@@ -385,6 +424,7 @@ void PPU::oneFrameOver() {
 
 void PPU::startNewFrame() {
     vblankTime = 0;
+    ppu_ram_p = 0x2000;
 }
 
 void PPU::copySprite(byte *data) {

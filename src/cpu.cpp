@@ -75,7 +75,11 @@ void cpu_command_ASL(command_parm* parm) {
     case 0x16:
         value = parm->read(model);
     }
-
+/*
+    if (parm->op==0x0A) {
+        model = ADD_MODE_acc;
+    }
+*/
     CARRY_WITH(0x80);
 
     value <<= 1;
@@ -305,9 +309,9 @@ void cpu_command_JMP(command_parm* parm) {
         cpu->PCL = parm->p1;
         cpu->PCH = parm->p2;
     } else {
-        word offset = (parm->p2<<8) | parm->p1;
-        cpu->PCL = cpu->ram->read( offset   );
-        cpu->PCH = cpu->ram->read( offset+1 );
+        word offH = parm->p2<<8;
+        cpu->PCL = cpu->ram->read( offH |  parm->p1      );
+        cpu->PCH = cpu->ram->read( offH | (parm->p1 + 1) );
     }
 }
 
@@ -515,14 +519,6 @@ void cpu_command_STA(command_parm* parm) {
     case 0x81:
         parm->write(parm->op - 0x81, parm->cpu->A);
     }
-/*  if (parm->p1==0x24) {
-        word adr = parm->getAddr(parm->op - 0x81);
-        printf(parm->cpu->debug());
-
-        byte v1 = parm->ram->read(parm->p1);
-        byte v2 = parm->ram->read(parm->p1+1);
-        printf(">> ADDR : %x  | %x \n", adr, v2<<8 | v1);
-    } */
 }
 
 /* 把Y寄存器存入内存 */
@@ -537,11 +533,13 @@ void cpu_command_STY(command_parm* parm) {
 
 /* 把X寄存器存入内存 */
 void cpu_command_STX(command_parm* parm) {
+    byte mode = parm->op - 0x82;
     switch (parm->op) {
+    case 0x96:
+        mode = ADD_MODE_zpgY;
     case 0x8E:
     case 0x86:
-    case 0x96:
-        parm->write(parm->op - 0x82, parm->cpu->X);
+        parm->write(mode, parm->cpu->X);
     }
 }
 
@@ -589,16 +587,18 @@ void cpu_command_LDY(command_parm* parm) {
 void cpu_command_LDX(command_parm* parm) {
 
     cpu_6502* cpu = parm->cpu;
+    byte mode = parm->op - 0xA2;
 
     switch (parm->op) {
     case 0xA2:
         cpu->X = parm->p1;
         break;
+    case 0xB6:
+        mode = ADD_MODE_zpgY;
     case 0xAE:
     case 0xA6:
     case 0xBE:
-    case 0xB6:
-        cpu->X = parm->read(parm->op - 0xA2);
+        cpu->X = parm->read(mode);
         break;
     }
 
@@ -705,7 +705,7 @@ void cpu_command_CLV(command_parm* parm) {
 
 /****************************************************************************/
 
-#define Op(n, t, l, p)   {#n, t, l, command_6502::vt_op_##p, cpu_command_##n}
+#define Op(n, t, l, p)   {#n, t, l, ADD_MODE_##p, cpu_command_##n}
 #define  L               Op(XXX, 0, 1, not)
 #define  N               L,
 #define  O(n, t, l, p)   Op(n, t, l, p),
@@ -713,116 +713,116 @@ void cpu_command_CLV(command_parm* parm) {
 /* 索引既是6502命令的首字节 */
 command_6502 command_list_6502[] = {
 /* --------------------------------------| 0x00 - 0x0F |--- */
-    O(BRK, 7, 1, not)   O(ORA, 6, 2, ind)   N
+    O(BRK, 7, 1, not)   O(ORA, 6, 2, inX)   N
     N                   N                   O(ORA, 3, 2, zpg)
     O(ASL, 5, 2, zpg)   N                   O(PHP, 3, 1, not)
     O(ORA, 2, 2, imm)   O(ASL, 2, 1, not)   N
     N                   O(ORA, 4, 3, abs)   O(ASL, 6, 3, abs)
     N
 /* --------------------------------------| 0x10 - 0x1F |--- */
-    O(BPL, 2, 2, rel)   O(ORA, 5, 2, ind)   N
-    N                   N                   O(ORA, 4, 2, zpg)
-    O(ASL, 6, 2, zpg)   N                   O(CLC, 2, 1, not)
-    O(ORA, 4, 3, abs)   N                   N
-    N                   O(ORA, 4, 3, abs)   O(ASL, 6, 3, abs)
+    O(BPL, 2, 2, rel)   O(ORA, 5, 2, inY)   N
+    N                   N                   O(ORA, 4, 2, zpX)
+    O(ASL, 6, 2, zpX)   N                   O(CLC, 2, 1, not)
+    O(ORA, 4, 3, abY)   N                   N
+    N                   O(ORA, 4, 3, abX)   O(ASL, 6, 3, abX)
     N
 /* --------------------------------------| 0x20 - 0x2F |--- */
-    O(JSR, 6 ,3, rel)   O(AND, 6, 2, ind)   N
+    O(JSR, 6 ,3, rel)   O(AND, 6, 2, inY)   N
     N                   O(BIT, 3, 2, zpg)   O(AND, 3, 2, zpg)
     O(ROL, 5, 2, zpg)   N                   O(PLP, 4, 1, not)
     O(AND, 2, 2, imm)   O(ROL, 2, 1, not)   N
     O(BIT, 4, 3, abs)   O(AND, 4, 3, abs)   O(ROL, 6, 3, abs)
     N
 /* --------------------------------------| 0x30 - 0x3F |--- */
-    O(BMI, 2, 2, rel)   O(AND, 5, 2, ind)   N
-    N                   N                   O(AND, 4, 2, zpg)
-    O(ROL, 6, 2, zpg)   N                   O(SEC, 2, 1, not)
-    O(AND, 4, 3, abs)   N                   N
-    N                   O(AND, 4, 3, abs)   O(ROL, 6, 3, abs)
+    O(BMI, 2, 2, rel)   O(AND, 5, 2, inY)   N
+    N                   N                   O(AND, 4, 2, zpX)
+    O(ROL, 6, 2, zpX)   N                   O(SEC, 2, 1, not)
+    O(AND, 4, 3, abY)   N                   N
+    N                   O(AND, 4, 3, abX)   O(ROL, 6, 3, abX)
     N
 /* --------------------------------------| 0x40 - 0x4F |--- */
-    O(RTI, 6, 1, not)   O(EOR, 6, 2, ind)   N
+    O(RTI, 6, 1, not)   O(EOR, 6, 2, inX)   N
     N                   N                   O(EOR, 3, 2, zpg)
     O(LSR, 5, 2, zpg)   N                   O(PHA, 3, 1, not)
     O(EOR, 2, 2, imm)   O(LSR, 2, 1, not)   N
     O(JMP, 3, 3, abs)   O(EOR, 4, 3, abs)   O(LSR, 6, 3, abs)
     N
 /* --------------------------------------| 0x50 - 0x5F |--- */
-    O(BVC, 2, 2, rel)   O(EOR, 5, 2, ind)   N
-    N                   N                   O(EOR, 4, 2, zpg)
-    O(LSR, 6, 2, zpg)   N                   O(CLI, 2, 1, not)
-    O(EOR, 4, 3, abs)   N                   N
-    N                   O(EOR, 4, 3, abs)   O(LSR, 6, 3, abs)
+    O(BVC, 2, 2, rel)   O(EOR, 5, 2, inY)   N
+    N                   N                   O(EOR, 4, 2, zpX)
+    O(LSR, 6, 2, zpX)   N                   O(CLI, 2, 1, not)
+    O(EOR, 4, 3, abY)   N                   N
+    N                   O(EOR, 4, 3, abX)   O(LSR, 6, 3, abX)
     N
 /* --------------------------------------| 0x60 - 0x6F |--- */
-    O(RTS, 6, 1, not)   O(ADC, 6, 2, ind)   N
+    O(RTS, 6, 1, not)   O(ADC, 6, 2, inX)   N
     N                   N                   O(ADC, 3, 2, zpg)
     O(ROR, 5, 2, zpg)   N                   O(PLA, 4, 1, not)
     O(ADC, 2, 2, imm)   O(ROR, 2, 1, not)   N
-    O(JMP, 6, 3, ind)   O(ADC, 4, 3, abs)   O(ROR, 6, 3, abs)
+    O(JMP, 6, 3, not)   O(ADC, 4, 3, abs)   O(ROR, 6, 3, abs)
     N
 /* --------------------------------------| 0x70 - 0x7F |--- */
-    O(BVS, 2, 2, rel)   O(ADC, 5, 2, ind)   N
-    N                   N                   O(ADC, 4, 2, zpg)
-    O(ROR, 6, 2, zpg)   N                   O(SEI, 2, 1, not)
-    O(ADC, 4, 3, abs)   N                   N
-    N                   O(ADC, 4, 3, abs)   O(ROR, 6, 3, abs)
+    O(BVS, 2, 2, rel)   O(ADC, 5, 2, inY)   N
+    N                   N                   O(ADC, 4, 2, zpX)
+    O(ROR, 6, 2, zpX)   N                   O(SEI, 2, 1, not)
+    O(ADC, 4, 3, abY)   N                   N
+    N                   O(ADC, 4, 3, abX)   O(ROR, 6, 3, abX)
     N
 /* --------------------------------------| 0x80 - 0x8F |--- */
-    N                   O(STA, 6, 2, ind)   N
+    N                   O(STA, 6, 2, inX)   N
     N                   O(STY, 3, 2, zpg)   O(STA, 3, 2, zpg)
     O(STX, 3, 2, zpg)   N                   O(DEY, 2, 1, not)
     N                   O(TXA, 2, 1, not)   N
     O(STY, 4, 3, abs)   O(STA, 4, 3, abs)   O(STX, 4, 3, abs)
     N
 /* --------------------------------------| 0x90 - 0x9F |--- */
-    O(BCC, 2, 2, rel)   O(STA, 6, 2, ind)   N
-    N                   O(STY, 4, 2, zpg)   O(STA, 4, 2, zpg)
-    O(STX, 4, 2, zpg)   N                   O(TYA, 2, 1, not)
-    O(STA, 5, 3, abs)   O(TXS, 2, 1, not)   N
-    N                   O(STA, 4, 3, abs)   N
+    O(BCC, 2, 2, rel)   O(STA, 6, 2, inY)   N
+    N                   O(STY, 4, 2, zpX)   O(STA, 4, 2, zpX)
+    O(STX, 4, 2, zpY)   N                   O(TYA, 2, 1, not)
+    O(STA, 5, 3, abY)   O(TXS, 2, 1, not)   N
+    N                   O(STA, 4, 3, abX)   N
     N
 /* --------------------------------------| 0xA0 - 0xAF |--- */
-    O(LDY, 2, 2, imm)   O(LDA, 6, 2, ind)   O(LDX, 2, 2, imm)
+    O(LDY, 2, 2, imm)   O(LDA, 6, 2, inX)   O(LDX, 2, 2, imm)
     N                   O(LDY, 3, 2, zpg)   O(LDA, 3, 2, zpg)
     O(LDX, 3, 2, zpg)   N                   O(TAY, 2, 1, not)
     O(LDA, 2, 2, imm)   O(TAX, 2, 1, not)   N
     O(LDY, 4, 3, abs)   O(LDA, 4, 3, abs)   O(LDX, 4, 3, abs)
     N
 /* --------------------------------------| 0xB0 - 0xBF |--- */
-    O(BCS, 2, 2, rel)   O(LDA, 5, 2, ind)   N
-    N                   O(LDY, 4, 2, zpg)   O(LDA, 4, 2, zpg)
-    O(LDX, 4, 2, zpg)   N                   O(CLV, 2, 1, not)
-    O(LDA, 4, 3, abs)   O(TSX, 2, 1, not)   N
-    O(LDY, 4, 3, abs)   O(LDA, 4, 3, abs)   O(LDX, 4, 3, abs)
+    O(BCS, 2, 2, rel)   O(LDA, 5, 2, inY)   N
+    N                   O(LDY, 4, 2, zpX)   O(LDA, 4, 2, zpX)
+    O(LDX, 4, 2, zpY)   N                   O(CLV, 2, 1, not)
+    O(LDA, 4, 3, abY)   O(TSX, 2, 1, not)   N
+    O(LDY, 4, 3, abX)   O(LDA, 4, 3, abX)   O(LDX, 4, 3, abY)
     N
 /* --------------------------------------| 0xC0 - 0xCF |--- */
-    O(CPY, 2, 2, imm)   O(CMP, 6, 2, ind)   N
+    O(CPY, 2, 2, imm)   O(CMP, 6, 2, inX)   N
     N                   O(CPY, 3, 2, zpg)   O(CMP, 3, 2, zpg)
     O(DEC, 5, 2, zpg)   N                   O(INY, 2, 1, not)
     O(CMP, 2, 2, imm)   O(DEX, 2, 1, not)   N
     O(CPY, 4, 3, abs)   O(CMP, 4, 3, abs)   O(DEC, 6, 3, abs)
     N
 /* --------------------------------------| 0xD0 - 0xDF |--- */
-    O(BNE, 2, 2, rel)   O(CMP, 5, 2, ind)   N
-    N                   N                   O(CMP, 4, 2, zpg)
-    O(DEC, 6, 2, zpg)   N                   O(CLD, 2, 1, not)
-    O(CMP, 4, 3, abs)   N                   N
-    N                   O(CMP, 4, 3, abs)   O(DEC, 6, 3, abs)
+    O(BNE, 2, 2, rel)   O(CMP, 5, 2, inY)   N
+    N                   N                   O(CMP, 4, 2, zpX)
+    O(DEC, 6, 2, zpX)   N                   O(CLD, 2, 1, not)
+    O(CMP, 4, 3, abY)   N                   N
+    N                   O(CMP, 4, 3, abX)   O(DEC, 6, 3, abX)
     N
 /* --------------------------------------| 0xE0 - 0xEF |--- */
-    O(CPX, 2, 2, imm)   O(SBC, 6, 2, ind)   N
+    O(CPX, 2, 2, imm)   O(SBC, 6, 2, inX)   N
     N                   O(CPX, 3, 2, zpg)   O(SBC, 3, 2, zpg)
     O(INC, 5, 2, zpg)   N                   O(INX, 2, 1, not)
     O(SBC, 2, 2, imm)   O(NOP, 2, 1, not)   N
     O(CPX, 4, 3, abs)   O(SBC, 4, 3, abs)   O(INC, 6, 3, abs)
     N
 /* --------------------------------------| 0xF0 - 0xFF |--- */
-    O(BEQ, 2, 2, rel)   O(SBC, 5, 2, ind)   N
-    N                   N                   O(SBC, 4, 2, zpg)
-    O(INC, 6, 2, zpg)   N                   O(SED, 2, 1, not)
-    O(SBC, 4, 3, abs)   N                   N
-    N                   O(SBC, 4, 3, abs)   O(INC, 6, 3, abs)
+    O(BEQ, 2, 2, rel)   O(SBC, 5, 2, inY)   N
+    N                   N                   O(SBC, 4, 2, zpX)
+    O(INC, 6, 2, zpX)   N                   O(SED, 2, 1, not)
+    O(SBC, 4, 3, abY)   N                   N
+    N                   O(SBC, 4, 3, abX)   O(INC, 6, 3, abX)
     N
 /* --------------------------------------| over        |--- */
     L
@@ -836,7 +836,8 @@ command_6502 command_list_6502[] = {
 /****************************************************************************/
 
 cpu_6502::cpu_6502(memory* ram)
-        : NMI_idle(1), NMI(0), IRQ(0), RES(1), ram(ram), m_showDebug(0)
+        : NMI_idle(1), m_showDebug(0)
+        , NMI(0), IRQ(0), RES(1), ram(ram)
 {
 }
 
@@ -871,18 +872,37 @@ char* cpu_6502::cmdInfo() {
     }
 
     switch (cmd->type) {
-    case command_6502::vt_op_abs:
-        tp = "abs"; break;
-    case command_6502::vt_op_imm:
-        tp = "imm"; break;
-    case command_6502::vt_op_ind:
-        tp = "ind"; break;
-    case command_6502::vt_op_rel:
-        tp = "rel"; break;
-    case command_6502::vt_op_zpg:
-        tp = "zpg"; break;
+
+    case ADD_MODE_abs:
+        tp = "abs "; break;
+    case ADD_MODE_absY:
+        tp = "absY"; break;
+    case ADD_MODE_absX:
+        tp = "absX"; break;
+
+    case ADD_MODE_$zpg$Y:
+        tp = "indY"; break;
+    case ADD_MODE_$zpgX$:
+        tp = "indX"; break;
+
+    case ADD_MODE_imm:
+        tp = "imm "; break;
+
+    case ADD_MODE_rel:
+        tp = "rel "; break;
+
+    case ADD_MODE_zpgX:
+        tp = "zpgX"; break;
+    case ADD_MODE_zpgY:
+        tp = "zpgY"; break;
+    case ADD_MODE_zpg:
+        tp = "zpg "; break;
+
+    case ADD_MODE_acc:
+    case ADD_MODE_not:
+        tp = "----"; break;
     default:
-        tp = "---"; break;
+        tp = "!!!?"; break;
     }
 
     sprintf(buf, cc, prev_parm->addr, tp,
@@ -1119,6 +1139,9 @@ inline word command_parm::getAddr(const byte addressing_mode) {
 
     case ADD_MODE_zpgX:
         return zpgX();
+
+    case ADD_MODE_zpgY:
+        return zpgY();
 
     case ADD_MODE_$zpg$Y:
         return $zpg$Y();

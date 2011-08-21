@@ -18,18 +18,32 @@ private:
     HDC     hdc;
     HDC     hMemDC;
     HBITMAP hBitmap;
+    int     x_off;
+    int     y_off;
+    int     width;
+    int     height;
 
 public:
     WindowsVideo(HWND hwnd) {
+        WindowsVideo(NULL, PPU_DISPLAY_P_WIDTH, PPU_DISPLAY_P_HEIGHT);
+    }
+
+    WindowsVideo(HWND hwnd, int w, int h)
+            : x_off(0), y_off(0), width(w), height(h)
+    {
         m_hwnd = hwnd;
         hdc = GetDC(hwnd);
         hMemDC = CreateCompatibleDC(hdc);
 
-        hBitmap = CreateCompatibleBitmap(
-                hdc, PPU_DISPLAY_P_WIDTH, PPU_DISPLAY_P_HEIGHT);
+        hBitmap = CreateCompatibleBitmap(hdc, width, height);
 
         SelectObject(hMemDC, hBitmap);
         initHdcColor(hdc);
+    }
+
+    void setOffset(int x, int y) {
+        x_off = x;
+        y_off = y;
     }
 
     void drawPixel(int x, int y, T_COLOR color) {
@@ -37,8 +51,7 @@ public:
     }
 
     void refresh() {
-        BitBlt(hdc, 0, 0, PPU_DISPLAY_P_WIDTH,
-               PPU_DISPLAY_P_HEIGHT, hMemDC, 0, 0, SRCCOPY);
+        BitBlt(hdc, x_off, y_off, width, height, hMemDC, 0, 0, SRCCOPY);
     }
 
     ~WindowsVideo() {
@@ -111,7 +124,7 @@ public:
         pixel[x + (y<<8)] = color;
     }
 
-    void refresh() {
+    inline void refresh() {
         RECT lpDestRect;
 
         /* ×ª»»×ø±êµã */
@@ -155,10 +168,6 @@ public:
     }
 };
 
-
-#include "nes_sys.h"
-#include "debug.h"
-
 /* 0 : 0x30, 9 : 0x39
  * A : 0x41, W : 0x57, S : 0x53, D : 0x44
  * F : 0x46, H : 0x48, J : 0x4A, K : 0x4B */
@@ -188,16 +197,15 @@ public:
         p1_key_map[FC_PAD_BU_RIGHT ] = K_D;
     }
 
-NesSystem *sys;
-
-    byte keyPushed(FC_PAD_KEY key, byte id) {
-        //if (key == FC_PAD_BU_START) {
-            //sys->debug();
-            //return 1;
-        //}
+    inline byte keyPushed(FC_PAD_KEY key, byte id) {
+        static int a=0;
+        if (key==FC_PAD_BU_START && a++>2) {
+            a=0;
+            printf("send start button.\n");
+          //  return 1;
+        }
         return (GetAsyncKeyState( p1_key_map[key] ) & 0x8000) ? 1 : 0;
     }
-
 };
 
 #endif

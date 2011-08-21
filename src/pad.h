@@ -1,8 +1,6 @@
 #ifndef PAD_H_INCLUDED
 #define PAD_H_INCLUDED
 
-#include <stdio.h>
-
 /* ÊÖ±ú°´¼ü */
 enum FC_PAD_KEY {
     FC_PAD_BU_A       = 0,

@@ -1,18 +1,18 @@
 # depslib dependency file v1.0
-1313796284 source:e:\c-project\fc\src\cpu.cpp
+1313899369 source:e:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
 	"stdlib.h"
 
-1313763092 e:\c-project\fc\src\mem.h
+1313900215 e:\c-project\fc\src\mem.h
 	"type.h"
 	"rom.h"
 	"mmc.h"
 	"ppu.h"
 	"pad.h"
 
-1313793070 e:\c-project\fc\src\type.h
+1313913584 e:\c-project\fc\src\type.h
 
 1313753487 e:\c-project\fc\src\rom.h
 	"type.h"
@@ -21,17 +21,16 @@
 1313273660 e:\c-project\fc\src\mmc.h
 	"rom.h"
 
-1313748868 e:\c-project\fc\src\ppu.h
+1313910989 e:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
 1313667364 e:\c-project\fc\src\video.h
 	"type.h"
 
-1313791983 e:\c-project\fc\src\pad.h
-	<stdio.h>
+1313880016 e:\c-project\fc\src\pad.h
 
-1313755455 e:\c-project\fc\src\cpu.h
+1313894770 e:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 	"ppu.h"
@@ -42,7 +41,7 @@
 	<conio.h>
 	"type.h"
 
-1313792059 source:e:\c-project\fc\src\mem.cpp
+1313913651 source:e:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
 	<stdio.h>
@@ -52,7 +51,7 @@
 	"type.h"
 	"stdio.h"
 
-1313795529 source:e:\c-project\fc\src\nes_sys.cpp
+1313904580 source:e:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	"debug.h"
 	<stdio.h>
@@ -66,7 +65,7 @@
 
 1313749613 e:\c-project\fc\src\debug.h
 
-1313667606 source:e:\c-project\fc\src\ppu.cpp
+1313913468 source:e:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
@@ -81,7 +80,7 @@
 	"rom.h"
 	<stdio.h>
 
-1313804074 source:e:\c-project\fc\src\windows.cpp
+1313913544 source:e:\c-project\fc\src\windows.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
@@ -90,15 +89,13 @@
 	"winsys.h"
 	"debug.h"
 
-1313803927 e:\c-project\fc\src\winsys.h
+1313902355 e:\c-project\fc\src\winsys.h
 	<windows.h>
 	<stdio.h>
 	"video.h"
 	"ppu.h"
 	"ddraw.h"
 	"pad.h"
-	"nes_sys.h"
-	"debug.h"
 
 1313667364 e:\c-project\fc\dx81sdk\ddraw.h
 	<objbase.h>
@@ -106,11 +103,11 @@
 1313791719 source:e:\c-project\fc\src\winsys.cpp
 	"winsys.h"
 
-1313795571 source:e:\c-project\fc\src\debug.cpp
+1313898832 source:e:\c-project\fc\src\debug.cpp
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
 	<time.h>
-	"nes_sys.h"
 	"cpu.h"
+	"nes_sys.h"
 

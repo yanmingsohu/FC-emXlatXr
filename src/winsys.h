@@ -198,12 +198,6 @@ public:
     }
 
     inline byte keyPushed(FC_PAD_KEY key, byte id) {
-        static int a=0;
-        if (key==FC_PAD_BU_START && a++>2) {
-            a=0;
-            printf("send start button.\n");
-          //  return 1;
-        }
         return (GetAsyncKeyState( p1_key_map[key] ) & 0x8000) ? 1 : 0;
     }
 };

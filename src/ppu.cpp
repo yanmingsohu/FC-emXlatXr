@@ -63,17 +63,18 @@ void PPU::controlWrite(word addr, byte data) {
 
     case 5: /* 0x2005 设置窗口坐标         */
         if (w2005==wX) {
-            winX &= 0xFF00;
-            winX |= data;
+            winX = (0x100 & winX) | data;
             w2005 = wY;
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::窗口坐标...");
+#endif
         } else {
-            winY &= 0xFF00;
-            winY |= data;
+            winY = (0x100 & winY) | data;
             w2005 = wX;
-        }
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
 #endif
+        }
         break;
 
     case 6: /* 0x2006 PPU地址指针           */
@@ -225,7 +226,7 @@ inline void PPU::write(byte data) {
     ppu_ram_p += addr_add;
 }
 
-void PPU::swithMirror(byte type) {
+void PPU::switchMirror(byte type) {
     switch (type) {
 
     case PPU_VMIRROR_VERTICAL:
@@ -379,8 +380,8 @@ void PPU::drawSprite() {
 }
 
 void PPU::drawPixel(int X, int Y) {
-    int x = winX + X;
-    int y = winY + Y;
+    int x = (winX + X) % 512;
+    int y = (winY + Y) % 480;
     BackGround *bgs;
 
     if (x<256) {

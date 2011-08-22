@@ -143,7 +143,7 @@ public:
     /* cpu通过读0x2000~0x2007(0x3FFF)得到PPU状态                   */
     byte readState(word addr);
     /* 切换屏幕布局                                                */
-    void swithMirror(byte type);
+    void switchMirror(byte type);
     /* 设置cpu的NMI地址线                                          */
     void setNMI(byte* cpu_nmi);
     /* 当一帧绘制完成时调用以发送中断, 系统预热时也需要调用两次    */

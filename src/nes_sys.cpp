@@ -42,21 +42,31 @@ void NesSystem::drawFrame() {
         }
         cpu_cyc -= P_HLINE_CPU_CYC;
         x = 0; y++;
-
+#ifdef SHOW_PPU_DRAW_INFO
+        printf("一行完成,水平消隐 %X,%X,,", x, y);
+#endif
         /* 水平消隐周期 */
         while (cpu_cyc<P_HBLANK_CPU_CYC) {
             cpu_cyc += cpu->process();
         }
         cpu_cyc -= P_HBLANK_CPU_CYC;
+#ifdef SHOW_PPU_DRAW_INFO
+        printf("消隐结束\n");
+#endif
     }
     ppu->drawSprite();
     ppu->oneFrameOver();
-
+#ifdef SHOW_PPU_DRAW_INFO
+    printf("绘制一帧结束,垂直消隐\n");
+#endif
     /* 垂直消隐周期 */
     while (cpu_cyc<P_VBLANK_CPU_CYC) {
         cpu_cyc += cpu->process();
     }
     cpu_cyc -= P_VBLANK_CPU_CYC;
+#ifdef SHOW_PPU_DRAW_INFO
+    printf("drawFrame 返回\n");
+#endif
 }
 
 int NesSystem::load_rom(string filename) {
@@ -69,7 +79,7 @@ int NesSystem::load_rom(string filename) {
             printf("INT vector(0xFFFA-0xFFFF): ");
             rom->printRom(0xFFFA - 0x8000, 6);
             ram->reset();
-            ppu->swithMirror(rom->t1 & 0x0B);
+            ppu->switchMirror(rom->t1 & 0x0B);
             ppu->reset();
             cpu->RES = 1;
         } else {

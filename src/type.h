@@ -38,6 +38,8 @@ char* parseOpenError(int load_err_code);
 //#define SHOW_PPU_REGISTER
 /* 显示CPU寻址消息                                                */
 //#define SHOW_CPU_MEMORY_ADDRESSING
+/* 显示PPU绘制屏幕时序的相关消息                                  */
+//#define SHOW_PPU_DRAW_INFO
 /*-----------------------------------------------| END DEBUG |----*/
 
 #endif // TYPE_H_INCLUDED

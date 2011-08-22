@@ -433,7 +433,7 @@ void cpu_command_SBC(command_parm* parm) {
         break;
     }
 
-    result -= cpu->A;
+    result = cpu->A - result;
     if (cpu->FLAGS & CPU_FLAGS_CARRY) {
         --result;
     }

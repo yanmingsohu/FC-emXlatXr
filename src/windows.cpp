@@ -88,7 +88,7 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
     return 1;
 }
 
-#define ROM "rom/F-1.nes"
+#define ROM "rom/Tennis.nes"
 //#define ROM "rom/Dr_Mario.nes"
 //#define ROM "rom/test.nes"
 void start_game(HWND hwnd, PMSG messages) {
@@ -121,7 +121,7 @@ void start_game(HWND hwnd, PMSG messages) {
 			/* Send message to WindowProcedure */
 			DispatchMessage(messages);
     	}
-        //debugCpu(&fc);
+        debugCpu(&fc);
         fc.drawFrame();
         //fc.getPPU()->drawTileTable();
         // frame 1680 error

@@ -114,6 +114,9 @@ inline void PPU::control_2000(byte data) {
     } else {
         winY &= 0x00FF;
     }
+#ifdef SHOW_PPU_REGISTER
+    printf("PPU::´°¿Ú×ø±ê x:%d, y:%d\n", winX, winY);
+#endif
 
     addr_add    = _BIT(2) ? 0x20   : 0x01;
     spRomOffset = _BIT(3) ? 0x1000 : 0;

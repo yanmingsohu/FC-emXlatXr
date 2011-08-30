@@ -839,6 +839,8 @@ cpu_6502::cpu_6502(memory* ram)
         : NMI_idle(1), m_showDebug(0)
         , NMI(0), IRQ(0), RES(1), ram(ram)
 {
+    prev_parm.cpu = this;
+    prev_parm.ram = ram;
 }
 
 char* cpu_6502::debug() {
@@ -860,7 +862,7 @@ char* cpu_6502::cmdInfo() {
     static char buf[64];
     const char* cc = NULL;
     const char* tp = NULL;
-    command_6502 *cmd = &command_list_6502[prev_parm->op];
+    command_6502 *cmd = &command_list_6502[prev_parm.op];
 
     switch (cmd->len) {
     case 3:
@@ -905,39 +907,33 @@ char* cpu_6502::cmdInfo() {
         tp = "!!!?"; break;
     }
 
-    sprintf(buf, cc, prev_parm->addr, tp,
-                 prev_parm->op, cmd->name, prev_parm->p1, prev_parm->p2);
+    sprintf(buf, cc, prev_parm.addr, tp,
+                 prev_parm.op, cmd->name, prev_parm.p1, prev_parm.p2);
 
     return buf;
 }
 
 byte cpu_6502::process() {
-
-    static command_parm parm;
-    prev_parm = &parm;
-
     byte cpu_cyc = reset();
 
-    parm.op = ram->readPro(PC);
-    command_6502 *opp = &command_list_6502[parm.op];
+    prev_parm.op = ram->readPro(PC);
+    command_6502 *opp = &command_list_6502[prev_parm.op];
 
     switch (opp->len) {
     case 3:
-        parm.p2 = ram->readPro(PC+2);
+        prev_parm.p2 = ram->readPro(PC+2);
     case 2:
-        parm.p1 = ram->readPro(PC+1);
+        prev_parm.p1 = ram->readPro(PC+1);
     }
 
-    parm.cmd = opp;
-    parm.addr = PC;
-    parm.cpu = this;
-    parm.ram = parm.cpu->ram;
+    prev_parm.cmd = opp;
+    prev_parm.addr = PC;
     PC += opp->len;
 
 #ifdef SHOW_CPU_OPERATE
     if (m_showDebug) printf(cmdInfo());
 #endif
-    opp->op_func(&parm);
+    opp->op_func(&prev_parm);
 
     cpu_cyc += nmi();
     cpu_cyc += irq();

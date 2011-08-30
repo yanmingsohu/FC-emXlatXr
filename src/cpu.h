@@ -7,6 +7,7 @@
 
 struct command_6502;
 struct command_parm;
+struct cpu_6502;
 
 /* cpu寻址方式 */
 enum CPU_ADDRESSING_MODE {
@@ -29,6 +30,41 @@ enum CPU_ADDRESSING_MODE {
     ADD_MODE_zpY     = 0x15, /* zpgY别名                */
     ADD_MODE_abY     = 0x18, /* absX别名                */
     ADD_MODE_abX     = 0x1C, /* absX别名                */
+};
+
+/* 向命令处理函数传递参数          */
+struct command_parm {
+
+    command_6502 *cmd;
+    memory       *ram;
+    cpu_6502     *cpu;
+
+    byte op;  /* 命令的代码         */
+    byte p1;  /* 第一个参数(如果有) */
+    byte p2;  /* 第二个参数(如果有) */
+    word addr;/* 当前指令的地址     */
+
+    /* 按照内存寻址方式返回该地址的上的数据            *
+     * 不同寻址类型的相同指令编码品偏移量相同(也有例外)*
+     * 于是,可以用cpu指令减去偏移得到该指令的寻址类型  */
+    inline byte read(const byte addressing_mode);
+
+    /* 按照内存寻址方式把value写入到该地址             */
+    inline void write(const byte addressing_mode, byte value);
+
+    /* 按照内存寻址方式读取该地址的数据                */
+    inline word getAddr(const byte addressing_mode);
+
+    /*---------------| 寻址算法定义, 函数返回地址 |----*/
+    word  abs   ();
+    word  absX  ();
+    word  absY  ();
+    word  zpg   ();
+    word  zpgX  ();
+    word  zpgY  ();
+    word  $zpg$Y();
+    word  $zpgX$();
+    word  $$$   (byte x, byte y);
 };
 
 struct cpu_6502 {
@@ -75,7 +111,7 @@ public:
     byte RES;       /* 如果>0则执行复位动作                          */
 
     memory       *ram;          /* 内存                              */
-    command_parm *prev_parm;    /* 前一个命令的参数                  */
+    command_parm  prev_parm;    /* 前一个命令的参数                  */
 
     cpu_6502(memory* ram);
 
@@ -109,41 +145,6 @@ public:
     byte isShowDebug() {
         return m_showDebug;
     }
-};
-
-/* 向命令处理函数传递参数          */
-struct command_parm {
-
-    command_6502 *cmd;
-    memory       *ram;
-    cpu_6502     *cpu;
-
-    byte op;  /* 命令的代码         */
-    byte p1;  /* 第一个参数(如果有) */
-    byte p2;  /* 第二个参数(如果有) */
-    word addr;/* 当前指令的地址     */
-
-    /* 按照内存寻址方式返回该地址的上的数据            *
-     * 不同寻址类型的相同指令编码品偏移量相同(也有例外)*
-     * 于是,可以用cpu指令减去偏移得到该指令的寻址类型  */
-    inline byte read(const byte addressing_mode);
-
-    /* 按照内存寻址方式把value写入到该地址             */
-    inline void write(const byte addressing_mode, byte value);
-
-    /* 按照内存寻址方式读取该地址的数据                */
-    inline word getAddr(const byte addressing_mode);
-
-    /*---------------| 寻址算法定义, 函数返回地址 |----*/
-    word  abs   ();
-    word  absX  ();
-    word  absY  ();
-    word  zpg   ();
-    word  zpgX  ();
-    word  zpgY  ();
-    word  $zpg$Y();
-    word  $zpgX$();
-    word  $$$   (byte x, byte y);
 };
 
 struct command_6502 {

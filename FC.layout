@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="src\cpu.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="25629" topLine="1101" />
+	<File name="src\cpu.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="23038" topLine="928" />
 	</File>
 	<File name="src\cpu.h" open="1" top="0" tabpos="3">
-		<Cursor position="6392" topLine="51" />
+		<Cursor position="167" topLine="99" />
 	</File>
 	<File name="src\debug.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="2687" topLine="4" />
 	</File>
-	<File name="src\main.cpp" open="1" top="1" tabpos="7">
+	<File name="src\main.cpp" open="1" top="0" tabpos="7">
 		<Cursor position="334" topLine="0" />
 	</File>
 	<File name="src\mem.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="2046" topLine="0" />
+		<Cursor position="2046" topLine="41" />
 	</File>
 	<File name="src\mem.h" open="0" top="0" tabpos="6">
 		<Cursor position="1397" topLine="8" />
@@ -35,10 +35,10 @@
 		<Cursor position="865" topLine="0" />
 	</File>
 	<File name="src\ppu.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="966" topLine="18" />
+		<Cursor position="7915" topLine="298" />
 	</File>
 	<File name="src\ppu.h" open="0" top="0" tabpos="6">
-		<Cursor position="6677" topLine="0" />
+		<Cursor position="2392" topLine="51" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="1975" topLine="0" />
@@ -56,12 +56,12 @@
 		<Cursor position="347" topLine="0" />
 	</File>
 	<File name="src\windows.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="566" topLine="0" />
+		<Cursor position="4537" topLine="92" />
 	</File>
 	<File name="src\winsys.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="585" topLine="0" />
 	</File>
 	<File name="src\winsys.h" open="1" top="0" tabpos="8">
-		<Cursor position="1449" topLine="0" />
+		<Cursor position="210" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

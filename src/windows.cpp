@@ -22,8 +22,6 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
                      LPSTR lpszArgument,
                      int nCmdShow )
 {
-    welcome();
-
     HWND hwnd;               /* This is the handle for our window */
     MSG messages;            /* Here messages to the application are saved */
 
@@ -115,9 +113,7 @@ void start_game(HWND hwnd, PMSG messages) {
     		if (messages->message==WM_QUIT) {
 				break;
     		}
-			/* Translate virtual-key messages into character messages */
 			TranslateMessage(messages);
-			/* Send message to WindowProcedure */
 			DispatchMessage(messages);
     	}
 
@@ -125,22 +121,22 @@ void start_game(HWND hwnd, PMSG messages) {
     	if (clock()-usetime<20) continue;
     	usetime = clock();
 
-        //debugCpu(&fc);
+        debugCpu(&fc);
         fc.drawFrame();
         //fc.getPPU()->drawTileTable();
-        // frame 1680 error
 
         displayCpu(cpu, hwnd);
 
         if (active) video->refresh();
 
-        if (++count%40==0) {
-            //fc.getPPU()->drawBackGround(bgPanel);
-            //bgPanel->refresh();
+        if (++count%10==0) {
+            fc.getPPU()->drawBackGround(bgPanel);
+            bgPanel->refresh();
         }
     }
 
     delete video;
+    delete bgPanel;
 }
 
 void displayCpu(cpu_6502* cpu, HWND hwnd) {
@@ -202,7 +198,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 break;
             case WA_INACTIVE:
                 // 不活动, 停止向主页面绘画.
-                active = false;
+                //active = false;
                 break;
             }
         }

@@ -1,30 +1,26 @@
 #include <windows.h>
 #include <stdio.h>
 #include <time.h>
-#include "nes_sys.h"
-#include "ppu.h"
 #include "winsys.h"
-
 #include "debug.h"
+#include <Winuser.h>
 
 
-/*  Declare Windows procedure  */
-LRESULT CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM);
-void    displayCpu                 (cpu_6502*, HWND);
-void    start_game                 (HWND hwnd, PMSG messages);
-int     initWindow                 (HWND*, HINSTANCE, int);
-
+LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
+void        displayCpu                 (cpu_6502*, HWND             );
+void        start_game                 (HWND hwnd, PMSG messages    );
+int         initWindow                 (HWND*, HINSTANCE, int       );
+HMENU       createMenu                 ();
 
 /*  Make the class name into a global variable  */
 static char szClassName[ ] = "CodeBlocksWindowsApp";
-static char titleName[ ] = "FC 模拟器 DEmo. -=CatfoOD=-";
+static char titleName  [ ] = "FC 模拟器 DEmo. -=CatfoOD=-";
 static bool active = 1;
 
-
-int WINAPI WinMain (HINSTANCE hThisInstance,
+int WINAPI WinMain ( HINSTANCE hThisInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR lpszArgument,
-                     int nCmdShow)
+                     int nCmdShow )
 {
     welcome();
 
@@ -78,7 +74,7 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
            width,               /* The programs width */
            height,              /* and height in pixels */
            HWND_DESKTOP,        /* The window is a child-window to desktop */
-           NULL,                /* No menu */
+           createMenu(),        /* menu */
            hThisInstance,       /* Program Instance handler */
            NULL                 /* No Window Creation data */
            );
@@ -88,9 +84,11 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
     return 1;
 }
 
-#define ROM "rom/Tennis.nes"
+//#define ROM "rom/Tennis.nes"
 //#define ROM "rom/Dr_Mario.nes"
 //#define ROM "rom/test.nes"
+//#define ROM "rom/F-1.nes"
+#define ROM "rom/dkk.nes"
 void start_game(HWND hwnd, PMSG messages) {
 
     PlayPad *pad = new WinPad();
@@ -108,6 +106,7 @@ void start_game(HWND hwnd, PMSG messages) {
 
 	cpu_6502* cpu = fc.getCpu();
     int count = 0;
+    clock_t usetime = clock();
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
@@ -121,7 +120,12 @@ void start_game(HWND hwnd, PMSG messages) {
 			/* Send message to WindowProcedure */
 			DispatchMessage(messages);
     	}
-        debugCpu(&fc);
+
+        /* 限速,但是并不准确 */
+    	if (clock()-usetime<20) continue;
+    	usetime = clock();
+
+        //debugCpu(&fc);
         fc.drawFrame();
         //fc.getPPU()->drawTileTable();
         // frame 1680 error
@@ -198,7 +202,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 break;
             case WA_INACTIVE:
                 // 不活动, 停止向主页面绘画.
-                //active = false;
+                active = false;
                 break;
             }
         }
@@ -211,4 +215,11 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     }
 
     return 0;
+}
+
+HMENU createMenu() {
+    HMENU hmenu = CreateMenu();
+	InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING, 1, "One");
+	InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING, 2, "Two");
+	return hmenu;
 }

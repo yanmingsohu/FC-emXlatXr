@@ -82,7 +82,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	if (clock()-usetime<20) continue;
     	usetime = clock();
 
-        //debugCpu(&fc);
+        debugCpu(&fc);
         fc.drawFrame();
         displayCpu(cpu, hwnd);
 

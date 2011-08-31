@@ -20,6 +20,7 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
     wi->titleName   = "±³¾°";
     wi->height      = 480;
     wi->width       = 512;
+    wi->nCmdShow    = 0;
 
     if (!createWindow(wi)) {
         delete wi;

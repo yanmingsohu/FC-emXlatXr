@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="src\cpu.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="23464" topLine="928" />
+	<File name="src\cpu.cpp" open="1" top="1" tabpos="5">
+		<Cursor position="6694" topLine="299" />
 	</File>
 	<File name="src\cpu.h" open="0" top="0" tabpos="3">
 		<Cursor position="167" topLine="99" />
@@ -34,11 +34,11 @@
 	<File name="src\pad.h" open="0" top="0" tabpos="3">
 		<Cursor position="865" topLine="0" />
 	</File>
-	<File name="src\ppu.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="7915" topLine="298" />
+	<File name="src\ppu.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="5091" topLine="167" />
 	</File>
-	<File name="src\ppu.h" open="0" top="0" tabpos="6">
-		<Cursor position="4607" topLine="84" />
+	<File name="src\ppu.h" open="1" top="0" tabpos="7">
+		<Cursor position="3745" topLine="52" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="1975" topLine="0" />
@@ -56,15 +56,15 @@
 		<Cursor position="347" topLine="0" />
 	</File>
 	<File name="src\win\bgpanel.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="829" topLine="0" />
+		<Cursor position="682" topLine="0" />
 	</File>
-	<File name="src\win\main_window.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="4796" topLine="146" />
+	<File name="src\win\main_window.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="2131" topLine="56" />
 	</File>
 	<File name="src\win\winsys.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="2538" topLine="162" />
+		<Cursor position="2538" topLine="0" />
 	</File>
 	<File name="src\win\winsys.h" open="1" top="0" tabpos="3">
-		<Cursor position="1948" topLine="25" />
+		<Cursor position="642" topLine="25" />
 	</File>
 </CodeBlocks_layout_file>

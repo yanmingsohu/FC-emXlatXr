@@ -221,7 +221,6 @@ void cpu_command_CMP(command_parm* parm) {
 }
 
 void cpu_command_CPX(command_parm* parm) {
-    byte a = parm->cpu->X;
     byte b = 0;
 
     switch (parm->op) {
@@ -233,11 +232,10 @@ void cpu_command_CPX(command_parm* parm) {
         b = parm->read(parm->op - 0xE0);
     }
 
-    cmp_op(parm, a, b);
+    cmp_op(parm, parm->cpu->X, b);
 }
 
 void cpu_command_CPY(command_parm* parm) {
-    byte a = parm->cpu->Y;
     byte b = 0;
 
     switch (parm->op) {
@@ -249,7 +247,7 @@ void cpu_command_CPY(command_parm* parm) {
         b = parm->read(parm->op - 0xC0);
     }
 
-    cmp_op(parm, a, b);
+    cmp_op(parm, parm->cpu->Y, b);
 }
 
 void cpu_command_AND(command_parm* parm) {

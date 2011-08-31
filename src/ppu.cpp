@@ -169,7 +169,13 @@ byte PPU::readState(word addr) {
 }
 
 inline BackGround* PPU::swBg() {
-    word offs = (ppu_ram_p % 0x3000 - 0x2000) / 0x400;
+    word offs = 0;
+    if (ppu_ram_p<0x3000)
+        offs = (ppu_ram_p - 0x2000) / 0x400;
+    else {
+        offs = (ppu_ram_p - 0x3000) / 0x400;
+    }
+
 #ifdef SHOW_ERR_MEM_OPERATE
     if (offs>=4) {
         printf("PPU::无效的显存访问%X.\n", ppu_ram_p);

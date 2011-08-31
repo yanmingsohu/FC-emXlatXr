@@ -51,9 +51,10 @@
 		<Unit filename="src\type.cpp" />
 		<Unit filename="src\type.h" />
 		<Unit filename="src\video.h" />
-		<Unit filename="src\windows.cpp" />
-		<Unit filename="src\winsys.cpp" />
-		<Unit filename="src\winsys.h" />
+		<Unit filename="src\win\bgpanel.cpp" />
+		<Unit filename="src\win\main_window.cpp" />
+		<Unit filename="src\win\winsys.cpp" />
+		<Unit filename="src\win\winsys.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

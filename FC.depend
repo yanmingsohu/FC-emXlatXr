@@ -113,7 +113,7 @@
 	"cpu.h"
 	"nes_sys.h"
 
-1314159805 source:f:\c-project\fc\src\cpu.cpp
+1314751800 source:f:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
@@ -144,7 +144,7 @@
 
 1314159805 f:\c-project\fc\src\pad.h
 
-1314159805 f:\c-project\fc\src\cpu.h
+1314751800 f:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 	"ppu.h"
@@ -164,13 +164,13 @@
 	"video.h"
 	"pad.h"
 
-1314692520 source:f:\c-project\fc\src\main.cpp
+1314776035 source:f:\c-project\fc\src\main.cpp
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
 	"type.h"
 	<windows.h>
-	"winsys.h"
+	"win/winsys.h"
 
 1314159805 source:f:\c-project\fc\src\mem.cpp
 	"mem.h"
@@ -212,7 +212,7 @@
 	"debug.h"
 	<Winuser.h>
 
-1314692968 f:\c-project\fc\src\winsys.h
+1314693216 f:\c-project\fc\src\winsys.h
 	<windows.h>
 	<stdio.h>
 	"nes_sys.h"
@@ -226,4 +226,28 @@
 
 1314687449 source:f:\c-project\fc\src\winsys.cpp
 	"winsys.h"
+
+1314777347 f:\c-project\fc\src\win\winsys.h
+	<windows.h>
+	<stdio.h>
+	"../nes_sys.h"
+	"ddraw.h"
+
+1314777515 source:f:\c-project\fc\src\win\winsys.cpp
+	"winsys.h"
+
+1314777399 source:f:\c-project\fc\src\win\main_window.cpp
+	<windows.h>
+	<stdio.h>
+	<time.h>
+	<Winuser.h>
+	"winsys.h"
+	"../debug.h"
+
+1314777075 source:f:\c-project\fc\src\win\bgpanel.cpp
+	<windows.h>
+	<stdio.h>
+	<Winuser.h>
+	"winsys.h"
+	"../ppu.h"
 

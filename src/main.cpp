@@ -5,7 +5,7 @@
 
 #ifdef __WIN32__
 #include <windows.h>
-#include "winsys.h"
+#include "win/winsys.h"
 #endif
 
 #ifdef __linux__
@@ -20,7 +20,7 @@ int main()
     WinMain(hInstance, NULL, NULL, SW_SHOW);
 #endif
 
-    system("pause");
+//    system("pause");
     return 0;
 }
 

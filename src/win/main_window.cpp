@@ -1,85 +1,45 @@
-#include <windows.h>
-#include <stdio.h>
-#include <time.h>
-#include "winsys.h"
-#include "debug.h"
-#include <Winuser.h>
+#include  <windows.h>
+#include    <stdio.h>
+#include     <time.h>
+#include  <Winuser.h>
+#include   "winsys.h"
+#include "../debug.h"
 
 
-LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
-void        displayCpu                 (cpu_6502*, HWND             );
-void        start_game                 (HWND hwnd, PMSG messages    );
-int         initWindow                 (HWND*, HINSTANCE, int       );
-HMENU       createMenu                 ();
+static LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
+static void        displayCpu                 (cpu_6502*, HWND             );
+static void        start_game                 (HWND, PMSG, HINSTANCE       );
+static HMENU       createMainMenu             ();
 
 /*  Make the class name into a global variable  */
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = "FC 模拟器 DEmo. -=CatfoOD=-";
 static bool active = 1;
+static win_info* bgpanel = NULL;
 
 int WINAPI WinMain ( HINSTANCE hThisInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR lpszArgument,
                      int nCmdShow )
 {
-    HWND hwnd;               /* This is the handle for our window */
     MSG messages;            /* Here messages to the application are saved */
+    win_info wi;
 
-    if (!initWindow(&hwnd, hThisInstance, nCmdShow)) {
+    wi.procedure   = WindowProcedure;
+    wi.hInstance   = hThisInstance;
+    wi.szClassName = szClassName;
+    wi.titleName   = titleName;
+    wi.nCmdShow    = nCmdShow;
+    wi.menu        = createMainMenu();
+
+    if (!createWindow(&wi)) {
         return -1;
     }
 
-    start_game(hwnd, &messages);
+    start_game(wi.hwnd, &messages, hThisInstance);
 
     /* The program return-value is 0 - The value that PostQuitMessage() gave */
     return messages.wParam;
-}
-
-int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
-    const int width = 800;
-    const int height = 600;
-    WNDCLASSEX wincl;        /* Data structure for the windowclass */
-
-    /* The Window structure */
-    wincl.hInstance = hThisInstance;
-    wincl.lpszClassName = szClassName;
-    wincl.lpfnWndProc = WindowProcedure;      /* This function is called by windows */
-    wincl.style = CS_DBLCLKS;                 /* Catch double-clicks */
-    wincl.cbSize = sizeof (WNDCLASSEX);
-
-    /* Use default icon and mouse-pointer */
-    wincl.hIcon = LoadIcon (NULL, IDI_APPLICATION);
-    wincl.hIconSm = LoadIcon (NULL, IDI_APPLICATION);
-    wincl.hCursor = LoadCursor (NULL, IDC_ARROW);
-    wincl.lpszMenuName = NULL;                 /* No menu */
-    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0;                      /* structure or the window instance */
-    /* Use Windows's default colour as the background of the window */
-    wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
-
-    /* Register the window class, and if it fails quit the program */
-    if (!RegisterClassEx (&wincl))
-        return 0;
-
-    /* The class is registered, let's create the program*/
-    *hwnd = CreateWindowEx (
-           0,                   /* Extended possibilites for variation */
-           szClassName,         /* Classname */
-           titleName,           /* Title Text */
-           WS_OVERLAPPEDWINDOW, /* default window */
-           CW_USEDEFAULT,       /* Windows decides the position */
-           CW_USEDEFAULT,       /* where the window ends up on the screen */
-           width,               /* The programs width */
-           height,              /* and height in pixels */
-           HWND_DESKTOP,        /* The window is a child-window to desktop */
-           createMenu(),        /* menu */
-           hThisInstance,       /* Program Instance handler */
-           NULL                 /* No Window Creation data */
-           );
-
-    /* Make the window visible on the screen */
-    ShowWindow(*hwnd, nCmdShow);
-    return 1;
 }
 
 //#define ROM "rom/Tennis.nes"
@@ -87,24 +47,25 @@ int initWindow(HWND *hwnd, HINSTANCE hThisInstance, int nCmdShow) {
 //#define ROM "rom/test.nes"
 //#define ROM "rom/F-1.nes"
 #define ROM "rom/dkk.nes"
-void start_game(HWND hwnd, PMSG messages) {
+void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();
     Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
     NesSystem fc(video, pad);
-    int ret = 0;
 
-    if (ret = fc.load_rom(ROM)) {
+    if (int ret = fc.load_rom(ROM)) {
         MessageBox(hwnd, parseOpenError(ret), "错误", 0);
         return;
     }
 
-    WindowsVideo *bgPanel = new WindowsVideo(hwnd, 512, 480);
-    bgPanel->setOffset(270, 40);
-
 	cpu_6502* cpu = fc.getCpu();
-    int count = 0;
     clock_t usetime = clock();
+
+    bgpanel = bg_panel(hInstance, fc.getPPU());
+    if (!bgpanel) {
+        MessageBox(hwnd, "未知的错误", "错误", 0);
+        return;
+    }
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
@@ -121,22 +82,14 @@ void start_game(HWND hwnd, PMSG messages) {
     	if (clock()-usetime<20) continue;
     	usetime = clock();
 
-        debugCpu(&fc);
+        //debugCpu(&fc);
         fc.drawFrame();
-        //fc.getPPU()->drawTileTable();
-
         displayCpu(cpu, hwnd);
 
         if (active) video->refresh();
-
-        if (++count%10==0) {
-            fc.getPPU()->drawBackGround(bgPanel);
-            bgPanel->refresh();
-        }
     }
 
     delete video;
-    delete bgPanel;
 }
 
 void displayCpu(cpu_6502* cpu, HWND hwnd) {
@@ -181,9 +134,12 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     }
 }
 
+#define MENU_FILE   1
+#define MENU_DEUBG  2
+
 /*  This function is called by the Windows function DispatchMessage()  */
 
-LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)              /* handle the messages */
     {
@@ -203,9 +159,23 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             }
         }
         break;
+
     case WM_DESTROY:
         PostQuitMessage (0);      /* send a WM_QUIT to the message queue */
         break;
+
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case MENU_FILE:
+            break;
+
+        case MENU_DEUBG:
+            bgpanel->show();
+            break;
+        }
+        break;
+
     default:                      /* for messages that we don't deal with */
         return DefWindowProc (hwnd, message, wParam, lParam);
     }
@@ -213,9 +183,9 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     return 0;
 }
 
-HMENU createMenu() {
+HMENU createMainMenu() {
     HMENU hmenu = CreateMenu();
-	InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING, 1, "One");
-	InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING, 2, "Two");
+	InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING, MENU_FILE,  "文件");
+	InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING, MENU_DEUBG, "调试");
 	return hmenu;
 }

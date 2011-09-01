@@ -10,6 +10,7 @@ struct win_info;
 
 int WINAPI  WinMain       (HINSTANCE, HINSTANCE, LPSTR, int);
 win_info*   bg_panel      (HINSTANCE, PPU*);
+win_info*   tile_panel    (HINSTANCE, PPU*);
 void        initHdcColor  (HDC hdc);
 int         createWindow  (win_info*);
 

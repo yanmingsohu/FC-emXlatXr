@@ -16,6 +16,7 @@ static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = "FC Ä£ÄâÆ÷ DEmo. -=CatfoOD=-";
 static bool active = 1;
 static win_info* bgpanel = NULL;
+static win_info* tlpanel = NULL;
 
 int WINAPI WinMain ( HINSTANCE hThisInstance,
                      HINSTANCE hPrevInstance,
@@ -62,7 +63,8 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     clock_t usetime = clock();
 
     bgpanel = bg_panel(hInstance, fc.getPPU());
-    if (!bgpanel) {
+    tlpanel = tile_panel(hInstance, fc.getPPU());
+    if (!(bgpanel && tlpanel)) {
         MessageBox(hwnd, "Î´ÖªµÄ´íÎó", "´íÎó", 0);
         return;
     }
@@ -84,7 +86,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
         debugCpu(&fc);
         fc.drawFrame();
-        displayCpu(cpu, hwnd);
+        //displayCpu(cpu, hwnd);
 
         if (active) video->refresh();
     }
@@ -172,6 +174,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
         case MENU_DEUBG:
             bgpanel->show();
+            tlpanel->show();
             break;
         }
         break;

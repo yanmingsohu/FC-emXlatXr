@@ -272,7 +272,7 @@ void PPU::setNMI(byte* cpu_nmi) {
     NMI = cpu_nmi;
 }
 
-void PPU::drawTileTable() {
+void PPU::drawTileTable(Video *v) {
     byte dataH, dataL;
     byte colorIdx;
     int x=0, y=0;
@@ -290,14 +290,14 @@ void PPU::drawTileTable() {
                 if (dataH>>d & 1) {
                     colorIdx |= 2;
                 }
-                video->drawPixel(x++, y, ppu_color_table[colorIdx]);
+                v->drawPixel(x++, y, ppu_color_table[colorIdx]);
             }
             x-= 8;
             y++;
         }
         x+= 8;
         y-= 8;
-        if (p && p%32==0) {
+        if (p%16==15) {
             x = 0;
             y+= 8;
         }

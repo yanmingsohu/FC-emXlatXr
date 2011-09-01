@@ -158,7 +158,7 @@ public:
     /* 在video上绘制四个背景 512*480                               */
     void drawBackGround(Video *v);
     /* 立即绘制背景字库                                            */
-    void drawTileTable();
+    void drawTileTable(Video *v);
     /* 绘制指定位置的像素                                          */
     void drawPixel(int x, int y);
 };

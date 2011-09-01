@@ -53,6 +53,7 @@
 		<Unit filename="src\video.h" />
 		<Unit filename="src\win\bgpanel.cpp" />
 		<Unit filename="src\win\main_window.cpp" />
+		<Unit filename="src\win\tilepanel.cpp" />
 		<Unit filename="src\win\winsys.cpp" />
 		<Unit filename="src\win\winsys.h" />
 		<Extensions>

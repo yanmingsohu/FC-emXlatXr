@@ -5,21 +5,21 @@
 #include   "../ppu.h"
 
 static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-static WindowsVideo *bgPanel;
+static WindowsVideo *tPanel;
 static PPU *ppu;
 
 /* ³É¹¦·µ»ØÖ¸ÕëÊ§°Ü·µ»ØNULL */
-win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
+win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
 {
     MSG messages;            /* Here messages to the application are saved */
     win_info *wi = new win_info();
 
     wi->procedure   = WindowProcedure;
     wi->hInstance   = hThisInstance;
-    wi->szClassName = "bg panel";
-    wi->titleName   = "±³¾°";
-    wi->height      = 480;
-    wi->width       = 512;
+    wi->szClassName = "title panel";
+    wi->titleName   = "×Ö¿â";
+    wi->height      = 300;
+    wi->width       = 150;
   //  wi->nCmdShow    = 0;
 
     if (!createWindow(wi)) {
@@ -27,8 +27,8 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
         return NULL;
     }
 
-    ppu     = _ppu;
-    bgPanel = new WindowsVideo(wi->hwnd, 512, 480);
+    ppu    = _ppu;
+    tPanel = new WindowsVideo(wi->hwnd, 512, 480);
     return wi;
 }
 
@@ -42,12 +42,12 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_DESTROY:
-        delete bgPanel;
+        delete tPanel;
         break;
 
     case WM_PAINT:
-        ppu->drawBackGround(bgPanel);
-        bgPanel->refresh();
+        ppu->drawTileTable(tPanel);
+        tPanel->refresh();
         break;
 
     default:               /* for messages that we don't deal with */

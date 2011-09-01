@@ -21,7 +21,7 @@
 1313273660 e:\c-project\fc\src\mmc.h
 	"rom.h"
 
-1314014608 e:\c-project\fc\src\ppu.h
+1314878319 e:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
@@ -67,7 +67,7 @@
 
 1313749613 e:\c-project\fc\src\debug.h
 
-1314796641 source:e:\c-project\fc\src\ppu.cpp
+1314879184 source:e:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
@@ -251,13 +251,13 @@
 	"winsys.h"
 	"../ppu.h"
 
-1314788596 e:\c-project\fc\src\win\winsys.h
+1314878798 e:\c-project\fc\src\win\winsys.h
 	<windows.h>
 	<stdio.h>
 	"../nes_sys.h"
 	"ddraw.h"
 
-1314797015 source:e:\c-project\fc\src\win\main_window.cpp
+1314878879 source:e:\c-project\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
@@ -268,7 +268,14 @@
 1314788596 source:e:\c-project\fc\src\win\winsys.cpp
 	"winsys.h"
 
-1314796976 source:e:\c-project\fc\src\win\bgpanel.cpp
+1314877766 source:e:\c-project\fc\src\win\bgpanel.cpp
+	<windows.h>
+	<stdio.h>
+	<Winuser.h>
+	"winsys.h"
+	"../ppu.h"
+
+1314879311 source:e:\c-project\fc\src\win\tilepanel.cpp
 	<windows.h>
 	<stdio.h>
 	<Winuser.h>

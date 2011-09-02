@@ -11,7 +11,6 @@ static PPU *ppu;
 /* 成功返回指针失败返回NULL */
 win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
 {
-    MSG messages;            /* Here messages to the application are saved */
     win_info *wi = new win_info();
 
     wi->procedure   = WindowProcedure;
@@ -20,7 +19,7 @@ win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
     wi->titleName   = "字库";
     wi->height      = 300;
     wi->width       = 150;
-  //  wi->nCmdShow    = 0;
+    wi->nCmdShow    = 0;
 
     if (!createWindow(wi)) {
         delete wi;

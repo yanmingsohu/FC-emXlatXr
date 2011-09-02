@@ -11,7 +11,6 @@ static PPU *ppu;
 /* 成功返回指针失败返回NULL */
 win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
 {
-    MSG messages;            /* Here messages to the application are saved */
     win_info *wi = new win_info();
 
     wi->procedure   = WindowProcedure;
@@ -20,7 +19,7 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
     wi->titleName   = "背景";
     wi->height      = 480;
     wi->width       = 512;
-  //  wi->nCmdShow    = 0;
+    wi->nCmdShow    = 0;
 
     if (!createWindow(wi)) {
         delete wi;

@@ -47,7 +47,8 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "rom/Dr_Mario.nes"
 //#define ROM "rom/test.nes"
 //#define ROM "rom/F-1.nes"
-#define ROM "rom/dkk.nes"
+//#define ROM "rom/dkk.nes"
+#define ROM "rom/fighter_f8000.nes"
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();
@@ -65,7 +66,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     bgpanel = bg_panel(hInstance, fc.getPPU());
     tlpanel = tile_panel(hInstance, fc.getPPU());
     if (!(bgpanel && tlpanel)) {
-        MessageBox(hwnd, "未知的错误", "错误", 0);
+        MessageBox(hwnd, "创建调试面板错误", "错误", 0);
         return;
     }
 
@@ -84,7 +85,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	if (clock()-usetime<20) continue;
     	usetime = clock();
 
-        debugCpu(&fc);
+        //debugCpu(&fc);
         fc.drawFrame();
         //displayCpu(cpu, hwnd);
 

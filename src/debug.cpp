@@ -18,6 +18,56 @@ printf(
 );
 }
 
+#define CPU_IS(o, x, y)        \
+         ( (parm->op==(0x##o)) \
+         &&(parm->p1==(0x##x)) \
+         &&(parm->p2==(0x##y)) )
+static void condition_code(NesSystem *fc) { /* 实现可能不准确 */
+
+    cpu_6502     *cpu  = fc->getCpu();
+    PPU          *ppu  = fc->getPPU();
+    command_parm *parm = &cpu->prev_parm;
+
+    if (CPU_IS(8D, 00, 20)) {
+        printf("DBG::修改PPU窗口坐标高位,滚动方式,字库偏移,精灵大小,VB中断\n");
+    } else
+
+    if (CPU_IS(8D, 01, 20)) {
+        printf("DBG::修改PPU左列状态,显示屏蔽,背景色\n");
+    } else
+
+    if (CPU_IS(8D, 03, 20)) {
+        printf("DBG::修改PPU精灵内存指针\n");
+    } else
+
+    if (CPU_IS(8D, 04, 20)) {
+        printf("DBG::向PPU精灵内存写数据\n");
+    } else
+
+    if (CPU_IS(8D, 05, 20)) {
+        int x, y;
+        ppu->getWindowPos(&x, &y);
+        printf("DBG::修改PPU窗口坐标低位 x:%d,y:%d\n", x, y);
+    } else
+
+    if (CPU_IS(8D, 06, 20)) {
+        printf("DBG::修改PPU指针:%04x\n", ppu->getVRamPoint());
+    } else
+
+    if (CPU_IS(8D, 07, 20)) {
+        printf("DBG::向PPU写数据 地址:%04X\n", ppu->getVRamPoint());
+    } else
+
+    if (CPU_IS(AD, 02, 20)) {
+        printf("DBG::读取2002数据,(精灵溢出,碰撞,VBlank)\n");
+    } else
+
+    if (CPU_IS(AD, 07, 20)) {
+        printf("DBG::读取PPU显存数据 地址:%04X\n", ppu->getVRamPoint());
+    }
+}
+#undef CPU_IS
+
 void debugCpu(NesSystem *fc) {
 
     cpu_6502 *cpu = fc->getCpu();
@@ -42,6 +92,7 @@ void debugCpu(NesSystem *fc) {
             cpu->process();
             ++c;
             if (frameIrq && (c%frameIrq==0)) ppu->oneFrameOver();
+            condition_code(fc);
             printf(cpu->cmdInfo());
             printf(cpu->debug());
         }

@@ -29,7 +29,7 @@ T_COLOR ppu_color_table[0x40] = {
 
 PPU::PPU(MMC *_mmc, Video *_video)
     : addr_add(1), ppuSW(pH), w2005(wX), mmc(_mmc)
-    , video(_video)
+    , video(_video), pitch_first_read(0)
 {
 }
 
@@ -86,6 +86,8 @@ void PPU::controlWrite(word addr, byte data) {
             ppu_ram_p = (ppu_ram_p & 0xFF00) | data;
             ppuSW = pH;
         }
+        /* 模拟PPU怪癖 */
+        pitch_first_read = ppu_ram_p < 0x4000;
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
 #endif
@@ -128,10 +130,10 @@ inline void PPU::control_2000(byte data) {
 
 inline void PPU::control_2001(byte data) {
     hasColor    = _BIT(0) ? 0 : 1;
-    bkleftCol   = _BIT(1) ? 0 : 1;
-    spleftCol   = _BIT(2) ? 0 : 1;
-    bkAllDisp   = _BIT(3) ? 0 : 1;
-    spAllDisp   = _BIT(4) ? 0 : 1;
+    bkleftCol   = _BIT(1) ? 1 : 0;
+    spleftCol   = _BIT(2) ? 1 : 0;
+    bkAllDisp   = _BIT(3) ? 1 : 0;
+    spAllDisp   = _BIT(4) ? 1 : 0;
     red         = _BIT(5) ? 1 : 0;
     green       = _BIT(6) ? 1 : 0;
     blue        = _BIT(7) ? 1 : 0;
@@ -151,7 +153,7 @@ byte PPU::readState(word addr) {
             vblankTime = 1;
         }
         if ( spOverflow ) r |= ( 1<<5 );
-        if ( spClash    ) r |= ( 1<<6 );
+        if ( hit        ) r |= ( 1<<6 );
         if ( vblankTime ) r |= ( 1<<7 );
         vblankTime = 0;
         ppuSW      = pH;
@@ -159,8 +161,17 @@ byte PPU::readState(word addr) {
         break;
 
     case 7: /* 0x2007 读数据寄存器          */
-        r = read();
+        if (pitch_first_read) {
+            pitch_first_read = 0;
+        } else {
+            r = read();
+        }
         break;
+#ifdef SHOW_ERR_MEM_OPERATE
+    default:
+        printf("PPU::无效的显存读取 %X.\n", addr);
+        break;
+#endif
     }
 #ifdef SHOW_PPU_REGISTER
     printf("PPU::read:%X, return:%X\n", addr, r);
@@ -263,7 +274,7 @@ void PPU::switchMirror(byte type) {
 
 void PPU::reset() {
     spOverflow = 0;
-    spClash    = 0;
+    hit        = 0;
     *NMI       = 0;
     preheating = 3;
 }
@@ -369,7 +380,7 @@ void PPU::drawBackGround(Video *panel) {
 void PPU::drawSprite() {
     byte paletteIdx;
 
-    for (int i=63<<2; i>=0; i-=4) {
+    for (int i=63<<2; i>=0; i-=4) { // spriteType, hit
         byte by   = spWorkRam[i  ];
         byte tile = spWorkRam[i+1];
         byte ctrl = spWorkRam[i+2];
@@ -398,16 +409,16 @@ void PPU::drawPixel(int X, int Y) {
             bgs = pbg[0];
         } else {
             bgs = pbg[2];
-            y = Y;
+            y   = Y;
         }
     } else {
         if (y<240) {
             bgs = pbg[1];
-            x = X;
+            x   = X;
         } else {
             bgs = pbg[3];
-            x = X;
-            y = Y;
+            x   = X;
+            y   = Y;
         }
     }
 
@@ -430,14 +441,24 @@ void PPU::oneFrameOver() {
         printf("PPU::发送中断到CPU\n");
 #endif
     }
+    hit        = 0;
     vblankTime = 1;
 }
 
 void PPU::startNewFrame() {
     vblankTime = 0;
-    ppu_ram_p = 0x2000;
+    ppu_ram_p  = 0x2000;
 }
 
 void PPU::copySprite(byte *data) {
     memcpy(spWorkRam, data, 256);
+}
+
+void PPU::getWindowPos(int *x, int *y) {
+    *x = winX;
+    *y = winY;
+}
+
+word PPU::getVRamPoint() {
+    return ppu_ram_p;
 }

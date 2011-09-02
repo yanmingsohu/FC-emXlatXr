@@ -33,7 +33,7 @@ struct BackGround {
     byte name      [0x03C0];
     byte attribute [0x0040];
 
-    inline void write(word offset, byte data) {
+    void write(word offset, byte data) {
         word off = (offset % 0x0400);
         if (off<0x03C0) {
             name[off] = data;
@@ -42,7 +42,7 @@ struct BackGround {
         }
     }
 
-    inline byte read(word offset) {
+    byte read(word offset) {
         word off = (offset % 0x0400);
         if (off<0x03C0) {
             return name[off];
@@ -117,7 +117,8 @@ private:
     byte blue;              /* 蓝色着色                            */
 
     byte spOverflow;        /* 卡通8个溢出                         */
-    byte spClash;           /* 卡通冲突?                           */
+    byte hit;               /* 卡通碰撞                            */
+    byte pitch_first_read;  /* 模拟ppu怪癖                         */
 
     MMC   *mmc;
     Video *video;
@@ -152,6 +153,10 @@ public:
     void startNewFrame();
     /* 复制256字节的数据到精灵Ram                                  */
     void copySprite(byte *data);
+    /* 取得窗口坐标                                                */
+    void getWindowPos(int *x, int *y);
+    /* 返回当前ppu显存指针                                         */
+    word getVRamPoint();
 
     /* 绘制一帧中的精灵                                            */
     void drawSprite();

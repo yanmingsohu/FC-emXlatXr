@@ -5,7 +5,7 @@
 #include   "../ppu.h"
 
 static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-static WindowsVideo *bgPanel;
+static Video *bgPanel;
 static PPU *ppu;
 
 /* 成功返回指针失败返回NULL */
@@ -17,8 +17,8 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
     wi->hInstance   = hThisInstance;
     wi->szClassName = "bg panel";
     wi->titleName   = "背景";
-    wi->height      = 480;
-    wi->width       = 512;
+    wi->height      = 480 + 50;
+    wi->width       = 512 + 10;
     wi->nCmdShow    = 0;
 
     if (!createWindow(wi)) {
@@ -27,7 +27,7 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
     }
 
     ppu     = _ppu;
-    bgPanel = new WindowsVideo(wi->hwnd, 512, 480);
+    bgPanel = new DirectXVideo(wi->hwnd, 512, 480);
     return wi;
 }
 
@@ -45,6 +45,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_PAINT:
+        bgPanel->clear(0);
         ppu->drawBackGround(bgPanel);
         bgPanel->refresh();
         break;

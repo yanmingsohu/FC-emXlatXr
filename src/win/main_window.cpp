@@ -15,6 +15,7 @@ static HMENU       createMainMenu             ();
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = "FC 模拟器 DEmo. -=CatfoOD=-";
 static bool active = 1;
+static bool sDebug = 0;
 static win_info* bgpanel = NULL;
 static win_info* tlpanel = NULL;
 
@@ -48,7 +49,8 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "rom/test.nes"
 //#define ROM "rom/F-1.nes"
 //#define ROM "rom/dkk.nes"
-#define ROM "rom/fighter_f8000.nes"
+//#define ROM "rom/fighter_f8000.nes"
+#define ROM "rom/NEStress.nes"
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();
@@ -82,12 +84,15 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	}
 
         /* 限速,但是并不准确 */
-    	if (clock()-usetime<20) continue;
+    	if (clock()-usetime<15) continue;
     	usetime = clock();
 
-        //debugCpu(&fc);
+        if (sDebug) {
+            debugCpu(&fc);
+            sDebug = 0;
+        }
         fc.drawFrame();
-        //displayCpu(cpu, hwnd);
+        displayCpu(cpu, hwnd);
 
         if (active) video->refresh();
     }
@@ -103,7 +108,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     if (frameC%20!=0) return;
 
     HDC hdc = GetDC(hwnd);
-    int x = 300;
+    int x = 270;
 	int y = 0;
 	int xIn = 70;
 	int yIn = 18;
@@ -112,24 +117,23 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     sprintf(buf, "A: %02X", cpu->A);
     TextOut(hdc, x, y, buf, 5);
     sprintf(buf, "X: %02X", cpu->X);
-    TextOut(hdc, x+=xIn, y, buf, 5);
+    TextOut(hdc, x, y+=yIn, buf, 5);
     sprintf(buf, "Y: %02X", cpu->Y);
-    TextOut(hdc, x+=xIn, y, buf, 5);
-    y += yIn;
-    x = 300;
+    TextOut(hdc, x, y+=yIn, buf, 5);
+
     sprintf(buf, "SP: %02X", cpu->SP);
-    TextOut(hdc, x, y, buf, 6);
+    TextOut(hdc, x, y+=yIn, buf, 6);
     sprintf(buf, "PC: %04X", cpu->PC);
-    TextOut(hdc, x+=xIn, y, buf, 8);
+    TextOut(hdc, x, y+=yIn, buf, 8);
     sprintf(buf, "FG: %02X", cpu->FLAGS);
-    TextOut(hdc, x+=xIn, y, buf, 6);
+    TextOut(hdc, x, y+=yIn, buf, 6);
 
     double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
 
     sprintf(buf, "frame: %09ld", frameC);
-    TextOut(hdc, x+=xIn, y, buf, 16);
+    TextOut(hdc, x, y+=yIn, buf, 16);
     sprintf(buf, "rate : %02lf/s", f2c/utime);
-    TextOut(hdc, x, y-yIn, buf, 11);
+    TextOut(hdc, x, y+=yIn, buf, 11);
 
     if (f2c>50) {
         time = clock();
@@ -138,7 +142,8 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
 }
 
 #define MENU_FILE   1
-#define MENU_DEUBG  2
+#define MENU_SHOW   2
+#define MENU_DEBUG  3
 
 /*  This function is called by the Windows function DispatchMessage()  */
 
@@ -173,7 +178,11 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         case MENU_FILE:
             break;
 
-        case MENU_DEUBG:
+        case MENU_DEBUG:
+            sDebug = 1;
+            break;
+
+        case MENU_SHOW:
             bgpanel->show();
             tlpanel->show();
             break;
@@ -190,6 +199,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 HMENU createMainMenu() {
     HMENU hmenu = CreateMenu();
 	InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING, MENU_FILE,  "文件");
-	InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING, MENU_DEUBG, "调试");
+	InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING, MENU_SHOW,  "显示后台");
+	InsertMenu(hmenu, 2, MF_BYPOSITION | MF_STRING, MENU_DEBUG, "中断调试");
 	return hmenu;
 }

@@ -289,3 +289,128 @@
 	"winsys.h"
 	"../ppu.h"
 
+1313300576 source:e:\fc\src\mmc.cpp
+	"mmc.h"
+	"type.h"
+	"stdio.h"
+
+1313300576 e:\fc\src\mmc.h
+	"rom.h"
+
+1315015267 e:\fc\src\rom.h
+	"type.h"
+	"string"
+
+1315015267 e:\fc\src\type.h
+
+1313300576 source:e:\fc\src\rom.cpp
+	"rom.h"
+	<stdio.h>
+	<stdlib.h>
+
+1315022768 source:e:\fc\src\cpu.cpp
+	"mem.h"
+	"cpu.h"
+	"stdio.h"
+	"stdlib.h"
+
+1315015267 e:\fc\src\mem.h
+	"type.h"
+	"rom.h"
+	"mmc.h"
+	"ppu.h"
+	"pad.h"
+
+1315015267 e:\fc\src\ppu.h
+	"mmc.h"
+	"video.h"
+
+1315015550 e:\fc\src\video.h
+	"type.h"
+
+1315017735 e:\fc\src\pad.h
+
+1315015267 e:\fc\src\cpu.h
+	"type.h"
+	"mem.h"
+	"ppu.h"
+
+1315023603 source:e:\fc\src\debug.cpp
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<time.h>
+	"cpu.h"
+	"nes_sys.h"
+
+1315015267 e:\fc\src\nes_sys.h
+	"cpu.h"
+	"mem.h"
+	"rom.h"
+	"video.h"
+	"pad.h"
+
+1315015267 source:e:\fc\src\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	"type.h"
+	<windows.h>
+	"win/winsys.h"
+
+1315029386 e:\fc\src\win\winsys.h
+	<windows.h>
+	<stdio.h>
+	"../nes_sys.h"
+	"ddraw.h"
+
+1315015267 e:\fc\dx81sdk\ddraw.h
+	<objbase.h>
+
+1315015267 source:e:\fc\src\mem.cpp
+	"mem.h"
+	"string.h"
+	<stdio.h>
+
+1315015924 source:e:\fc\src\nes_sys.cpp
+	"nes_sys.h"
+	"debug.h"
+	<stdio.h>
+
+1315015267 e:\fc\src\debug.h
+
+1315021540 source:e:\fc\src\ppu.cpp
+	"ppu.h"
+	<stdio.h>
+	<string.h>
+
+1315015267 source:e:\fc\src\type.cpp
+	<stdio.h>
+	"type.h"
+	"rom.h"
+
+1315029513 source:e:\fc\src\win\bgpanel.cpp
+	<windows.h>
+	<stdio.h>
+	<Winuser.h>
+	"winsys.h"
+	"../ppu.h"
+
+1315029889 source:e:\fc\src\win\main_window.cpp
+	<windows.h>
+	<stdio.h>
+	<time.h>
+	<Winuser.h>
+	"winsys.h"
+	"../debug.h"
+
+1315029756 source:e:\fc\src\win\tilepanel.cpp
+	<windows.h>
+	<stdio.h>
+	<Winuser.h>
+	"winsys.h"
+	"../ppu.h"
+
+1315029497 source:e:\fc\src\win\winsys.cpp
+	"winsys.h"
+

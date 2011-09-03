@@ -7,8 +7,8 @@ enum FC_PAD_KEY {
     FC_PAD_BU_B       = 1,
     FC_PAD_BU_SELECT  = 2,
     FC_PAD_BU_START   = 3,
-    FC_PAD_BU_DOWN    = 4,
-    FC_PAD_BU_UP      = 5,
+    FC_PAD_BU_UP      = 4,
+    FC_PAD_BU_DOWN    = 5,
     FC_PAD_BU_LEFT    = 6,
     FC_PAD_BU_RIGHT   = 7
 };

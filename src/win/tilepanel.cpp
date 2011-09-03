@@ -27,7 +27,7 @@ win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
     }
 
     ppu    = _ppu;
-    tPanel = new WindowsVideo(wi->hwnd, 512, 480);
+    tPanel = new WindowsVideo(wi->hwnd, 128, 280);
     return wi;
 }
 
@@ -45,6 +45,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_PAINT:
+        tPanel->clear(0);
         ppu->drawTileTable(tPanel);
         tPanel->refresh();
         break;

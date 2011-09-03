@@ -88,6 +88,13 @@ void WindowsVideo::refresh() {
     BitBlt(hdc, x_off, y_off, width, height, hMemDC, 0, 0, SRCCOPY);
 }
 
+void WindowsVideo::clear(T_COLOR c) {
+    HBRUSH hBrush = CreateSolidBrush(c);
+    RECT r = {0, 0, width, height};
+    FillRect(hMemDC, &r, hBrush);
+    DeleteObject(hBrush);
+}
+
 WindowsVideo::~WindowsVideo() {
     DeleteDC(hMemDC);
     ReleaseDC(m_hwnd, hdc);
@@ -95,10 +102,13 @@ WindowsVideo::~WindowsVideo() {
 
 /****|DirectXVideo|************************************************************/
 
-DirectXVideo::DirectXVideo(HWND hwnd)
-    :lpDD4(0), lpDDSPrimary(0), success(0), m_hwnd(hwnd)
+DirectXVideo::DirectXVideo(HWND hwnd, int width, int height)
+    :lpDD4(0), lpDDSPrimary(0), success(0), pixel(0), m_hwnd(hwnd)
 {
     LPDIRECTDRAW lpDD;
+    pixel    = new T_COLOR[width * height];
+    m_height = height;
+    m_width  = width;
 
     //创建DirectCraw对象
     if ( DirectDrawCreate( NULL, &lpDD, NULL ) ) {
@@ -143,7 +153,11 @@ int DirectXVideo::isSuccess() {
 }
 
 void DirectXVideo::drawPixel(int x, int y, T_COLOR color) {
-    pixel[x + (y<<8)] = color;
+    pixel[x + (y*m_width)] = color;
+}
+
+void DirectXVideo::clear(T_COLOR color) {
+    memset(pixel, color, m_width * m_height * sizeof(int));
 }
 
 void DirectXVideo::refresh() {
@@ -155,8 +169,8 @@ void DirectXVideo::refresh() {
 
     lpDestRect.top    = point.y;
     lpDestRect.left   = point.x;
-    lpDestRect.bottom = point.y + PPU_DISPLAY_P_HEIGHT;
-    lpDestRect.right  = point.x + PPU_DISPLAY_P_WIDTH;
+    lpDestRect.bottom = point.y + m_height;
+    lpDestRect.right  = point.x + m_width;
 
     if (lpDDSPrimary->Lock(&lpDestRect, &ddsd,
              DDLOCK_SURFACEMEMORYPTR, NULL) != DD_OK) {
@@ -164,13 +178,13 @@ void DirectXVideo::refresh() {
     }
 
     UINT *buffer = (UINT*)ddsd.lpSurface;
-    UINT nPitch = ddsd.lPitch >> 2;
+    UINT nPitch = ddsd.lPitch>>2;
 
     for (int x=0, y=0;;) {
-        buffer[y*nPitch + x] = pixel[x + (y<<8)];
-        if (++x>=PPU_DISPLAY_P_WIDTH) {
+        buffer[x + y*nPitch] = pixel[x + y*m_width];
+        if (++x >= m_width) {
             x = 0;
-            if (++y>=PPU_DISPLAY_P_HEIGHT) break;
+            if (++y >= m_height) break;
         }
     }
 
@@ -187,6 +201,7 @@ DirectXVideo::~DirectXVideo() {
         lpDD4->Release();
         lpDD4 = NULL;
     }
+    delete [] pixel;
 }
 
 /****|WinPad|******************************************************************/

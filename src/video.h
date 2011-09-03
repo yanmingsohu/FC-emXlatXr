@@ -10,6 +10,9 @@ public:
     virtual void drawPixel(int x, int y, T_COLOR color) = 0;
     /* 刷新缓存到页面 */
     virtual void refresh() {}
+    /* 清除缓冲区，使用指定的颜色  */
+    virtual void clear(T_COLOR color) = 0;
+
 };
 
 #endif // VIDEO_H_INCLUDED

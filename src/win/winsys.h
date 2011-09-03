@@ -59,6 +59,7 @@ public:
     void setOffset(int x, int y);
     void drawPixel(int x, int y, T_COLOR color);
     void refresh();
+    void clear(T_COLOR color);
 };
 
 /* 使用DirectX绘图 */
@@ -68,18 +69,21 @@ private:
     LPDIRECTDRAW4         lpDD4;                /* DirectDraw对象 */
     LPDIRECTDRAWSURFACE4  lpDDSPrimary;         /* DirectDraw主页面 */
     int                   success;
-    T_COLOR               pixel[256*256];
+    T_COLOR              *pixel;
     HWND                  m_hwnd;
     DDSURFACEDESC2        ddsd;
     POINT                 point;
+    int                   m_width;
+    int                   m_height;
 
 public:
-    DirectXVideo(HWND hwnd);
+    DirectXVideo(HWND hwnd, int width = 256, int height = 256);
     ~DirectXVideo();
 
     int isSuccess();
     void drawPixel(int x, int y, T_COLOR color);
     void refresh();
+    void clear(T_COLOR color);
 };
 
 /* 0 : 0x30, 9 : 0x39

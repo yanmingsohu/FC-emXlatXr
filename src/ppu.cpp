@@ -381,18 +381,32 @@ void PPU::drawSprite() {
     byte paletteIdx;
 
     for (int i=63<<2; i>=0; i-=4) { // spriteType, hit
-        byte by   = spWorkRam[i  ];
+        byte by   = spWorkRam[i  ]+1;
         byte tile = spWorkRam[i+1];
         byte ctrl = spWorkRam[i+2];
         byte bx   = spWorkRam[i+3];
 
-        for (int y=by; y<by+8; ++y) {
-            for (int x=bx; x<bx+8; ++x) {
-                paletteIdx = gtLBit(x, y, tile, spRomOffset);
+        int dx, dy;
+        bool h = ctrl & (1<<6);
+        bool v = ctrl & (1<<7);
 
-                if (paletteIdx) {
-                    paletteIdx |= ((ctrl & 0x03) << 2);
-                    video->drawPixel(x, y, ppu_color_table[ spPalette[paletteIdx] ]);
+        int y = 0, x = 0;
+        for (;;) {
+            paletteIdx = gtLBit(x+bx, y+by, tile, spRomOffset);
+
+            if (paletteIdx) {
+                paletteIdx |= ((ctrl & 0x03) << 2);
+                if (h) dx = 8-x+bx;
+                else   dx =   x+bx;
+                if (v) dy = 8-y+by;
+                else   dy =   y+by;
+                video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx] ]);
+            }
+
+            if (++x >= 8) {
+                x = 0;
+                if (++y >= 8) {
+                    break;
                 }
             }
         }
@@ -409,16 +423,16 @@ void PPU::drawPixel(int X, int Y) {
             bgs = pbg[0];
         } else {
             bgs = pbg[2];
-            y   = Y;
+            y   = (winY + Y) % 240;
         }
     } else {
         if (y<240) {
             bgs = pbg[1];
-            x   = X;
+            x   = (winX + X) % 256;
         } else {
             bgs = pbg[3];
-            x   = X;
-            y   = Y;
+            x   = (winX + X) % 256;
+            y   = (winY + Y) % 240;
         }
     }
 
@@ -448,6 +462,7 @@ void PPU::oneFrameOver() {
 void PPU::startNewFrame() {
     vblankTime = 0;
     ppu_ram_p  = 0x2000;
+    video->clear(0);
 }
 
 void PPU::copySprite(byte *data) {

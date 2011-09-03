@@ -128,7 +128,7 @@ void debugCpu(NesSystem *fc) {
         }
 
         else if (ch=='r') {
-            cpu->reset();
+            cpu->RES = 1;
             c = 0;
         }
         else if (ch=='n') {

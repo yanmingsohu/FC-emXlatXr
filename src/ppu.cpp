@@ -29,9 +29,10 @@ T_COLOR ppu_color_table[0x40] = {
 
 PPU::PPU(MMC *_mmc, Video *_video)
     : spWorkOffset(0), addr_add(1), ppuSW(pH), w2005(wX)
-    , mmc(_mmc), video(_video), pitch_first_read(0)
+    , mmc(_mmc), video(_video), pitch_first_read(1)
     , spAllDisp(0), bkAllDisp(0)
 {
+    memset(spWorkRam, 0, sizeof(spWorkRam));
 }
 
 void PPU::controlWrite(word addr, byte data) {
@@ -143,7 +144,7 @@ inline void PPU::control_2001(byte data) {
 #undef _BIT
 
 byte PPU::readState(word addr) {
-    byte r = 0xFF;
+    byte r;
 
     switch (addr % 0x08) {
 
@@ -399,22 +400,25 @@ void PPU::_drawSprite(byte i, byte ctrl) {
          ctrl = spWorkRam[i+2];
     byte bx   = spWorkRam[i+3];
 
-    bool h = ctrl & (1<<6);
-    bool v = ctrl & (1<<7);
+    /* 8x8 个像素都需要判断，所以提前算好 */
+    bool h    = ctrl & (1<<6);
+    bool v    = ctrl & (1<<7);
+    byte hiC  = (ctrl & 0x03) << 2;
 
     if (!i) { sp0x = bx;
               sp0y = by; }
 
     for (x=y=0;;) {
-        dx = x + bx;
-        dy = y + by;
-        paletteIdx = gtLBit(dx, dy, tile, spRomOffset);
+        paletteIdx = gtLBit(x, y, tile, spRomOffset);
 
         if (paletteIdx) {
-            paletteIdx |= ( (ctrl & 0x03) << 2 );
-            if (h) dx = 8 - dx;
-            if (v) dy = 8 - dy; printf("_%x %x ", dx, dy);
-            video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx] ]);
+            if (h) dx = 8 - x + bx;
+            else   dx =     x + bx;
+            if (v) dy = 8 - y + by;
+            else   dy =     y + by;
+
+            video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
+
             /* 记录0号精灵在屏幕上绘制的像素 */
             if (!i) sp0hit[dx%8][dy%8] = 1;
             else    _checkHit(dx, dy);
@@ -496,7 +500,7 @@ void PPU::startNewFrame() {
     ppu_ram_p  = 0x2000;
     video->clear(0);
 
-    sp0x = sp0y = -1000;
+    //sp0x = sp0y = -1000;
     memset(sp0hit, 0, sizeof(sp0hit));
     _drawSprite(0,0);
 }

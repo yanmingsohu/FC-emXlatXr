@@ -22,14 +22,14 @@
 	<File name="src\mem.h" open="0" top="0" tabpos="6">
 		<Cursor position="1397" topLine="8" />
 	</File>
-	<File name="src\mmc.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="2028" topLine="57" />
+	<File name="src\mmc.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="2028" topLine="0" />
 	</File>
 	<File name="src\mmc.h" open="0" top="0" tabpos="3">
 		<Cursor position="902" topLine="5" />
 	</File>
-	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="819" topLine="27" />
+	<File name="src\nes_sys.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="555" topLine="23" />
 	</File>
 	<File name="src\nes_sys.h" open="0" top="0" tabpos="3">
 		<Cursor position="615" topLine="6" />
@@ -38,10 +38,10 @@
 		<Cursor position="227" topLine="0" />
 	</File>
 	<File name="src\ppu.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="10411" topLine="385" />
+		<Cursor position="4243" topLine="141" />
 	</File>
-	<File name="src\ppu.h" open="1" top="0" tabpos="5">
-		<Cursor position="4929" topLine="97" />
+	<File name="src\ppu.h" open="1" top="0" tabpos="4">
+		<Cursor position="3751" topLine="141" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2236" topLine="79" />
@@ -62,13 +62,13 @@
 		<Cursor position="742" topLine="0" />
 	</File>
 	<File name="src\win\main_window.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1540" topLine="24" />
+		<Cursor position="1533" topLine="168" />
 	</File>
 	<File name="src\win\tilepanel.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="194" topLine="0" />
 	</File>
-	<File name="src\win\winsys.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="5581" topLine="153" />
+	<File name="src\win\winsys.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="5169" topLine="153" />
 	</File>
 	<File name="src\win\winsys.h" open="0" top="0" tabpos="5">
 		<Cursor position="1511" topLine="36" />

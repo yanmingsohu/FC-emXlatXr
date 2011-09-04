@@ -28,8 +28,9 @@ T_COLOR ppu_color_table[0x40] = {
 #undef H
 
 PPU::PPU(MMC *_mmc, Video *_video)
-    : addr_add(1), ppuSW(pH), w2005(wX), mmc(_mmc)
-    , video(_video), pitch_first_read(0)
+    : spWorkOffset(0), addr_add(1), ppuSW(pH), w2005(wX)
+    , mmc(_mmc), video(_video), pitch_first_read(0)
+    , spAllDisp(0), bkAllDisp(0)
 {
 }
 
@@ -160,6 +161,13 @@ byte PPU::readState(word addr) {
         w2005      = wX;
         break;
 
+    case 4: /* 0x2004 读取卡通工作内存     */
+        r = spWorkRam[spWorkOffset++];
+#ifdef SHOW_PPU_REGISTER
+        printf("PPU::读取精灵数据: %X = %x\n", spWorkOffset, r);
+#endif
+        break;
+
     case 7: /* 0x2007 读数据寄存器          */
         if (pitch_first_read) {
             pitch_first_read = 0;
@@ -167,12 +175,14 @@ byte PPU::readState(word addr) {
             r = read();
         }
         break;
+
 #ifdef SHOW_ERR_MEM_OPERATE
     default:
-        printf("PPU::无效的显存读取 %X.\n", addr);
+        printf("PPU::无效的显存读取端口号 %X.\n", addr);
         break;
 #endif
     }
+
 #ifdef SHOW_PPU_REGISTER
     printf("PPU::read:%X, return:%X\n", addr, r);
 #endif
@@ -377,39 +387,60 @@ void PPU::drawBackGround(Video *panel) {
     }
 }
 
-void PPU::drawSprite() {
+void PPU::_drawSprite(byte i, byte ctrl) {
+    if (!spAllDisp) return;
+
+    int x, y, dx, dy;
     byte paletteIdx;
 
-    for (int i=63<<2; i>=0; i-=4) { // spriteType, hit
-        byte by   = spWorkRam[i  ]+1;
-        byte tile = spWorkRam[i+1];
-        byte ctrl = spWorkRam[i+2];
-        byte bx   = spWorkRam[i+3];
+    byte by   = spWorkRam[i  ]+1;
+    byte tile = spWorkRam[i+1];
+    if (!ctrl)
+         ctrl = spWorkRam[i+2];
+    byte bx   = spWorkRam[i+3];
 
-        int dx, dy;
-        bool h = ctrl & (1<<6);
-        bool v = ctrl & (1<<7);
+    bool h = ctrl & (1<<6);
+    bool v = ctrl & (1<<7);
 
-        int y = 0, x = 0;
-        for (;;) {
-            paletteIdx = gtLBit(x+bx, y+by, tile, spRomOffset);
+    if (!i) { sp0x = bx;
+              sp0y = by; }
 
-            if (paletteIdx) {
-                paletteIdx |= ((ctrl & 0x03) << 2);
-                if (h) dx = 8-x+bx;
-                else   dx =   x+bx;
-                if (v) dy = 8-y+by;
-                else   dy =   y+by;
-                video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx] ]);
-            }
+    for (x=y=0;;) {
+        dx = x + bx;
+        dy = y + by;
+        paletteIdx = gtLBit(dx, dy, tile, spRomOffset);
 
-            if (++x >= 8) {
-                x = 0;
-                if (++y >= 8) {
-                    break;
-                }
+        if (paletteIdx) {
+            paletteIdx |= ( (ctrl & 0x03) << 2 );
+            if (h) dx = 8 - dx;
+            if (v) dy = 8 - dy; printf("_%x %x ", dx, dy);
+            video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx] ]);
+            /* 记录0号精灵在屏幕上绘制的像素 */
+            if (!i) sp0hit[dx%8][dy%8] = 1;
+            else    _checkHit(dx, dy);
+        }
+
+        if (++x >= 8) {
+            x = 0;
+            if (++y >= 8) {
+                break;
             }
         }
+    }
+}
+
+inline void PPU::_checkHit(int x, int y) {
+    if (hit) return;
+    if (x>=sp0x && x<sp0x+8 && y>=sp0y && y<sp0y+8) {
+        hit = sp0hit[x%8][y%8];
+    }
+}
+
+void PPU::drawSprite(bgPriority bp) {
+    for (int i=63<<2; i>=0; i-=4) { // spriteType
+        byte ctrl = spWorkRam[i+2];
+        if ( ((ctrl>>5) & 1)!=bp ) continue;
+        _drawSprite(i, ctrl);
     }
 }
 
@@ -445,6 +476,7 @@ void PPU::drawPixel(int X, int Y) {
         paletteIdx |= bgHBit(x, y, bgs->attribute);
         byte colorIdx = bkPalette[paletteIdx];
         video->drawPixel(X, Y, ppu_color_table[colorIdx]);
+        _checkHit(X, Y);
     }
 }
 
@@ -463,6 +495,10 @@ void PPU::startNewFrame() {
     vblankTime = 0;
     ppu_ram_p  = 0x2000;
     video->clear(0);
+
+    sp0x = sp0y = -1000;
+    memset(sp0hit, 0, sizeof(sp0hit));
+    _drawSprite(0,0);
 }
 
 void PPU::copySprite(byte *data) {

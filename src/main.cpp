@@ -20,7 +20,7 @@ int main()
     WinMain(hInstance, NULL, NULL, SW_SHOW);
 #endif
 
-//    system("pause");
+//  system("pause");
     return 0;
 }
 

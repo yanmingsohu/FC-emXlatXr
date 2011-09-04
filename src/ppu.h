@@ -120,6 +120,9 @@ private:
     byte hit;               /* 卡通碰撞                            */
     byte pitch_first_read;  /* 模拟ppu怪癖                         */
 
+    int sp0x, sp0y;         /* 记录0号卡通的位置                   */
+    byte sp0hit[8][8];      /* 用来做碰撞检测                      */
+
     MMC   *mmc;
     Video *video;
 
@@ -135,7 +138,12 @@ private:
     /* 依据x,y的位置从attr属性表中取得颜色的低两位                 */
     byte gtLBit(int x, int y, byte tileIdx, word vromOffset);
 
+    void _drawSprite(byte spriteIdx, byte);
+    void _checkHit(int x, int y);
+
 public:
+    enum bgPriority {bpFront, bpBehind};
+
     PPU(MMC *mmc, Video *video);
 
     void reset();
@@ -159,7 +167,7 @@ public:
     word getVRamPoint();
 
     /* 绘制一帧中的精灵                                            */
-    void drawSprite();
+    void drawSprite(bgPriority);
     /* 在video上绘制四个背景 512*480                               */
     void drawBackGround(Video *v);
     /* 立即绘制背景字库                                            */

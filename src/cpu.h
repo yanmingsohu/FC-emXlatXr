@@ -32,17 +32,17 @@ enum CPU_ADDRESSING_MODE {
     ADD_MODE_abX     = 0x1C, /* absX别名                */
 };
 
-/* 向命令处理函数传递参数          */
+/* 向命令处理函数传递参数 */
 struct command_parm {
 
     command_6502 *cmd;
     memory       *ram;
     cpu_6502     *cpu;
 
-    byte op;  /* 命令的代码         */
-    byte p1;  /* 第一个参数(如果有) */
-    byte p2;  /* 第二个参数(如果有) */
-    word addr;/* 当前指令的地址     */
+    byte op;                 /* 命令的代码                 */
+    byte p1;                 /* 第一个参数(如果有)         */
+    byte p2;                 /* 第二个参数(如果有)         */
+    word addr;               /* 当前指令的地址             */
 
     /* 按照内存寻址方式返回该地址的上的数据            *
      * 不同寻址类型的相同指令编码品偏移量相同(也有例外)*
@@ -133,9 +133,7 @@ public:
     void    checkNZ(byte value);/* 如果value最高位为1 则N=1,否则为0, *
                                  * 如果value==0 则Z=1,否则为0        */
     void    checkZ(byte value);
-    void    checkV(word a, byte b);
-                                /* 如果a与b的最高位不同,则v=1否则为0
-                                 * b是参与运算之前的累加器的值       */
+    void    setV(bool set);     /* set==true 则设置溢出否则清除      */
     void    clearV();
 
     void showDebug(byte show) { /* 是否在命令结束后显示相关信息      */

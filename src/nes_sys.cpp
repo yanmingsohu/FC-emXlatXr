@@ -25,6 +25,8 @@ void NesSystem::drawFrame() {
     static int cpu_cyc = 0;
 
     ppu->startNewFrame();
+    ppu->drawSprite(PPU::bpFront);
+
     int x = 0, y = 0;
     double ppu_cyc = 0, cyc = 0;
 
@@ -54,8 +56,9 @@ void NesSystem::drawFrame() {
         printf("消隐结束\n");
 #endif
     }
-    ppu->drawSprite();
+    ppu->drawSprite(PPU::bpBehind);
     ppu->oneFrameOver();
+
 #ifdef SHOW_PPU_DRAW_INFO
     printf("绘制一帧结束,垂直消隐\n");
 #endif

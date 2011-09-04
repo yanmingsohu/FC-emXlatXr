@@ -1,76 +1,76 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release" />
-	<File name="src\cpu.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="23155" topLine="929" />
+	<ActiveTarget name="debug" />
+	<File name="src\cpu.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="34" topLine="835" />
 	</File>
-	<File name="src\cpu.h" open="0" top="0" tabpos="3">
-		<Cursor position="167" topLine="99" />
+	<File name="src\cpu.h" open="0" top="0" tabpos="5">
+		<Cursor position="3686" topLine="89" />
 	</File>
-	<File name="src\debug.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="638" topLine="0" />
+	<File name="src\debug.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="2370" topLine="11" />
 	</File>
 	<File name="src\debug.h" open="0" top="0" tabpos="0">
 		<Cursor position="212" topLine="0" />
 	</File>
 	<File name="src\main.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="344" topLine="0" />
+		<Cursor position="198" topLine="0" />
 	</File>
 	<File name="src\mem.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="2046" topLine="31" />
+		<Cursor position="1423" topLine="0" />
 	</File>
 	<File name="src\mem.h" open="0" top="0" tabpos="6">
 		<Cursor position="1397" topLine="8" />
 	</File>
 	<File name="src\mmc.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="502" topLine="53" />
+		<Cursor position="2028" topLine="57" />
 	</File>
 	<File name="src\mmc.h" open="0" top="0" tabpos="3">
-		<Cursor position="1838" topLine="0" />
+		<Cursor position="902" topLine="5" />
 	</File>
-	<File name="src\nes_sys.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="812" topLine="10" />
+	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="819" topLine="27" />
 	</File>
 	<File name="src\nes_sys.h" open="0" top="0" tabpos="3">
-		<Cursor position="314" topLine="0" />
+		<Cursor position="615" topLine="6" />
 	</File>
 	<File name="src\pad.h" open="0" top="0" tabpos="3">
 		<Cursor position="227" topLine="0" />
 	</File>
-	<File name="src\ppu.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="11795" topLine="441" />
+	<File name="src\ppu.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="10411" topLine="385" />
 	</File>
-	<File name="src\ppu.h" open="1" top="0" tabpos="3">
-		<Cursor position="5005" topLine="94" />
+	<File name="src\ppu.h" open="1" top="0" tabpos="5">
+		<Cursor position="4929" topLine="97" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="1975" topLine="0" />
+		<Cursor position="2236" topLine="79" />
 	</File>
 	<File name="src\rom.h" open="0" top="0" tabpos="4">
-		<Cursor position="1057" topLine="0" />
+		<Cursor position="2352" topLine="0" />
 	</File>
 	<File name="src\type.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="825" topLine="0" />
 	</File>
 	<File name="src\type.h" open="0" top="0" tabpos="6">
-		<Cursor position="836" topLine="0" />
+		<Cursor position="52" topLine="0" />
 	</File>
 	<File name="src\video.h" open="0" top="0" tabpos="2">
 		<Cursor position="402" topLine="0" />
 	</File>
-	<File name="src\win\bgpanel.cpp" open="1" top="0" tabpos="9">
+	<File name="src\win\bgpanel.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="742" topLine="0" />
 	</File>
-	<File name="src\win\main_window.cpp" open="1" top="1" tabpos="6">
-		<Cursor position="1637" topLine="38" />
+	<File name="src\win\main_window.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="1540" topLine="24" />
 	</File>
 	<File name="src\win\tilepanel.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="492" topLine="20" />
+		<Cursor position="194" topLine="0" />
 	</File>
-	<File name="src\win\winsys.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="5536" topLine="155" />
+	<File name="src\win\winsys.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="5581" topLine="153" />
 	</File>
-	<File name="src\win\winsys.h" open="1" top="0" tabpos="5">
+	<File name="src\win\winsys.h" open="0" top="0" tabpos="5">
 		<Cursor position="1511" topLine="36" />
 	</File>
 </CodeBlocks_layout_file>

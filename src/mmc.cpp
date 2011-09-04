@@ -12,7 +12,7 @@
 dword rom_mapper_3(MapperImpl* mi, word offset) {
     if (mi->rom->rom_size==1) {
         if (offset>=0xC000)
-        return (offset-0x4000);
+            return (offset-0x4000);
     }
     return offset;
 }

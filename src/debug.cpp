@@ -59,7 +59,7 @@ static void condition_code(NesSystem *fc) { /* 实现可能不准确 */
     } else
 
     if (CPU_IS(AD, 02, 20)) {
-        printf("DBG::读取2002数据,(精灵溢出,碰撞,VBlank)\n");
+        printf("DBG::读取2002数据,(精灵溢出[20],碰撞[40],VBlank[80])\n");
     } else
 
     if (CPU_IS(AD, 07, 20)) {

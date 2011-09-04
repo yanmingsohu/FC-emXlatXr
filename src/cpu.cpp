@@ -19,13 +19,14 @@ void cpu_command_XXX(command_parm* parm) {
 }
 
 void cpu_command_NOP(command_parm* parm) {
-    /* 不干正事 */
+/* 不干正事 */
 }
 
 /* 跳跃到子过程 */
 void cpu_command_JSR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
 
+    cpu->PC--;
     cpu->push(cpu->PCH);
     cpu->push(cpu->PCL);
 
@@ -39,12 +40,14 @@ void cpu_command_RTS(command_parm* parm) {
 
     cpu->PCL = cpu->pop();
     cpu->PCH = cpu->pop();
+    cpu->PC++;
 }
 
 /* 中断 */
 void cpu_command_BRK(command_parm* parm) {
-    parm->cpu->jump(0xFFFE);
+    parm->cpu->PC++;
     SET_FLAGS(CPU_FLAGS_BREAK);
+    parm->cpu->jump(0xFFFE);
 }
 
 /* 从中断过程中返回 */
@@ -75,11 +78,7 @@ void cpu_command_ASL(command_parm* parm) {
     case 0x16:
         value = parm->read(model);
     }
-/*
-    if (parm->op==0x0A) {
-        model = ADD_MODE_acc;
-    }
-*/
+
     CARRY_WITH(0x80);
 
     value <<= 1;
@@ -187,22 +186,19 @@ void cpu_command_BIT(command_parm* parm) {
     cpu->checkZ(cpu->A & b);
 }
 
-/* a<b, n=1; z=0; c=0 *
- * a=b, n=0; z=1; c=1 *
- * a>b, n=0; z=0; c=1 */
+/* a<b, *n=1; z=0; c=0 *
+ * a=b,  n=0; z=1; c=1 *
+ * a>b, *n=0; z=0; c=1 */
 HELP_FNC void cmp_op(command_parm* parm, byte a, byte b) {
-    if (a>b) {
-        CLE_FLAGS(CPU_FLAGS_NEGATIVE | CPU_FLAGS_ZERO);
+    word c = a - b;
+
+    if (c<0x100) {
         SET_FLAGS(CPU_FLAGS_CARRY);
+    } else {
+        CLE_FLAGS(CPU_FLAGS_CARRY);
     }
-    else if (a<b) {
-        CLE_FLAGS(CPU_FLAGS_CARRY | CPU_FLAGS_ZERO);
-        SET_FLAGS(CPU_FLAGS_NEGATIVE);
-    }
-    else {
-        CLE_FLAGS(CPU_FLAGS_NEGATIVE);
-        SET_FLAGS(CPU_FLAGS_CARRY | CPU_FLAGS_ZERO);
-    }
+
+    parm->cpu->checkNZ(c);
 }
 
 void cpu_command_CMP(command_parm* parm) {
@@ -307,9 +303,9 @@ void cpu_command_JMP(command_parm* parm) {
         cpu->PCL = parm->p1;
         cpu->PCH = parm->p2;
     } else {
-        word offH = parm->p2<<8;
-        cpu->PCL = cpu->ram->read( offH |  parm->p1      );
-        cpu->PCH = cpu->ram->read( offH | (parm->p1 + 1) );
+        word offH = parm->p2<<8; /* 模拟跨页bug */
+        cpu->PCL = cpu->ram->read( offH | parm->p1           );
+        cpu->PCH = cpu->ram->read( offH | byte(parm->p1 + 1) );
     }
 }
 
@@ -379,7 +375,8 @@ void cpu_command_ADC(command_parm* parm) {
 
     cpu_6502* cpu = parm->cpu;
     cpu->clearV();
-    word result = 0;
+    word temp = 0;
+    byte b;
 
     switch (parm->op) {
     case 0x69:
@@ -390,24 +387,24 @@ void cpu_command_ADC(command_parm* parm) {
     case 0x75:
     case 0x71:
     case 0x61:
-        result = parm->read(parm->op - 0x61);
+        b = parm->read(parm->op - 0x61);
         break;
     }
 
-    result += cpu->A;
+    temp = cpu->A + b;
     if (cpu->FLAGS & CPU_FLAGS_CARRY) {
-        ++result;
+        ++temp;
     }
 
-    if (result>0xFF) {
+    if (temp>0xFF) {
         SET_FLAGS(CPU_FLAGS_CARRY);
     } else {
         CLE_FLAGS(CPU_FLAGS_CARRY);
     }
 
-    cpu->checkV(result, cpu->A);
-    cpu->checkNZ((byte)result);
-    cpu->A = (byte) result;
+    cpu->setV( !((cpu->A ^ b) & 0x80) && ((cpu->A ^ temp) & 0x80) );
+    cpu->checkNZ((byte)temp);
+    cpu->A = (byte) temp;
 }
 
 /* 减法运算 */
@@ -416,7 +413,8 @@ void cpu_command_SBC(command_parm* parm) {
 
     cpu_6502* cpu = parm->cpu;
     cpu->clearV();
-    word result = 0;
+    word temp = 0;
+    byte b;
 
     switch (parm->op) {
     case 0xE9:
@@ -427,24 +425,27 @@ void cpu_command_SBC(command_parm* parm) {
     case 0xF5:
     case 0xF1:
     case 0xE1:
-        result = parm->read(parm->op - 0xE1);
+        b = parm->read(parm->op - 0xE1);
         break;
+    default:
+        printf("SBC::error op %X.", parm->op);
     }
 
-    result = cpu->A - result;
-    if (cpu->FLAGS & CPU_FLAGS_CARRY) {
-        --result;
+    temp = cpu->A - b;
+    if (!(cpu->FLAGS & CPU_FLAGS_CARRY)) {
+        --temp;
     }
 
-    if (((signed short int)result)>=0) {
+    if (temp<0x100) {
         SET_FLAGS(CPU_FLAGS_CARRY);
     } else {
         CLE_FLAGS(CPU_FLAGS_CARRY);
     }
 
-    cpu->checkV(result, cpu->A);
-    cpu->checkNZ((byte)result);
-    cpu->A = (byte) result;
+    temp &= 0xFF;
+    cpu->checkNZ((byte)temp);
+    cpu->setV( ((cpu->A ^ temp ) & 0x80) && ((cpu->A ^ b) & 0x80) );
+    cpu->A = (byte)temp;
 }
 
 /* --X */
@@ -1024,8 +1025,8 @@ inline void cpu_6502::checkZ(byte value) {
     }
 }
 
-inline void cpu_6502::checkV(word value, byte beforeOper) {
-    if (value & beforeOper & 0x80) {
+inline void cpu_6502::setV(bool set) {
+    if ( set ) {
         FLAGS |= CPU_FLAGS_OVERFLOW;
     } else {
         FLAGS &= 0xFF ^ CPU_FLAGS_OVERFLOW;

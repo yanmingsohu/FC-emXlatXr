@@ -5,7 +5,7 @@
 #include   "../ppu.h"
 
 static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
-static WindowsVideo *tPanel;
+static Video *tPanel;
 static PPU *ppu;
 
 /* 成功返回指针失败返回NULL */
@@ -27,7 +27,7 @@ win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
     }
 
     ppu    = _ppu;
-    tPanel = new WindowsVideo(wi->hwnd, 128, 280);
+    tPanel = new DirectXVideo(wi->hwnd, 128, 280);
     return wi;
 }
 

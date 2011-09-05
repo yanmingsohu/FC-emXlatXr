@@ -25,7 +25,7 @@ void NesSystem::drawFrame() {
     static int cpu_cyc = 0;
 
     ppu->startNewFrame();
-    ppu->drawSprite(PPU::bpFront);
+    ppu->drawSprite(PPU::bpBehind);
 
     int x = 0, y = 0;
     double ppu_cyc = 0, cyc = 0;
@@ -56,7 +56,7 @@ void NesSystem::drawFrame() {
         printf("ÏûÒþ½áÊø\n");
 #endif
     }
-    ppu->drawSprite(PPU::bpBehind);
+    ppu->drawSprite(PPU::bpFront);
     ppu->oneFrameOver();
 
 #ifdef SHOW_PPU_DRAW_INFO

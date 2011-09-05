@@ -131,16 +131,16 @@ private:
     byte spAllDisp;         /* 卡通全显示                          */
 
     byte hasColor;          /* 有无色彩                            */
-    byte red;               /* 红色着色                            */
-    byte green;             /* 绿色着色                            */
-    byte blue;              /* 蓝色着色                            */
+    T_COLOR bkColor;        /* 背景颜色                            */
 
     byte spOverflow;        /* 卡通8个溢出                         */
     byte hit;               /* 卡通碰撞                            */
-    byte pitch_first_read;  /* 模拟ppu怪癖                         */
 
-    int sp0x, sp0y;         /* 记录0号卡通的位置                   */
+    int  sp0x, sp0y;        /* 记录0号卡通的位置                   */
     byte sp0hit[8][8];      /* 用来做碰撞检测                      */
+    byte readBuf;           /* PPU总是返回上一次读取的数据,在每次
+                             * 修改指针时<0x3F00则没有预读取导致bug*/
+    word tmp_addr;          /* 保存修改地址高位                    */
 
     MMC   *mmc;
     Video *video;
@@ -159,6 +159,7 @@ private:
 
     void _drawSprite(byte spriteIdx, byte);
     void _checkHit(int x, int y);
+    void _add_ppu_point();
 
 public:
     enum bgPriority {bpFront, bpBehind};

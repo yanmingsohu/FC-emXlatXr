@@ -53,7 +53,6 @@ PPU::PPU(MMC *_mmc, Video *_video)
     , w2005(wX)
     , bkAllDisp(0)
     , spAllDisp(0)
-    , pitch_first_read(1)
     , mmc(_mmc)
     , video(_video)
 {
@@ -61,6 +60,7 @@ PPU::PPU(MMC *_mmc, Video *_video)
 }
 
 void PPU::controlWrite(word addr, byte data) {
+
     switch (addr % 0x08) {
 
     case 0: /* 0x2000                      */
@@ -88,7 +88,7 @@ void PPU::controlWrite(word addr, byte data) {
         spWorkRam[spWorkOffset++] = data;
         break;
 
-    case 5: /* 0x2005 设置窗口坐标         */
+    case 5: /* 0x2005 设置窗口坐标 */
         if (w2005==wX) {
             winX = (0x100 & winX) | data;
             w2005 = wY;
@@ -104,17 +104,21 @@ void PPU::controlWrite(word addr, byte data) {
         }
         break;
 
-    case 6: /* 0x2006 PPU地址指针           */
+    case 6: /* 0x2006 PPU地址指针 */
         if (ppuSW==pH) {
-            ppu_ram_p = (ppu_ram_p & 0x00FF) | (data<<8);
-            //ppu_ram_p %= 0x4000;
+            /* 没有完整写入高低字节不能改变PPU指针 */
+            tmp_addr = data;
             ppuSW = pL;
         } else {
-            ppu_ram_p = (ppu_ram_p & 0xFF00) | data;
+            ppu_ram_p = (tmp_addr<<8) | data;
             ppuSW = pH;
+
+            /* 全部写入地址才有效, 模拟PPU怪癖 */
+            if (ppu_ram_p >= 0x3F00) {
+                readBuf = read();
+                ppu_ram_p -= addr_add;
+            }
         }
-        /* 模拟PPU怪癖 */
-        pitch_first_read = ppu_ram_p < 0x4000;
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
 #endif
@@ -161,9 +165,16 @@ inline void PPU::control_2001(byte data) {
     spleftCol   = _BIT(2) ? 1 : 0;
     bkAllDisp   = _BIT(3) ? 1 : 0;
     spAllDisp   = _BIT(4) ? 1 : 0;
-    red         = _BIT(5) ? 1 : 0;
-    green       = _BIT(6) ? 1 : 0;
-    blue        = _BIT(7) ? 1 : 0;
+
+    if (_BIT(5)) {
+        bkColor = ppu_color_table[0x02];
+    } else if (_BIT(6)) {
+        bkColor = ppu_color_table[0x2A];
+    } else if (_BIT(7)) {
+        bkColor = ppu_color_table[0x17];
+    } else {
+        bkColor = 0;
+    }
 }
 
 #undef _BIT
@@ -194,12 +205,9 @@ byte PPU::readState(word addr) {
 #endif
         break;
 
-    case 7: /* 0x2007 读数据寄存器 */
-        if (pitch_first_read) {
-            pitch_first_read = 0;
-        } else {
-            r = read();
-        }
+    case 7:
+        r = readBuf;
+        readBuf = read();
         break;
 
 #ifdef SHOW_ERR_MEM_OPERATE
@@ -253,14 +261,14 @@ inline byte PPU::read() {
         }
     }
 
-    ppu_ram_p += addr_add;
+    _add_ppu_point();
     return res;
 }
 
 inline void PPU::write(byte data) {
     if (ppu_ram_p<0x2000) {
 #ifdef SHOW_ERR_MEM_OPERATE
-       printf("PPU::can't write VROM $%04x=%02x.\n", ppu_ram_p, data);
+        printf("PPU::can't write VROM $%04x=%02x.\n", ppu_ram_p, data);
 #endif
         return;
     } else
@@ -279,7 +287,7 @@ inline void PPU::write(byte data) {
         }
     }
 
-    ppu_ram_p += addr_add;
+    _add_ppu_point();
 }
 
 void PPU::switchMirror(byte type) {
@@ -525,9 +533,8 @@ void PPU::oneFrameOver() {
 void PPU::startNewFrame() {
     vblankTime = 0;
     ppu_ram_p  = 0x2000;
-    video->clear(0);
+    video->clear(bkColor);
 
-    //sp0x = sp0y = -1000;
     memset(sp0hit, 0, sizeof(sp0hit));
     _drawSprite(0,0);
 }
@@ -543,4 +550,10 @@ void PPU::getWindowPos(int *x, int *y) {
 
 word PPU::getVRamPoint() {
     return ppu_ram_p;
+}
+
+inline void PPU::_add_ppu_point() {
+    ppu_ram_p += addr_add;
+    if (ppu_ram_p>0x3FFF)
+        ppu_ram_p = 0;
 }

@@ -4,6 +4,7 @@ webServer.layout
 config/*.*
 bin/*
 obj/*
+rom/*
 
 *.dll
 *.db

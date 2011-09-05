@@ -110,7 +110,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     HDC hdc = GetDC(hwnd);
     int x = 270;
 	int y = 0;
-	int xIn = 70;
+	//int xIn = 70;
 	int yIn = 18;
 	char buf[128];
 
@@ -141,9 +141,9 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     }
 }
 
-#define MENU_FILE   1
-#define MENU_SHOW   2
-#define MENU_DEBUG  3
+static const int MENU_FILE   = 1;
+static const int MENU_SHOW   = 2;
+static const int MENU_DEBUG  = 3;
 
 /*  This function is called by the Windows function DispatchMessage()  */
 

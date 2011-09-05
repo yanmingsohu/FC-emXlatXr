@@ -1,3 +1,22 @@
+/*----------------------------------------------------------------------------*|
+|*                                                                            *|
+|* FC 模拟器 (Famicom是Nintendo公司在1983年7月15日于日本发售的8位游戏机)      *|
+|*                                                                            *|
+|* $ C++语言的第一个项目,就用它练手吧                                         *|
+|* $ 猫饭写作, 如引用本程序代码需注明出处                                     *|
+|* $ 作者对使用本程序造成的后果不负任何责任                                   *|
+|* $ 亦不会对代码的工作原理做进一步解释,如有重大问题请拨打119 & 911           *|
+|*                                                                            *|
+|* > 使用 [Code::Block 10.05] 开发环境                                        *|
+|* > 编译器使用 [MinGW 3.81] [gcc 4.4.1]                                      *|
+|* > 参考了来自 [http://nesdev.parodius.com] 网站的资料                       *|
+|* > 感谢 [Flubba] 设计的测试程序, 有了它开发效率成指数提升                   *|
+|*                                                                            *|
+|* ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ | CatfoOD |^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ *|
+|*                                           | yanming-sohu@sohu.com          *|
+|* [ TXT CHARSET WINDOWS-936 / GBK ]         | https://github.com/yanmingsohu *|
+|*                                           | qQ:412475540                   *|
+|*----------------------------------------------------------------------------*/
 #include "ppu.h"
 #include <stdio.h>
 #include <string.h>
@@ -28,9 +47,15 @@ T_COLOR ppu_color_table[0x40] = {
 #undef H
 
 PPU::PPU(MMC *_mmc, Video *_video)
-    : spWorkOffset(0), addr_add(1), ppuSW(pH), w2005(wX)
-    , mmc(_mmc), video(_video), pitch_first_read(1)
-    , spAllDisp(0), bkAllDisp(0)
+    : spWorkOffset(0)
+    , addr_add(1)
+    , ppuSW(pH)
+    , w2005(wX)
+    , bkAllDisp(0)
+    , spAllDisp(0)
+    , pitch_first_read(1)
+    , mmc(_mmc)
+    , video(_video)
 {
     memset(spWorkRam, 0, sizeof(spWorkRam));
 }
@@ -148,7 +173,7 @@ byte PPU::readState(word addr) {
 
     switch (addr % 0x08) {
 
-    case 2: /* 0x2002                       */
+    case 2: /* 0x2002 */
         r = 0;
         if (preheating) {
             preheating >>= 1;
@@ -162,14 +187,14 @@ byte PPU::readState(word addr) {
         w2005      = wX;
         break;
 
-    case 4: /* 0x2004 读取卡通工作内存     */
+    case 4: /* 0x2004 读取卡通工作内存 */
         r = spWorkRam[spWorkOffset++];
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::读取精灵数据: %X = %x\n", spWorkOffset, r);
 #endif
         break;
 
-    case 7: /* 0x2007 读数据寄存器          */
+    case 7: /* 0x2007 读数据寄存器 */
         if (pitch_first_read) {
             pitch_first_read = 0;
         } else {
@@ -449,6 +474,8 @@ void PPU::drawSprite(bgPriority bp) {
 }
 
 void PPU::drawPixel(int X, int Y) {
+    if (!bkAllDisp) return;
+
     int x = (winX + X) % 512;
     int y = (winY + Y) % 480;
     BackGround *bgs;

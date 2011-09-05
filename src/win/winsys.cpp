@@ -59,7 +59,7 @@ int createWindow(win_info* wi) {
 /****|WindowsVideo|************************************************************/
 
 WindowsVideo::WindowsVideo(HWND hwnd) {
-    WindowsVideo(NULL, PPU_DISPLAY_P_WIDTH, PPU_DISPLAY_P_HEIGHT);
+    WindowsVideo(hwnd, PPU_DISPLAY_P_WIDTH, PPU_DISPLAY_P_HEIGHT);
 }
 
 WindowsVideo::WindowsVideo(HWND hwnd, int w, int h)
@@ -202,19 +202,20 @@ DirectXVideo::~DirectXVideo() {
         lpDD4 = NULL;
     }
     delete [] pixel;
+    pixel = NULL;
 }
 
 /****|WinPad|******************************************************************/
 
 WinPad::WinPad() {
-    p1_key_map[FC_PAD_BU_A     ] = K_J;
-    p1_key_map[FC_PAD_BU_B     ] = K_K;
-    p1_key_map[FC_PAD_BU_START ] = K_H;
-    p1_key_map[FC_PAD_BU_SELECT] = K_F;
-    p1_key_map[FC_PAD_BU_UP    ] = K_W;
-    p1_key_map[FC_PAD_BU_DOWN  ] = K_S;
-    p1_key_map[FC_PAD_BU_LEFT  ] = K_A;
-    p1_key_map[FC_PAD_BU_RIGHT ] = K_D;
+    p1_key_map[ FC_PAD_BU_A      ] = K_J;
+    p1_key_map[ FC_PAD_BU_B      ] = K_K;
+    p1_key_map[ FC_PAD_BU_START  ] = K_H;
+    p1_key_map[ FC_PAD_BU_SELECT ] = K_F;
+    p1_key_map[ FC_PAD_BU_UP     ] = K_W;
+    p1_key_map[ FC_PAD_BU_DOWN   ] = K_S;
+    p1_key_map[ FC_PAD_BU_LEFT   ] = K_A;
+    p1_key_map[ FC_PAD_BU_RIGHT  ] = K_D;
 }
 
 byte WinPad::keyPushed(FC_PAD_KEY key, byte id) {

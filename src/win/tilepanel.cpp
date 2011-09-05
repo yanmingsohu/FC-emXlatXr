@@ -15,8 +15,8 @@ win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
 
     wi->procedure   = WindowProcedure;
     wi->hInstance   = hThisInstance;
-    wi->szClassName = "title panel";
-    wi->titleName   = "×Ö¿â";
+    wi->szClassName = _CSTR("title panel");
+    wi->titleName   = _CSTR("×Ö¿â");
     wi->height      = 300;
     wi->width       = 150;
     wi->nCmdShow    = 0;
@@ -28,6 +28,7 @@ win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
 
     ppu    = _ppu;
     tPanel = new DirectXVideo(wi->hwnd, 128, 280);
+    UpdateWindow(wi->hwnd);
     return wi;
 }
 

@@ -15,8 +15,8 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
 
     wi->procedure   = WindowProcedure;
     wi->hInstance   = hThisInstance;
-    wi->szClassName = "bg panel";
-    wi->titleName   = "±³¾°";
+    wi->szClassName = _CSTR("bg panel");
+    wi->titleName   = _CSTR("±³¾°");
     wi->height      = 480 + 50;
     wi->width       = 512 + 10;
     wi->nCmdShow    = 0;
@@ -28,6 +28,7 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
 
     ppu     = _ppu;
     bgPanel = new DirectXVideo(wi->hwnd, 512, 480);
+    UpdateWindow(wi->hwnd);
     return wi;
 }
 

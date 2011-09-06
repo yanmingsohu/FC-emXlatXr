@@ -57,6 +57,7 @@ struct command_parm {
     command_6502 *cmd;
     memory       *ram;
     cpu_6502     *cpu;
+    int          mem_time;   /* 寻址附加时间,不会自动复位  */
 
     byte op;                 /* 命令的代码                 */
     byte p1;                 /* 第一个参数(如果有)         */
@@ -83,7 +84,7 @@ struct command_parm {
     word  zpgY  ();
     word  $zpg$Y();
     word  $zpgX$();
-    word  $$$   (byte x, byte y);
+    word  $$$   (byte x);
 };
 
 struct cpu_6502 {

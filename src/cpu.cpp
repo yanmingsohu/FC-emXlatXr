@@ -22,6 +22,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#define NOT_MEM_TIME  parm->mem_time = 0 /* 不需要另加寻址时间 */
 #define SET_FLAGS(x) (parm->cpu->FLAGS |= (x))
 #define CLE_FLAGS(x) (parm->cpu->FLAGS &= 0xFF ^ (x))
 
@@ -104,6 +105,7 @@ void cpu_command_ASL(command_parm* parm) {
 
     cpu->checkNZ(value);
     parm->write(model, value);
+    NOT_MEM_TIME;
 }
 
 /* 右移0补位 */
@@ -129,6 +131,7 @@ void cpu_command_LSR(command_parm* parm) {
     CLE_FLAGS(CPU_FLAGS_NEGATIVE);
     cpu->checkZ(value);
     parm->write(model, value);
+    NOT_MEM_TIME;
 }
 
 /* 左移循环补位 */
@@ -156,6 +159,7 @@ void cpu_command_ROL(command_parm* parm) {
 
     cpu->checkNZ(value);
     parm->write(model, value);
+    NOT_MEM_TIME;
 }
 
 /* 右移循环补位 */
@@ -183,6 +187,7 @@ void cpu_command_ROR(command_parm* parm) {
 
     cpu->checkNZ(value);
     parm->write(model, value);
+    NOT_MEM_TIME;
 }
 
 #undef CARRY_WITH
@@ -328,7 +333,8 @@ void cpu_command_JMP(command_parm* parm) {
     }
 }
 
-#define JUMP_CODE  parm->cpu->PC += ((signed char)parm->p1)
+#define JUMP_CODE  parm->cpu->PC += ((signed char)parm->p1); \
+                   parm->mem_time = 1
 
 /* 条件跳转 C==0 */
 void cpu_command_BCC(command_parm* parm) {
@@ -508,6 +514,7 @@ void cpu_command_DEC(command_parm* parm) {
         ram->write(addr, value);
         parm->cpu->checkNZ(value);
     }
+    NOT_MEM_TIME;
 }
 
 /* ++内存 */
@@ -523,6 +530,7 @@ void cpu_command_INC(command_parm* parm) {
         ram->write(addr, value);
         parm->cpu->checkNZ(value);
     }
+    NOT_MEM_TIME;
 }
 
 /* 把A寄存器存入内存 */
@@ -537,6 +545,7 @@ void cpu_command_STA(command_parm* parm) {
     case 0x81:
         parm->write(parm->op - 0x81, parm->cpu->A);
     }
+    NOT_MEM_TIME;
 }
 
 /* 把Y寄存器存入内存 */
@@ -720,6 +729,7 @@ void cpu_command_CLV(command_parm* parm) {
 
 #undef SET_FLAGS
 #undef CLE_FLAGS
+#undef NOT_MEM_TIME
 
 /****************************************************************************/
 
@@ -742,7 +752,7 @@ command_6502 command_list_6502[] = {
     N                   N                   O(ORA, 4, 2, zpX)
     O(ASL, 6, 2, zpX)   N                   O(CLC, 2, 1, not)
     O(ORA, 4, 3, abY)   N                   N
-    N                   O(ORA, 4, 3, abX)   O(ASL, 6, 3, abX)
+    N                   O(ORA, 4, 3, abX)   O(ASL, 7, 3, abX)
     N
 /* --------------------------------------| 0x20 - 0x2F |--- */
     O(JSR, 6 ,3, rel)   O(AND, 6, 2, inY)   N
@@ -853,12 +863,45 @@ command_6502 command_list_6502[] = {
 
 /****************************************************************************/
 
+byte cpu_6502::process() {
+    byte cpu_cyc = reset();
+
+    prev_parm.op = ram->readPro(PC);
+    command_6502 *opp = &command_list_6502[prev_parm.op];
+
+    switch (opp->len) {
+    case 3:
+        prev_parm.p2 = ram->readPro(PC+2);
+    case 2:
+        prev_parm.p1 = ram->readPro(PC+1);
+    }
+
+    prev_parm.cmd = opp;
+    prev_parm.addr = PC;
+    PC += opp->len;
+
+#ifdef SHOW_CPU_OPERATE
+    if (m_showDebug) printf(cmdInfo());
+#endif
+
+    prev_parm.mem_time = 0;
+    opp->op_func(&prev_parm);
+
+    cpu_cyc += opp->time;
+    cpu_cyc += prev_parm.mem_time;
+    cpu_cyc += nmi();
+    cpu_cyc += irq();
+
+    return cpu_cyc;
+}
+
 cpu_6502::cpu_6502(memory* ram)
         : NMI_idle(1), m_showDebug(0)
         , NMI(0), IRQ(0), RES(1), ram(ram)
 {
     prev_parm.cpu = this;
     prev_parm.ram = ram;
+    prev_parm.mem_time = 0;
 }
 
 char* cpu_6502::debug() {
@@ -929,35 +972,6 @@ char* cpu_6502::cmdInfo() {
                  prev_parm.op, cmd->name, prev_parm.p1, prev_parm.p2);
 
     return buf;
-}
-
-byte cpu_6502::process() {
-    byte cpu_cyc = reset();
-
-    prev_parm.op = ram->readPro(PC);
-    command_6502 *opp = &command_list_6502[prev_parm.op];
-
-    switch (opp->len) {
-    case 3:
-        prev_parm.p2 = ram->readPro(PC+2);
-    case 2:
-        prev_parm.p1 = ram->readPro(PC+1);
-    }
-
-    prev_parm.cmd = opp;
-    prev_parm.addr = PC;
-    PC += opp->len;
-
-#ifdef SHOW_CPU_OPERATE
-    if (m_showDebug) printf(cmdInfo());
-#endif
-    opp->op_func(&prev_parm);
-
-    cpu_cyc += nmi();
-    cpu_cyc += irq();
-    cpu_cyc += opp->time;
-
-    return cpu_cyc;
 }
 
 byte cpu_6502::reset() {
@@ -1063,11 +1077,19 @@ inline word command_parm::abs() {
 }
 
 inline word command_parm::absX() {
-    return abs() + cpu->X;
+    word base = abs();
+    word hi = base & 0xFF00;
+    base += cpu->X;
+    if ( (0xFF00 & base) ^ hi ) mem_time = 1;
+    return base;
 }
 
 inline word command_parm::absY() {
-    return abs() + cpu->Y;
+    word base = abs();
+    word hi = base & 0xFF00;
+    base += cpu->Y;
+    if ( (0xFF00 & base) ^ hi ) mem_time = 1;
+    return base;
 }
 
 inline word command_parm::zpg() {
@@ -1083,18 +1105,22 @@ inline word command_parm::zpgY() {
 }
 
 inline word command_parm::$zpg$Y() {
-    return $$$(0, cpu->Y);
+    word base = $$$(0);
+    word hi = base & 0xFF00;
+    base += cpu->Y;
+    if ( (0xFF00 & base) ^ hi ) mem_time = 1;
+    return base;
 }
 
 inline word command_parm::$zpgX$() {
-    return $$$(cpu->X, 0);
+    return $$$(cpu->X);
 }
 
-inline word command_parm::$$$(byte x, byte y) {
+inline word command_parm::$$$(byte x) {
     word offset = (p1 + x) & 0x00FF;
     byte l = ram->read( offset   );
     byte h = ram->read( offset+1 );
-    return (h<<8 | l) + y;
+    return (h<<8 | l);
 }
 
 inline byte command_parm::read(const byte addressing_mode) {

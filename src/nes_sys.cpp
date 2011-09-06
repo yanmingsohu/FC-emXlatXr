@@ -81,6 +81,7 @@ void NesSystem::drawFrame() {
 #ifdef SHOW_PPU_DRAW_INFO
     printf("绘制一帧结束,垂直消隐\n");
 #endif
+
     /* 垂直消隐周期 */
     while (cpu_cyc<P_VBLANK_CPU_CYC) {
         cpu_cyc += cpu->process();

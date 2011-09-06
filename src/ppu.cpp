@@ -93,13 +93,13 @@ void PPU::controlWrite(word addr, byte data) {
             winX = (0x100 & winX) | data;
             w2005 = wY;
 #ifdef SHOW_PPU_REGISTER
-        printf("PPU::窗口坐标...");
+            printf("PPU::窗口坐标...");
 #endif
         } else {
             winY = (0x100 & winY) | data;
             w2005 = wX;
 #ifdef SHOW_PPU_REGISTER
-        printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
+            printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
 #endif
         }
         break;
@@ -554,6 +554,7 @@ word PPU::getVRamPoint() {
 
 inline void PPU::_add_ppu_point() {
     ppu_ram_p += addr_add;
+
     if (ppu_ram_p>0x3FFF)
-        ppu_ram_p = 0;
+        ppu_ram_p -= 0x4000;
 }

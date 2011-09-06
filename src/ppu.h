@@ -45,6 +45,7 @@
                                          /* Ã¿ÏñËØÖÜÆÚ            */
 #define P_PIXEL_CPU_CYC       \
             ( P_HLINE_CPU_CYC / PPU_DISPLAY_P_WIDTH )
+#define P_END_CYC             2
 /*----------------------------------------------------------------*/
 
 struct BackGround {

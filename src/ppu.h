@@ -125,6 +125,7 @@ private:
     byte sendNMI;           /* 是否在刷新一帧后发送NMI             */
     byte preheating;        /* PPU预热期为3                        */
     byte vblankTime;        /* 如果处于垂直消隐时期则为1           */
+    byte skipWrite;         /* 忽略写操作为1                       */
 
     byte bkleftCol;         /* 背景显示左一列                      */
     byte spleftCol;         /* 卡通显示左一列                      */
@@ -180,7 +181,7 @@ public:
     void oneFrameOver();
     /* 当开始绘制一幅新的帧时,该方法被调用                         */
     void startNewFrame();
-    /* 复制256字节的数据到精灵Ram                                  */
+    /* 复制256字节的数据到精灵Ram,需要512个CPU周期                 */
     void copySprite(byte *data);
     /* 取得窗口坐标                                                */
     void getWindowPos(int *x, int *y);

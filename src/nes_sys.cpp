@@ -43,6 +43,16 @@ NesSystem::~NesSystem() {
 void NesSystem::drawFrame() {
     static int cpu_cyc = 0;
 
+#ifdef SHOW_PPU_DRAW_INFO
+    printf("一帧开始,n帧的隐藏绘制\n");
+#endif
+    ppu->oneFrameOver();
+    /* 先绘制20帧(有待验证) */
+    while (cpu_cyc<P_HLINE_CPU_CYC*30) {
+        cpu_cyc += cpu->process();
+    }
+    cpu_cyc -= P_HLINE_CPU_CYC*30;
+
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
 
@@ -76,19 +86,9 @@ void NesSystem::drawFrame() {
 #endif
     }
     ppu->drawSprite(PPU::bpFront);
-    ppu->oneFrameOver();
 
 #ifdef SHOW_PPU_DRAW_INFO
-    printf("绘制一帧结束,垂直消隐\n");
-#endif
-
-    /* 垂直消隐周期 */
-    while (cpu_cyc<P_VBLANK_CPU_CYC) {
-        cpu_cyc += cpu->process();
-    }
-    cpu_cyc -= P_VBLANK_CPU_CYC;
-#ifdef SHOW_PPU_DRAW_INFO
-    printf("drawFrame 返回\n");
+    printf("绘制一帧结束\n");
 #endif
 }
 

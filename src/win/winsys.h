@@ -118,7 +118,7 @@ private:
     static const byte K_F = 0x46;
     static const byte K_H = 0x48;
     static const byte K_J = 0x4A;
-    static const byte K_K = 0x48;
+    static const byte K_K = 0x4B;
 
     byte p1_key_map[8];
 

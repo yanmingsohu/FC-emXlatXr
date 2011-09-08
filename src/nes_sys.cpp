@@ -40,6 +40,9 @@ NesSystem::~NesSystem() {
     delete pad;
 }
 
+#define START_FRAME (N_HLINE_CPU_CYC + N_HBLANK_CPU_CYC) \
+                   *(N_VLINE_COUNT - PPU_DISPLAY_N_HEIGHT)
+
 void NesSystem::drawFrame() {
     static int cpu_cyc = 0;
 
@@ -48,10 +51,10 @@ void NesSystem::drawFrame() {
 #endif
     ppu->oneFrameOver();
     /* 先绘制20帧(有待验证) */
-    while (cpu_cyc<P_HLINE_CPU_CYC*30) {
+    while (cpu_cyc < START_FRAME) {
         cpu_cyc += cpu->process();
     }
-    cpu_cyc -= P_HLINE_CPU_CYC*30;
+    cpu_cyc -= START_FRAME;
 
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
@@ -59,28 +62,29 @@ void NesSystem::drawFrame() {
     int x = 0, y = 0;
     double ppu_cyc = 0, cyc = 0;
 
-    while (y<PPU_DISPLAY_P_HEIGHT) {
+    while (y<PPU_DISPLAY_N_HEIGHT) {
         /* 绘制一行 */
-        while (cpu_cyc<P_HLINE_CPU_CYC) {
+        while (cpu_cyc<N_HLINE_CPU_CYC) {
             cyc = cpu->process();
             cpu_cyc += cyc;
             ppu_cyc += cyc;
 
-            while (ppu_cyc>=P_PIXEL_CPU_CYC) {
+            while (ppu_cyc>=N_PIXEL_CPU_CYC) {
                 ppu->drawPixel(x++, y);
-                ppu_cyc -= P_PIXEL_CPU_CYC;
+                ppu_cyc -= N_PIXEL_CPU_CYC;
             }
         }
-        cpu_cyc -= P_HLINE_CPU_CYC;
+        cpu_cyc -= N_HLINE_CPU_CYC;
         x = 0; y++;
 #ifdef SHOW_PPU_DRAW_INFO
         printf("一行完成,水平消隐 %X,%X,,", x, y);
 #endif
+
         /* 水平消隐周期 */
-        while (cpu_cyc<P_HBLANK_CPU_CYC) {
+        while (cpu_cyc<N_HBLANK_CPU_CYC) {
             cpu_cyc += cpu->process();
         }
-        cpu_cyc -= P_HBLANK_CPU_CYC;
+        cpu_cyc -= N_HBLANK_CPU_CYC;
 #ifdef SHOW_PPU_DRAW_INFO
         printf("消隐结束\n");
 #endif

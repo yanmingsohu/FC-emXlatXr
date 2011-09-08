@@ -27,25 +27,38 @@
 #define PPU_DISPLAY_P_HEIGHT     240
 
 #define PPU_DISPLAY_N_WIDTH      256
-#define PPU_DISPLAY_N_HEIGHT     224
+#define PPU_DISPLAY_N_HEIGHT     240
 
-#define PPU_VMIRROR_VERTICAL    0x01
-#define PPU_VMIRROR_HORIZONTAL  0x00
-#define PPU_VMIRROR_SINGLE      0x03
-#define PPU_VMIRROR_4_LAYOUT    0x08
+#define PPU_VMIRROR_VERTICAL     0x01
+#define PPU_VMIRROR_HORIZONTAL   0x00
+#define PPU_VMIRROR_SINGLE       0x03
+#define PPU_VMIRROR_4_LAYOUT     0x08
 
+#define TO_CPU_CC(x)             (x/12.0)
 /*---------------------------------------| PAL Info |-------------*/
-#define P_VLINE_COUNT          312       /* 每帧扫描线            */
-#define P_HLINE_CPU_CYC      (1024/12.0) /* 每行绘制周期          */
-#define P_HBLANK_CPU_CYC      (338/12.0) /* 每行水平消隐周期      */
-#define P_VBLANK_CPU_CYC      (683/12.0) /* 垂直消隐周期          */
-                                         /* 每帧周期              */
+#define P_VLINE_COUNT                312   /* 每帧扫描线          */
+#define P_HLINE_CPU_CYC    TO_CPU_CC(1024) /* 每行绘制周期        */
+#define P_HBLANK_CPU_CYC   TO_CPU_CC(338 ) /* 每行水平消隐周期    */
+#define P_VBLANK_CPU_CYC   TO_CPU_CC(683 ) /* 垂直消隐周期        */
+                                           /* 每帧周期            */
 #define P_FRAME_CPU_CYC       \
-            ( (P_HLINE_CPU_CYC+P_HBLANK_CPU_CYC) * P_VLINE_COUNT )
-                                         /* 每像素周期            */
+            ( (P_HLINE_CPU_CYC + P_HBLANK_CPU_CYC) * P_VLINE_COUNT )
+                                           /* 每像素周期          */
 #define P_PIXEL_CPU_CYC       \
             ( P_HLINE_CPU_CYC / PPU_DISPLAY_P_WIDTH )
 #define P_END_CYC             2
+/*---------------------------------------| NTSC Info |------------*/
+#define N_VLINE_COUNT                262   /* 每帧扫描线          */
+#define N_HLINE_CPU_CYC    TO_CPU_CC(1024) /* 每行绘制周期        */
+#define N_HBLANK_CPU_CYC   TO_CPU_CC(340 ) /* 每行水平消隐周期    */
+#define N_VBLANK_CPU_CYC   TO_CPU_CC(0   ) /* 垂直消隐周期        */
+                                           /* 每帧周期            */
+#define N_FRAME_CPU_CYC       \
+            ( (N_HLINE_CPU_CYC + N_HBLANK_CPU_CYC) * N_VLINE_COUNT )
+                                           /* 每像素周期          */
+#define N_PIXEL_CPU_CYC       \
+            ( N_HLINE_CPU_CYC / PPU_DISPLAY_P_WIDTH )
+#define N_END_CYC             4
 /*----------------------------------------------------------------*/
 
 struct BackGround {

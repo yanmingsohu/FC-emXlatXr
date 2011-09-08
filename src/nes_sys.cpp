@@ -40,6 +40,10 @@ NesSystem::~NesSystem() {
     delete pad;
 }
 
+void NesSystem::drawFrame2() {
+
+}
+
 void NesSystem::drawFrame() {
     static int cpu_cyc = 0;
 

@@ -1148,15 +1148,15 @@ inline void command_parm::write(const byte addressing_mode, byte value) {
         cpu->A = value;
         return;
     }
-#ifdef SHOW_CPU_MEMORY_ADDRESSING
     word addr = getAddr(addressing_mode);
+    if (addr==0x4014) {
+        mem_time = 512;
+    }
+#if defined SHOW_CPU_MEMORY_ADDRESSING
     cpu->isShowDebug()
         && printf("CPU::write address:%04X value:%X\n", addr, value);
+#endif
     cpu->ram->write(addr, value);
-#endif
-#ifndef SHOW_CPU_MEMORY_ADDRESSING
-    cpu->ram->write(getAddr(addressing_mode), value);
-#endif
 }
 
 inline word command_parm::getAddr(const byte addressing_mode) {

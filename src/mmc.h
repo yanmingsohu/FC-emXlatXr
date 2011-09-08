@@ -32,6 +32,8 @@ typedef void  (*SWITCH_PAGE)(MapperImpl*, word off, byte value);
 typedef dword (*ROM_READER )(MapperImpl*, word off);
 /* 与ROM_READER类似 off=(0x0-0x1FFF)                       */
 typedef dword (*VROM_READER)(MapperImpl*, word off);
+/* 初始化,cpu复位时需要执行                                */
+typedef void  (*MMC_RESET)(MapperImpl*);
 
 
 struct MapperImpl {
@@ -41,6 +43,8 @@ struct MapperImpl {
     ROM_READER      r_prom;
     /* 读取显存ROM,暂时为空(未实现)   */
     VROM_READER     r_vrom;
+
+    MMC_RESET       reset;
 
     const nes_file* rom;
     /* 当前程序页号                   */

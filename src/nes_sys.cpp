@@ -40,64 +40,64 @@ NesSystem::~NesSystem() {
     delete pad;
 }
 
-void NesSystem::drawFrame2() {
-
-}
-
-#define START_FRAME (N_HLINE_CPU_CYC + N_HBLANK_CPU_CYC) \
-                   *(N_VLINE_COUNT - PPU_DISPLAY_N_HEIGHT)
+/* 所有时钟都是基于cpu*3或ppu/4 */
+#define MID_CYC(x)       (x/4)
+#define ONE_LINE_CYC     1364
+#define START_CYC        MID_CYC(ONE_LINE_CYC*21)
+#define END_CYC          MID_CYC(ONE_LINE_CYC)
+#define HBLANK_CYC       MID_CYC(340)
 
 void NesSystem::drawFrame() {
-    static int cpu_cyc = 0;
+    static int _cyc = 0;
+    int _t_cyc = 0;
 
-#ifdef SHOW_PPU_DRAW_INFO
-    printf("一帧开始,n帧的隐藏绘制\n");
-#endif
     ppu->oneFrameOver();
-    /* 先绘制20帧(有待验证) */
-    while (cpu_cyc < START_FRAME) {
-        cpu_cyc += cpu->process();
+    while (_cyc < START_CYC) {
+        _cyc += cpu->process() * 3;
     }
-    cpu_cyc -= START_FRAME;
+    _cyc -= START_CYC;
+    _t_cyc += START_CYC;
 
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
 
-    int x = 0, y = 0;
-    double ppu_cyc = 0, cyc = 0;
+    int x=0, y=0;
 
-    while (y<PPU_DISPLAY_N_HEIGHT) {
+    while (y<240) {
         /* 绘制一行 */
-        while (cpu_cyc<N_HLINE_CPU_CYC) {
-            cyc = cpu->process();
-            cpu_cyc += cyc;
-            ppu_cyc += cyc;
+        for (;;) {
+            _t_cyc++;
+            ppu->drawPixel(x++, y);
+            if (x>=256) {
+                break;
+            }
 
-            while (ppu_cyc>=N_PIXEL_CPU_CYC) {
-                ppu->drawPixel(x++, y);
-                ppu_cyc -= N_PIXEL_CPU_CYC;
+            if (_cyc<=0) {
+                _cyc += cpu->process() * 3;
+            } else {
+                _cyc--;
             }
         }
-        cpu_cyc -= N_HLINE_CPU_CYC;
+
         x = 0; y++;
-#ifdef SHOW_PPU_DRAW_INFO
-        printf("一行完成,水平消隐 %X,%X,,", x, y);
-#endif
 
         /* 水平消隐周期 */
-        while (cpu_cyc<N_HBLANK_CPU_CYC) {
-            cpu_cyc += cpu->process();
+        while (_cyc < HBLANK_CYC) {
+            _cyc += cpu->process() * 3;
         }
-        cpu_cyc -= N_HBLANK_CPU_CYC;
-#ifdef SHOW_PPU_DRAW_INFO
-        printf("消隐结束\n");
-#endif
+        _cyc -= HBLANK_CYC;
+        _t_cyc += HBLANK_CYC;
     }
+
     ppu->drawSprite(PPU::bpFront);
 
-#ifdef SHOW_PPU_DRAW_INFO
-    printf("绘制一帧结束\n");
-#endif
+    while (_cyc < END_CYC) {
+        _cyc += cpu->process() * 3;
+    }
+    _cyc -= END_CYC;
+    _t_cyc += END_CYC;
+
+    //printf("used time %d, %f\n", _t_cyc*4, 21477270/59.94);
 }
 
 int NesSystem::load_rom(string filename) {

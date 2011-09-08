@@ -52,7 +52,6 @@ public:
 
     /* 绘制一帧 */
     void drawFrame();
-    void drawFrame2();
 
     /* 开始cpu单步执行,同时需要打开编译开关 */
     void debug();

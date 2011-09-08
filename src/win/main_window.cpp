@@ -50,7 +50,8 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "rom/F-1.nes"
 //#define ROM "rom/dkk.nes"
 //#define ROM "rom/fighter_f8000.nes"
-#define ROM "rom/NEStress.nes"
+//#define ROM "rom/NEStress.nes"
+#define ROM "H:\\VROMS\\FC_ROMS\\°ÔÍõµÄ´óÂ½.nes"
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();

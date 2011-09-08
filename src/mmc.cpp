@@ -7,6 +7,7 @@
  * rom_mapper_  读取程序代码
  * vrom_mapper_ 读取显示代码
  * switch_page_ 切换页面代码
+ * reset_       复位代码
  */////////////////////////////////////////////////////////////////////
 
 dword rom_mapper_3(MapperImpl* mi, word offset) {
@@ -17,18 +18,45 @@ dword rom_mapper_3(MapperImpl* mi, word offset) {
     return offset;
 }
 
+//--///////////////////////////////////////////////////////////////////
+
+dword switch_page_19(MapperImpl* mi, word offset) {
+}
+
+dword rom_mapper_19(MapperImpl* mi, word offset) {
+    if (offset<0xC000) {
+        return offset;
+    } else {
+        return offset + (mi->rom->rom_size-1) * 16 * 1024;
+    }
+}
+
+dword vrom_mapper_19(MapperImpl* mi, word offset) {
+    return offset;
+}
+
+void reset_19(MapperImpl* mi) {
+    mi->pr_page = 0;
+    mi->vr_page = 0;
+}
+
 /* ------------------------------------------------------------------ */
 
-#define MA_PA(x, a,b,c) x.sw_page = a; x.r_prom = b; x.r_vrom = c
-#define MA_P1(x, b)     MA_PA(x, NULL, b, NULL)
+#define MA_PA(x, a,b,c, d) x.sw_page = a; x.r_prom = b; \
+                           x.r_vrom = c; x.reset = d
+
+#define MA_P1(x, b)     MA_PA(x, NULL, b, NULL, NULL)
 #define MA_PL(x)        MA_P1(map_list[x], rom_mapper_##x)
 #define MA_PD(x, y)     MA_P1(map_list[x], rom_mapper_##y)
+#define MA_PX(x)        MA_PA(map_list[x], switch_page_##x, \
+                              rom_mapper_##x, vrom_mapper_##x, reset_##x)
 
 MapperImpl map_list[256] = {};
 
 static void init_map_list() {
-    MA_PD(0, 3);
-    MA_PL(   3);
+    MA_PD( 0,  3);
+    MA_PL(     3);
+    MA_PL(    19);
 }
 
 #undef MA_PD

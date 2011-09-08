@@ -47,14 +47,15 @@ T_COLOR ppu_color_table[0x40] = {
 #undef H
 
 PPU::PPU(MMC *_mmc, Video *_video)
-    : spWorkOffset(0)
-    , addr_add(1)
-    , ppuSW(pH)
-    , w2005(wX)
-    , bkAllDisp(0)
-    , spAllDisp(0)
-    , mmc(_mmc)
-    , video(_video)
+    : skipWrite   (0)
+    , spWorkOffset(0)
+    , addr_add    (1)
+    , ppuSW      (pH)
+    , w2005      (wX)
+    , bkAllDisp   (0)
+    , spAllDisp   (0)
+    , mmc      (_mmc)
+    , video  (_video)
 {
     memset(spWorkRam, 0, sizeof(spWorkRam));
 }
@@ -107,13 +108,16 @@ void PPU::controlWrite(word addr, byte data) {
     case 6: /* 0x2006 PPU地址指针 */
         if (ppuSW==pH) {
             /* 没有完整写入高低字节不能改变PPU指针 */
-            tmp_addr = data;
-            ppuSW = pL;
+            tmp_addr  = data;
+            ppuSW     = pL;
+            skipWrite = 1;
         } else {
+            /* 全部写入地址才有效 */
             ppu_ram_p = (tmp_addr<<8) | data;
-            ppuSW = pH;
+            ppuSW     = pH;
+            skipWrite = 0;
 
-            /* 全部写入地址才有效, 模拟PPU怪癖 */
+            /* 模拟PPU怪癖 */
             if (ppu_ram_p >= 0x3F00) {
                 readBuf = read();
                 ppu_ram_p -= addr_add;
@@ -190,6 +194,7 @@ byte PPU::readState(word addr) {
             preheating >>= 1;
             vblankTime = 1;
         }
+        if ( skipWrite  ) r |= ( 1<<4 );
         if ( spOverflow ) r |= ( 1<<5 );
         if ( hit        ) r |= ( 1<<6 );
         if ( vblankTime ) r |= ( 1<<7 );

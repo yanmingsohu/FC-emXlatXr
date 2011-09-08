@@ -84,7 +84,7 @@ struct command_parm {
     word  zpgY  ();
     word  $zpg$Y();
     word  $zpgX$();
-    word  $$$   (byte x);
+    word  $ind$ (byte x);
 };
 
 struct cpu_6502 {

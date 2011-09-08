@@ -1072,24 +1072,25 @@ inline void cpu_6502::clearV() {
 
 /****************************************************************************/
 
+/* a+b 超过页界限则寻址时间+1, 返回 a+b */
+static inline word CHECK_PAGE_BOUND(word a, word b, int *mem_time) {
+    word base = a;
+    word hi = base & 0xFF00;
+    base += b;
+    if ( (0xFF00 & base) ^ hi ) *mem_time = 1;
+    return base;
+}
+
 inline word command_parm::abs() {
     return (p2<<8) | p1;
 }
 
 inline word command_parm::absX() {
-    word base = abs();
-    word hi = base & 0xFF00;
-    base += cpu->X;
-    if ( (0xFF00 & base) ^ hi ) mem_time = 1;
-    return base;
+    return CHECK_PAGE_BOUND(abs(), cpu->X, &mem_time);
 }
 
 inline word command_parm::absY() {
-    word base = abs();
-    word hi = base & 0xFF00;
-    base += cpu->Y;
-    if ( (0xFF00 & base) ^ hi ) mem_time = 1;
-    return base;
+    return CHECK_PAGE_BOUND(abs(), cpu->Y, &mem_time);
 }
 
 inline word command_parm::zpg() {
@@ -1105,18 +1106,14 @@ inline word command_parm::zpgY() {
 }
 
 inline word command_parm::$zpg$Y() {
-    word base = $$$(0);
-    word hi = base & 0xFF00;
-    base += cpu->Y;
-    if ( (0xFF00 & base) ^ hi ) mem_time = 1;
-    return base;
+    return CHECK_PAGE_BOUND($ind$(0), cpu->Y, &mem_time);
 }
 
 inline word command_parm::$zpgX$() {
-    return $$$(cpu->X);
+    return $ind$(cpu->X);
 }
 
-inline word command_parm::$$$(byte x) {
+inline word command_parm::$ind$(byte x) {
     word offset = (p1 + x) & 0x00FF;
     byte l = ram->read( offset   );
     byte h = ram->read( offset+1 );

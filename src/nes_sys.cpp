@@ -107,9 +107,11 @@ int NesSystem::load_rom(string filename) {
         rom->romInfo();
 
         if (mmc->loadNes(rom)) {
-            printf("INT vector(0xFFFA-0xFFFF): ");
-            rom->printRom(0xFFFA - 0x8000, 6);
-            ram->reset();
+            int s = rom->rom_size * 16 * 1024 - 6;
+            printf("INT vector(0xFFFA-0xFFFF) rom offset %X: ", s);
+            rom->printRom(s, 6);
+
+            ram->hard_reset();
             ppu->switchMirror(rom->t1 & 0x0B);
             ppu->reset();
             cpu->RES = 1;

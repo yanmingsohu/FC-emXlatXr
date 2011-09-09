@@ -8,8 +8,13 @@ memory::memory(MMC *mmc, PPU *_ppu, PlayPad *_pad)
 {
 }
 
-void memory::reset() {
+void memory::hard_reset() {
     memset(&ram, 0, sizeof(ram));
+    mmc->resetMapper();
+}
+
+void memory::soft_reset() {
+    mmc->resetMapper();
 }
 
 byte memory::read(const word offset) {
@@ -63,12 +68,12 @@ void memory::write(const word offset, const byte data) {
         pad->writePort(offset, data);
         return;
     }
-#ifdef SHOW_ERR_MEM_OPERATE
     if (offset>=0x8000) {
+#ifdef SHOW_ERR_MEM_OPERATE
         printf("MEM::向程序段写入数据: 0x%x = 0x%x \n", offset, data);
-    }
 #endif
-    mmc->checkSwitch(offset, data);
+        mmc->checkSwitch(offset, data);
+    }
 }
 
 byte memory::readPro(const word offset) {

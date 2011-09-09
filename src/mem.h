@@ -49,7 +49,9 @@ private:
 public:
     memory(MMC *mmc, PPU *_ppu, PlayPad* _pad);
     /** 重置内存状态全部清0                        */
-    void reset();
+    void hard_reset();
+    /** 软重置,不会清除内存                        */
+    void soft_reset();
     /** 可以读取全部地址                           */
     byte read(const word offset);
     /** 可以写入全部地址                           */

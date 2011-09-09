@@ -50,8 +50,9 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "rom/F-1.nes"
 //#define ROM "rom/dkk.nes"
 //#define ROM "rom/fighter_f8000.nes"
-//#define ROM "rom/NEStress.nes"
-#define ROM "H:\\VROMS\\FC_ROMS\\霸王的大陆.nes"
+#define ROM "rom/NEStress.nes"
+//#define ROM "H:\\VROMS\\FC_ROMS\\霸王的大陆.nes"
+#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();
@@ -72,7 +73,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
         MessageBox(hwnd, "创建调试面板错误", "错误", 0);
         return;
     }
-
+sDebug = 1;
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
     {

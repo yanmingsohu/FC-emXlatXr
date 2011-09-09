@@ -91,8 +91,8 @@ nes_file::~nes_file() {
 
 void nes_file::printRom(int offset, int len) {
     if (offset > rom_size* 16 * 1024) {
-        offset %= rom_size* 16 * 1024;
         printf("> out of rom index REmapping to %X", offset);
+        return;
     }
 
     if (offset%16!=0) printf("\n0x%X: ", offset);

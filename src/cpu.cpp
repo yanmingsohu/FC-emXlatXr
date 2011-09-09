@@ -981,8 +981,9 @@ byte cpu_6502::reset() {
         RES    = 0;
         FLAGS  = CPU_FLAGS_CONST | CPU_FLAGS_INTERDICT;
 
-        PCH    = ram->read(0xFFFD);
-        PCL    = ram->read(0xFFFC);
+        ram->soft_reset();
+        PCH    = ram->readPro(0xFFFD);
+        PCL    = ram->readPro(0xFFFC);
 
         NMI_idle = 1;
         return CPU_RESET_CYC;

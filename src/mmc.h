@@ -22,35 +22,29 @@
 
 #include "rom.h"
 
-struct MapperImpl;
+class MapperImpl {
 
-/* 切换页面的接口, 可以切换ROM或VROM, off=(0x8000-0xFFFF)  *
- * off为地址, value为写入的数据                            */
-typedef void  (*SWITCH_PAGE)(MapperImpl*, word off, byte value);
-/* 转换ROM地址的接口, off=(0x8000-0xFFFF), 返回转换后的地址*
- * 转换后的地址可以在任意范围                              */
-typedef dword (*ROM_READER )(MapperImpl*, word off);
-/* 与ROM_READER类似 off=(0x0-0x1FFF)                       */
-typedef dword (*VROM_READER)(MapperImpl*, word off);
-/* 初始化,cpu复位时需要执行                                */
-typedef void  (*MMC_RESET)(MapperImpl*);
-
-
-struct MapperImpl {
-    /* 检查内存写入,切换页面,可以空   */
-    SWITCH_PAGE     sw_page;
-    /* 读取程序ROM,不能为空           */
-    ROM_READER      r_prom;
-    /* 读取显存ROM,暂时为空(未实现)   */
-    VROM_READER     r_vrom;
-
-    MMC_RESET       reset;
-
+public:
     const nes_file* rom;
-    /* 当前程序页号                   */
-    byte            pr_page;
-    /* 当前显存页号                   */
-    byte            vr_page;
+
+    /* 切换mapper时释放当前使用的资源 */
+    virtual ~MapperImpl() { rom = NULL; }
+
+    /* 切换页面的接口, 可以切换ROM或VROM, off=(0x8000-0xFFFF)
+       off为地址, value为写入的数据 */
+    virtual void sw_page(word off, byte value) {}
+
+    /* 转换ROM地址的接口, off=(0x8000-0xFFFF), 返回转换后的地址
+       转换后的地址映射到rom中(0~n) */
+    virtual uint r_prom(word off) = 0;
+
+    /* 与ROM_READER类似 off=(0x0-0x1FFF) */
+    virtual uint r_vrom(word off) {
+        return off;
+    }
+
+    /* 初始化,cpu复位时需要执行 */
+    virtual void reset() {}
 };
 
 /**
@@ -65,7 +59,8 @@ private:
 
 public:
     MMC();
-    /* 切换rom, 该操作会改变Mapper, 如果不支持MMC返回false */
+    /* 切换rom, 该操作会改变Mapper, 如果不支持MMC返回false
+     * 同时前一个Mapper会被释放                            */
     bool loadNes(nes_file* rom);
     /* 读取程序段 addr=(0x8000-0xFFFF)                     */
     byte readRom(const word addr);
@@ -73,6 +68,8 @@ public:
     byte readVRom(const word addr);
     /* 在向内存写数据时执行换页操作                        */
     void checkSwitch(const word addr, const byte value);
+    /* 初始化mapper组件                                    */
+    void resetMapper();
     /* 返回vrom的长度(字节)                                */
     int  vromSize();
 };

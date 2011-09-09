@@ -20,8 +20,10 @@
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
 
-#define HELP_FNC   static inline
-#define _CSTR(x)    const_cast<char*>(x)
+#define HELP_FNC     static inline
+#define _CSTR(x)     const_cast<char*>(x)
+#define TNUL(x, _s)  if (!x) printf("debug::%s at %s %d line", \
+                                    _s, __FILE__, __LINE__)
 
 /*------------------| DIV除法定义 |----*/
 #define DIV2(x)     ((x)>>1)
@@ -32,6 +34,7 @@
 #define DIV64(x)    ((x)>>6)
 /*---------------------| DIV over |----*/
 
+typedef unsigned int        uint;
 typedef unsigned char       byte;
 typedef unsigned short int  word;
 typedef unsigned int        dword;
@@ -58,8 +61,6 @@ char* parseOpenError(int load_err_code);
 //#define SHOW_PPU_REGISTER
 /* 显示CPU寻址消息                                                */
 #define SHOW_CPU_MEMORY_ADDRESSING
-/* 显示PPU绘制屏幕时序的相关消息                                  */
-//#define SHOW_PPU_DRAW_INFO
 /*-----------------------------------------------| END DEBUG |----*/
 
 #endif // TYPE_H_INCLUDED

@@ -135,7 +135,7 @@ public:
 
     cpu_6502(memory* ram);
 
-    byte    reset();            /* 重置cpu状态,返回使用周期          */
+    byte    reset();            /* 重置cpu状态,返回使用周期(soft)    */
     void    push(byte d);       /* 向堆栈中压数                      */
     byte    pop();              /* 从堆栈中取数                      */
     char*   debug();            /* 返回cpu状态字符串                 */

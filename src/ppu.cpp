@@ -318,6 +318,9 @@ void PPU::switchMirror(byte type) {
         pbg[2] = &bg[2];
         pbg[3] = &bg[3];
     break;
+
+    default:
+        printf("PPU::无效的屏幕布局码%d\n", type);
     }
 }
 

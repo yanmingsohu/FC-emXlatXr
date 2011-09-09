@@ -73,7 +73,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
         MessageBox(hwnd, "创建调试面板错误", "错误", 0);
         return;
     }
-sDebug = 1;
+
     /* Run the message loop. It will run until GetMessage() returns 0 */
     for(;;)
     {

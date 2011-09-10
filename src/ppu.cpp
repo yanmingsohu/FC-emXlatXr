@@ -217,7 +217,7 @@ byte PPU::readState(word addr) {
 
 #ifdef SHOW_ERR_MEM_OPERATE
     default:
-        printf("PPU::无效的显存读取端口号 %X.\n", addr);
+        printf("PPU::无效的显存读取端口号 %X(%x).\n", addr, addr%0x8);
         break;
 #endif
     }
@@ -272,10 +272,7 @@ inline byte PPU::read() {
 
 inline void PPU::write(byte data) {
     if (ppu_ram_p<0x2000) {
-#ifdef SHOW_ERR_MEM_OPERATE
-        printf("PPU::can't write VROM $%04x=%02x.\n", ppu_ram_p, data);
-#endif
-        return;
+        mmc->writeVRom(ppu_ram_p, data);
     } else
 
     if (ppu_ram_p<0x3EFF) {
@@ -321,6 +318,7 @@ void PPU::switchMirror(byte type) {
 
     default:
         printf("PPU::无效的屏幕布局码%d\n", type);
+        pbg[0] = pbg[1] = pbg[2] = pbg[3] = &bg[0];
     }
 }
 

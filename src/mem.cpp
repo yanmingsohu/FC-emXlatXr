@@ -1,7 +1,7 @@
 #include "mem.h"
 #include "string.h"
 #include <stdio.h>
-
+#include <memory.h>
 
 memory::memory(MMC *mmc, PPU *_ppu, PlayPad *_pad)
       : mmc(mmc), ppu(_ppu), pad(_pad)
@@ -69,9 +69,6 @@ void memory::write(const word offset, const byte data) {
         return;
     }
     if (offset>=0x8000) {
-#ifdef SHOW_ERR_MEM_OPERATE
-        printf("MEM::向程序段写入数据: 0x%x = 0x%x \n", offset, data);
-#endif
         mmc->checkSwitch(offset, data);
     }
 }

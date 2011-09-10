@@ -60,7 +60,7 @@
             ( N_HLINE_CPU_CYC / PPU_DISPLAY_P_WIDTH )
 #define N_END_CYC             4
 /*----------------------------------------------------------------*/
-#include "stdio.h"
+
 struct BackGround {
 
     byte name      [0x03C0];
@@ -69,7 +69,6 @@ struct BackGround {
     void write(word offset, byte data) {
         word off = (offset % 0x0400);
         if (off<0x03C0) {
-printf("name:%X %X\n", name, this);//!!!!!!!!!!!!!!!!!!
             name[off] = data;
         } else {
             attribute[off-0x03C0] = data;

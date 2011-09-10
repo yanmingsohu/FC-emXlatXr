@@ -1,6 +1,8 @@
 #include "mmc.h"
 #include "type.h"
-#include "stdio.h"
+#include "ppu.h"
+#include <stdio.h>
+#include <memory.h>
 
 /* ------------------------------------------------------------------ */
 /* 前缀:
@@ -20,7 +22,7 @@ public:
     uint r_prom(word off) {
         if (MMC_PRG_SIZE==1) {
             if (off>=0xC000) {
-                return (off - 0x4000 - 0x8000);
+                return (off - 0xC000);
             }
         }
         return off - 0x8000;
@@ -37,7 +39,9 @@ class Mapper_3 : public Mapper_0 {
 class Mapper_4 : public MapperImpl {
 
 private:
-    static const uint bankSize = 8 * 1024;
+    static const uint vramSize    = 8 * 1024;
+    static const uint prgBankSize = 8 * 1024;
+    static const uint ppuBankSize = 1 * 1024;
 
     uint $prg_8000_off;  /* 8000 ~ 9FFF */
     uint $prg_A000_off;  /* A000 ~ BFFF */
@@ -45,18 +49,24 @@ private:
     uint $prg_E000_off;  /* E000 ~ FFFF 固定最后一个页面 */
 
     uint *modify;
-    bool chr_xor;
+    uint bankSize;           /* 每次切换页面的大小,1K|8K */
+    bool chr_xor;            /* vram地址^0x1000          */
+    bool isVRAM;             /* 卡带提供显存开关         */
+    byte ex_vram[vramSize];  /* 卡带提供显存             */
+    bool enableIrq;
+    uint irqLatch;
+    uint irqConter;
 
-    /* 0:[0000 ~ 07FF] 1:[0800 ~ 0FFF] 2:[1000 ~ 13FF] *
-     * 3:[1400 ~ 17FF] 4:[1800 ~ 1BFF] 5:[1C00 ~ 1FFF] */
+    /* 0:[0000 ~ 07FF]  1:[0800 ~ 0FFF]  2:[1000 ~ 13FF] *
+     * 3:[1400 ~ 17FF]  4:[1800 ~ 1BFF]  5:[1C00 ~ 1FFF] */
     uint _vrom_off[6];
-    /* 0:[0000 ~ 03FF] 1:[0400 ~ 07FF] 2:[0800 ~ 0BFF] *
-     * 3:[0C00 ~ 0FFF] 4:[1000 ~ 17FF] 5:[1800 ~ 1FFF] */
+    /* 0:[0000 ~ 03FF]  1:[0400 ~ 07FF]  2:[0800 ~ 0BFF] *
+     * 3:[0C00 ~ 0FFF]  4:[1000 ~ 17FF]  5:[1800 ~ 1FFF] */
     uint _vrom_xoff[6];
 
 
     uint prg_bank2page(uint prgBank) {
-        return prgBank * bankSize;
+        return prgBank * prgBankSize;
     }
 
 public:
@@ -75,6 +85,10 @@ public:
     }
 
     uint r_vrom(word off) {
+        if (isVRAM) {
+            return ex_vram[off];
+        }
+
         int idx;
 
         if (chr_xor) {
@@ -99,33 +113,66 @@ public:
         }
     }
 
+    void w_vrom(word off, byte value) {
+        ex_vram[off] = value;
+    }
+
     void sw_page(word off, byte value) {
         if (off==0x8000) {
             chr_xor  = value & (1<<7);
             byte low = value & 0x7;
 
             if (low<6) {
-                modify = chr_xor
+                bankSize = ppuBankSize;
+                modify   = chr_xor
                          ? &_vrom_xoff[low]
                          : &_vrom_off[low];
             }
             else if (low==6) {
-                modify = (value & (1<<6))
+                bankSize = prgBankSize;
+                modify   = (value & (1<<6))
                          ? &$prg_C000_off
                          : &$prg_8000_off;
             }
             else if (low==7) {
-                modify = &$prg_A000_off;
+                bankSize = prgBankSize;
+                modify   = &$prg_A000_off;
             }
         }
 
         else if (off==0x8001) {
-            *modify = value;
+            *modify = value * bankSize;
+        }
+
+        else if (off==0xA000) {
+            ppu->switchMirror(value & 1);
+        }
+
+        else if (off==0xC000) {
+            irqConter = value;
+        }
+        else if (off==0xC001) {
+            irqLatch = value;
+        }
+        else if (off==0xE000) {
+            enableIrq = false;
+            irqConter = irqLatch;
+        }
+        else if (off==0xE001) {
+            enableIrq = true;
+        }
+    }
+
+    void draw_line() {
+        if (enableIrq) {
+            if (--irqConter==0) {
+                *IRQ = 1;
+            }
         }
     }
 
     void reset() {
-        uint psize = rom->rom_size * 2 - 1;
+        uint psize = MMC_PRG_SIZE * 2 - 1;
 
         $prg_8000_off = prg_bank2page(0);
         $prg_A000_off = prg_bank2page(1);
@@ -133,6 +180,14 @@ public:
         $prg_E000_off = prg_bank2page(psize);
 
         chr_xor = false;
+        isVRAM  = MMC_PPU_SIZE==0;
+        memset(ex_vram, 0, sizeof(ex_vram));
+    }
+
+    uint capability() {
+        return MMC_CAPABILITY_WRITE_VROM
+             | MMC_CAPABILITY_CHECK_LINE
+             | MMC_CAPABILITY_CHECK_SWITCH;
     }
 };
 
@@ -168,10 +223,6 @@ static MapperImpl* createMapper(int mapper_id) {
 
 /* ------------------------------------------------------------------ */
 
-MMC::MMC() : rom(0), sw(0)
-{
-}
-
 bool MMC::loadNes(nes_file* _rom) {
     if (sw) {
         delete sw;
@@ -184,6 +235,9 @@ bool MMC::loadNes(nes_file* _rom) {
 
         if (sw) {
             sw->rom = this->rom = _rom;
+            sw->ppu = this->ppu;
+            sw->IRQ = this->IRQ;
+            capability = sw->capability();
             resetMapper();
             return true;
         }
@@ -192,34 +246,4 @@ bool MMC::loadNes(nes_file* _rom) {
     /* 失败的情况 */
     this->rom = NULL;
     return false;
-}
-
-byte MMC::readRom(const word addr) {
-    if (addr<0x8000) {
-        printf("MMC::读取ROM错误:使用了无效的程序地址 0x%x\n", addr);
-        return 0;
-    }
-TNUL(sw, "MMC没有读取有效rom");
-    uint n_addr = sw->r_prom(addr);
-    return rom->rom[n_addr];
-}
-
-byte MMC::readVRom(const word addr) {
-TNUL(sw, "MMC没有读取有效rom");
-    uint n_addr = sw->r_vrom(addr);
-    return rom->vrom[n_addr];
-}
-
-void MMC::checkSwitch(const word addr, const byte value) {
-TNUL(sw, "MMC没有读取有效rom");
-    sw->sw_page(addr, value);
-}
-
-void MMC::resetMapper() {
-TNUL(sw, "MMC没有读取有效rom");
-    sw->reset();
-}
-
-int MMC::vromSize() {
-    return rom->vrom_size * 8 * 1024;
 }

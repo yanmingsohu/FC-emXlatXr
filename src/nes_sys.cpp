@@ -27,7 +27,11 @@ NesSystem::NesSystem(Video* video, PlayPad *_pad) : pad(_pad) {
     ram = new memory(mmc, ppu, pad);
     cpu = new cpu_6502(ram);
     rom = new nes_file();
+
     ppu->setNMI(&cpu->NMI);
+    mmc->setPPU(ppu);
+    mmc->setIRQ(&cpu->IRQ);
+
     state = 0;
 }
 

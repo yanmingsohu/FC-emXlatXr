@@ -290,13 +290,16 @@
 	"winsys.h"
 	"../ppu.h"
 
-1315580253 source:e:\fc\src\mmc.cpp
+1315621987 source:e:\fc\src\mmc.cpp
 	"mmc.h"
 	"type.h"
-	"stdio.h"
+	"ppu.h"
+	<stdio.h>
+	<memory.h>
 
-1315579798 e:\fc\src\mmc.h
+1315622121 e:\fc\src\mmc.h
 	"rom.h"
+	<stdio.h>
 
 1315579798 e:\fc\src\rom.h
 	"type.h"
@@ -322,10 +325,9 @@
 	"ppu.h"
 	"pad.h"
 
-1315579798 e:\fc\src\ppu.h
+1315617959 e:\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
-	"stdio.h"
 
 1315579798 e:\fc\src\video.h
 	"type.h"
@@ -369,19 +371,20 @@
 1315015267 e:\fc\dx81sdk\ddraw.h
 	<objbase.h>
 
-1315579798 source:e:\fc\src\mem.cpp
+1315614887 source:e:\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
 	<stdio.h>
+	<memory.h>
 
-1315579798 source:e:\fc\src\nes_sys.cpp
+1315620918 source:e:\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	"debug.h"
 	<stdio.h>
 
 1315579798 e:\fc\src\debug.h
 
-1315580721 source:e:\fc\src\ppu.cpp
+1315615005 source:e:\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
@@ -398,7 +401,7 @@
 	"winsys.h"
 	"../ppu.h"
 
-1315580299 source:e:\fc\src\win\main_window.cpp
+1315617228 source:e:\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>

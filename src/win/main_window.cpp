@@ -45,14 +45,12 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 }
 
 //#define ROM "rom/Tennis.nes"
-//#define ROM "rom/Dr_Mario.nes"
-//#define ROM "rom/test.nes"
 //#define ROM "rom/F-1.nes"
 //#define ROM "rom/dkk.nes"
 //#define ROM "rom/fighter_f8000.nes"
 #define ROM "rom/NEStress.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\霸王的大陆.nes"
-#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
+//#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();

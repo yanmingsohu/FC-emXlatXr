@@ -64,13 +64,13 @@ void PPU::controlWrite(word addr, byte data) {
 
     switch (addr % 0x08) {
 
-    case 0: /* 0x2000                      */
+    case 0: /* 0x2000 */
         control_2000(data);
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::write addr 2000:%X\n", data);
 #endif
         break;
-    case 1: /* 0x2001                      */
+    case 1: /* 0x2001 */
         control_2001(data);
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::write addr 2001:%X\n", data);
@@ -82,7 +82,7 @@ void PPU::controlWrite(word addr, byte data) {
         printf("PPU::修改精灵指针:%x\n", data);
 #endif
         break;
-    case 4: /* 0x2004 写入卡通工作内存     */
+    case 4: /* 0x2004 写入卡通工作内存 */
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::写入精灵数据: %x = %x\n", spWorkOffset, data);
 #endif
@@ -91,12 +91,10 @@ void PPU::controlWrite(word addr, byte data) {
 
     case 5: /* 0x2005 设置窗口坐标 */
         if (w2005==wX) {
-            winX = (0x100 & winX) | data;
+            tmp_addr = data;
             w2005 = wY;
-#ifdef SHOW_PPU_REGISTER
-            printf("PPU::窗口坐标...");
-#endif
         } else {
+            winX = (0x100 & winX) | tmp_addr;
             winY = (0x100 & winY) | data;
             w2005 = wX;
 #ifdef SHOW_PPU_REGISTER
@@ -128,7 +126,7 @@ void PPU::controlWrite(word addr, byte data) {
 #endif
         break;
 
-    case 7: /* 0x2007 写数据寄存器          */
+    case 7: /* 0x2007 写数据寄存器 */
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
 #endif
@@ -396,9 +394,11 @@ void PPU::drawBackGround(Video *panel) {
         word tileIdx = pbg[bgIdx]->name[nameIdx];
         byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
 
+        paletteIdx |= bgHBit(x, y, pbg[bgIdx]->attribute);
+        paletteIdx  = bkPalette[paletteIdx];
+
         if (paletteIdx) {
-            paletteIdx |= bgHBit(x, y, pbg[bgIdx]->attribute);
-            panel->drawPixel(bx + x, by + y, ppu_color_table[ bkPalette[paletteIdx] ]);
+            panel->drawPixel(bx + x, by + y, ppu_color_table[ paletteIdx ]);
         }
 
         if (++x>=256) {
@@ -456,11 +456,13 @@ void PPU::_drawSprite(byte i, byte ctrl) {
             if (v) dy = 8 - y + by;
             else   dy =     y + by;
 
-            video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
+            if (dx<256 || dy<240) {
+                video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
 
-            /* 记录0号精灵在屏幕上绘制的像素 */
-            if (!i) sp0hit[dx%8][dy%8] = 1;
-            else    _checkHit(dx, dy);
+                /* 记录0号精灵在屏幕上绘制的像素 */
+                if (!i) sp0hit[dx%8][dy%8] = 1;
+                else    _checkHit(dx, dy);
+            }
         }
 
         if (++x >= 8) {
@@ -517,9 +519,9 @@ void PPU::drawPixel(int X, int Y) {
 
     byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
 
-    if (paletteIdx) {
-        paletteIdx |= bgHBit(x, y, bgs->attribute);
-        byte colorIdx = bkPalette[paletteIdx];
+    paletteIdx |= bgHBit(x, y, bgs->attribute);
+    byte colorIdx = bkPalette[paletteIdx];
+    if (colorIdx) {
         video->drawPixel(X, Y, ppu_color_table[colorIdx]);
         _checkHit(X, Y);
     }

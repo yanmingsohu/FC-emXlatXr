@@ -47,6 +47,7 @@ private:
     uint $prg_A000_off;  /* A000 ~ BFFF */
     uint $prg_C000_off;  /* C000 ~ DFFF */
     uint $prg_E000_off;  /* E000 ~ FFFF 固定最后一个页面 */
+    byte page_c;
 
     uint *modify;
     uint bankSize;           /* 每次切换页面的大小,1K|8K */
@@ -130,7 +131,16 @@ public:
             }
             else if (low==6) {
                 bankSize = prgBankSize;
-                modify   = (value & (1<<6))
+                byte is_c = (value & (1<<6));
+
+                if (page_c != is_c) {
+                    uint tmp = $prg_C000_off;
+                    $prg_C000_off = $prg_8000_off;
+                    $prg_8000_off = tmp;
+                    page_c = is_c;
+                }
+
+                modify   = is_c
                          ? &$prg_C000_off
                          : &$prg_8000_off;
             }
@@ -138,10 +148,12 @@ public:
                 bankSize = prgBankSize;
                 modify   = &$prg_A000_off;
             }
+            //printf("write 8000 %d\t", value);
         }
 
         else if (off==0x8001) {
             *modify = value * bankSize;
+            //printf("write 8001 %d\n", value);
         }
 
         else if (off==0xA000) {
@@ -178,10 +190,12 @@ public:
         $prg_A000_off = prg_bank2page(1);
         $prg_C000_off = prg_bank2page(psize - 1);
         $prg_E000_off = prg_bank2page(psize);
+        page_c = 1<<6;
 
         chr_xor = false;
         isVRAM  = MMC_PPU_SIZE==0;
         memset(ex_vram, 0, sizeof(ex_vram));
+        enableIrq = false;
     }
 
     uint capability() {

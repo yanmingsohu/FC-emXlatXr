@@ -545,6 +545,7 @@ void cpu_command_STA(command_parm* parm) {
     case 0x81:
         parm->write(parm->op - 0x81, parm->cpu->A);
     }
+
     NOT_MEM_TIME;
 }
 
@@ -891,7 +892,6 @@ byte cpu_6502::process() {
     cpu_cyc += prev_parm.mem_time;
     cpu_cyc += nmi();
     cpu_cyc += irq();
-
     return cpu_cyc;
 }
 
@@ -1150,9 +1150,6 @@ inline void command_parm::write(const byte addressing_mode, byte value) {
         return;
     }
     word addr = getAddr(addressing_mode);
-    if (addr==0x4014) {
-        mem_time = 512;
-    }
 #if defined SHOW_CPU_MEMORY_ADDRESSING
     cpu->isShowDebug()
         && printf("CPU::write address:%04X value:%X\n", addr, value);

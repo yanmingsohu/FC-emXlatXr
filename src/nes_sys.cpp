@@ -53,14 +53,13 @@ NesSystem::~NesSystem() {
 
 void NesSystem::drawFrame() {
     static int _cyc = 0;
-    int _t_cyc = 0;
 
     ppu->oneFrameOver();
+
     while (_cyc < START_CYC) {
         _cyc += cpu->process() * 3;
     }
     _cyc -= START_CYC;
-    _t_cyc += START_CYC;
 
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
@@ -70,16 +69,13 @@ void NesSystem::drawFrame() {
     while (y<240) {
         /* »æÖÆÒ»ÐÐ */
         for (;;) {
-            _t_cyc++;
             ppu->drawPixel(x++, y);
             if (x>=256) {
                 break;
             }
 
-            if (_cyc<=0) {
+            if (--_cyc <= 0) {
                 _cyc += cpu->process() * 3;
-            } else {
-                _cyc--;
             }
         }
 
@@ -90,7 +86,8 @@ void NesSystem::drawFrame() {
             _cyc += cpu->process() * 3;
         }
         _cyc -= HBLANK_CYC;
-        _t_cyc += HBLANK_CYC;
+
+        mmc->drawLineOver();
     }
 
     ppu->drawSprite(PPU::bpFront);
@@ -99,9 +96,6 @@ void NesSystem::drawFrame() {
         _cyc += cpu->process() * 3;
     }
     _cyc -= END_CYC;
-    _t_cyc += END_CYC;
-
-    //printf("used time %d, %f\n", _t_cyc*4, 21477270/59.94);
 }
 
 int NesSystem::load_rom(string filename) {

@@ -43,16 +43,20 @@ private:
     static const uint prgBankSize = 8 * 1024;
     static const uint ppuBankSize = 1 * 1024;
 
-    uint $prg_8000_off;  /* 8000 ~ 9FFF */
-    uint $prg_A000_off;  /* A000 ~ BFFF */
-    uint $prg_C000_off;  /* C000 ~ DFFF */
-    uint $prg_E000_off;  /* E000 ~ FFFF 固定最后一个页面 */
+    uint _prg_page_off;  /* 如果isC000fix==true,则映射
+                         /* 到8000 ~ 9FFF否则C000 ~ DFFF */
+    uint _prg_A000_off;  /* A000 ~ BFFF */
+    uint _prg_fixp_off;  /* 倒数第二固定映射页面         */
+    uint _prg_E000_off;  /* E000 ~ FFFF 固定最后一个页面 */
+    bool isC000fix;      /* 如果0xC000地址为固定==true   */
 
     uint *modify;
     uint bankSize;           /* 每次切换页面的大小,1K|8K */
+
     bool chr_xor;            /* vram地址^0x1000          */
     bool isVRAM;             /* 卡带提供显存开关         */
     byte ex_vram[vramSize];  /* 卡带提供显存             */
+
     bool enableIrq;
     uint irqLatch;
     uint irqConter;
@@ -72,16 +76,24 @@ private:
 public:
     uint r_prom(word off) {
         if (off<0x8000) {
-            return off + $prg_8000_off - 0x8000;
+            if (!isC000fix) {
+                return off + _prg_fixp_off - 0x8000;
+            } else {
+                return off + _prg_page_off - 0x8000;
+            }
         }
         if (off<0xA000) {
-            return off + $prg_A000_off - 0xA000;
+            return off + _prg_A000_off - 0xA000;
         }
         if (off<0xC000) {
-            return off + $prg_C000_off - 0xC000;
+            if (isC000fix) {
+                return off + _prg_fixp_off - 0xC000;
+            } else {
+                return off + _prg_page_off - 0xC000;
+            }
         }
         /* ELSE <0xE000 */
-        return off + $prg_E000_off - 0xE000;
+        return off + _prg_E000_off - 0xE000;
     }
 
     uint r_vrom(word off) {
@@ -119,8 +131,9 @@ public:
 
     void sw_page(word off, byte value) {
         if (off==0x8000) {
-            chr_xor  = value & (1<<7);
-            byte low = value & 0x7;
+            chr_xor   = value & (1<<7);
+            isC000fix = !(value & (1<<6));
+            byte low  = value & 0x7;
 
             if (low<6) {
                 bankSize = ppuBankSize;
@@ -130,13 +143,11 @@ public:
             }
             else if (low==6) {
                 bankSize = prgBankSize;
-                modify   = (value & (1<<6))
-                         ? &$prg_C000_off
-                         : &$prg_8000_off;
+                modify   = &_prg_page_off;
             }
             else if (low==7) {
                 bankSize = prgBankSize;
-                modify   = &$prg_A000_off;
+                modify   = &_prg_A000_off;
             }
         }
 
@@ -149,14 +160,13 @@ public:
         }
 
         else if (off==0xC000) {
-            irqConter = value;
+            irqLatch = value;
         }
         else if (off==0xC001) {
-            irqLatch = value;
+            irqConter = 0;
         }
         else if (off==0xE000) {
             enableIrq = false;
-            irqConter = irqLatch;
         }
         else if (off==0xE001) {
             enableIrq = true;
@@ -165,7 +175,10 @@ public:
 
     void draw_line() {
         if (enableIrq) {
-            if (--irqConter==0) {
+            if (!irqConter) {
+                irqConter = irqLatch;
+            }
+            else if (--irqConter==0) {
                 *IRQ = 1;
             }
         }
@@ -174,13 +187,15 @@ public:
     void reset() {
         uint psize = MMC_PRG_SIZE * 2 - 1;
 
-        $prg_8000_off = prg_bank2page(0);
-        $prg_A000_off = prg_bank2page(1);
-        $prg_C000_off = prg_bank2page(psize - 1);
-        $prg_E000_off = prg_bank2page(psize);
+        _prg_page_off = prg_bank2page(0);
+        _prg_A000_off = prg_bank2page(1);
+        _prg_fixp_off = prg_bank2page(psize - 1);
+        _prg_E000_off = prg_bank2page(psize);
 
-        chr_xor = false;
-        isVRAM  = MMC_PPU_SIZE==0;
+        isC000fix = true;
+        chr_xor   = false;
+        isVRAM    = MMC_PPU_SIZE==0;
+
         memset(ex_vram, 0, sizeof(ex_vram));
     }
 

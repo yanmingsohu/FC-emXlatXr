@@ -44,7 +44,8 @@ NesSystem::~NesSystem() {
     delete pad;
 }
 
-/* 所有时钟都是基于cpu*3或ppu/4 */
+/*----------| 所有时钟都是基于cpu*3或ppu/4 |----------*/
+#define MID_CYC_CPU(x)   (x*3)
 #define MID_CYC(x)       (x/4)
 #define ONE_LINE_CYC     1364
 #define START_CYC        MID_CYC(ONE_LINE_CYC*21)
@@ -57,7 +58,7 @@ void NesSystem::drawFrame() {
 
     ppu->oneFrameOver();
     while (_cyc < START_CYC) {
-        _cyc += cpu->process() * 3;
+        _cyc += MID_CYC_CPU( cpu->process() );
     }
     _cyc -= START_CYC;
     _t_cyc += START_CYC;
@@ -77,17 +78,18 @@ void NesSystem::drawFrame() {
             }
 
             if (_cyc<=0) {
-                _cyc += cpu->process() * 3;
+                _cyc += MID_CYC_CPU( cpu->process() );
             } else {
                 _cyc--;
             }
         }
 
         x = 0; y++;
+        mmc->drawLineOver();
 
         /* 水平消隐周期 */
         while (_cyc < HBLANK_CYC) {
-            _cyc += cpu->process() * 3;
+            _cyc += MID_CYC_CPU( cpu->process() );
         }
         _cyc -= HBLANK_CYC;
         _t_cyc += HBLANK_CYC;
@@ -96,7 +98,7 @@ void NesSystem::drawFrame() {
     ppu->drawSprite(PPU::bpFront);
 
     while (_cyc < END_CYC) {
-        _cyc += cpu->process() * 3;
+        _cyc += MID_CYC_CPU( cpu->process() );
     }
     _cyc -= END_CYC;
     _t_cyc += END_CYC;

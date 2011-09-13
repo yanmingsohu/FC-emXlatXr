@@ -44,8 +44,7 @@ NesSystem::~NesSystem() {
     delete pad;
 }
 
-/*----------| 所有时钟都是基于cpu*3或ppu/4 |----------*/
-#define MID_CYC_CPU(x)   (x*3)
+/* 所有时钟都是基于cpu*3或ppu/4 */
 #define MID_CYC(x)       (x/4)
 #define ONE_LINE_CYC     1364
 #define START_CYC        MID_CYC(ONE_LINE_CYC*21)
@@ -54,14 +53,13 @@ NesSystem::~NesSystem() {
 
 void NesSystem::drawFrame() {
     static int _cyc = 0;
-    int _t_cyc = 0;
 
     ppu->oneFrameOver();
+
     while (_cyc < START_CYC) {
-        _cyc += MID_CYC_CPU( cpu->process() );
+        _cyc += cpu->process() * 3;
     }
     _cyc -= START_CYC;
-    _t_cyc += START_CYC;
 
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
@@ -71,39 +69,32 @@ void NesSystem::drawFrame() {
     while (y<240) {
         /* 绘制一行 */
         for (;;) {
-            _t_cyc++;
             ppu->drawPixel(x++, y);
             if (x>=256) {
                 break;
             }
 
-            if (_cyc<=0) {
-                _cyc += MID_CYC_CPU( cpu->process() );
-            } else {
-                _cyc--;
+            if (--_cyc <= 0) {
+                _cyc += cpu->process() * 3;
             }
         }
 
-        x = 0; y++;
         mmc->drawLineOver();
+        x = 0; y++;
 
         /* 水平消隐周期 */
         while (_cyc < HBLANK_CYC) {
-            _cyc += MID_CYC_CPU( cpu->process() );
+            _cyc += cpu->process() * 3;
         }
         _cyc -= HBLANK_CYC;
-        _t_cyc += HBLANK_CYC;
     }
 
     ppu->drawSprite(PPU::bpFront);
 
     while (_cyc < END_CYC) {
-        _cyc += MID_CYC_CPU( cpu->process() );
+        _cyc += cpu->process() * 3;
     }
     _cyc -= END_CYC;
-    _t_cyc += END_CYC;
-
-    //printf("used time %d, %f\n", _t_cyc*4, 21477270/59.94);
 }
 
 int NesSystem::load_rom(string filename) {

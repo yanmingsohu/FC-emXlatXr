@@ -152,7 +152,11 @@ public:
         }
 
         else if (off==0x8001) {
+            if (bankSize==prgBankSize) value &= 0x3F; //!!!pitch
             *modify = value * bankSize;
+
+            printf("ÐÞ¸ÄÓ³Éä A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
+                   _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
         }
 
         else if (off==0xA000) {

@@ -1,27 +1,28 @@
 # depslib dependency file v1.0
-1315481439 source:e:\c-project\fc\src\cpu.cpp
+1315649389 source:e:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
 	"stdlib.h"
 
-1315218280 e:\c-project\fc\src\mem.h
+1315631554 e:\c-project\fc\src\mem.h
 	"type.h"
 	"rom.h"
 	"mmc.h"
 	"ppu.h"
 	"pad.h"
 
-1315218280 e:\c-project\fc\src\type.h
+1315631554 e:\c-project\fc\src\type.h
 
 1315218280 e:\c-project\fc\src\rom.h
 	"type.h"
 	"string"
 
-1315489475 e:\c-project\fc\src\mmc.h
+1315650753 e:\c-project\fc\src\mmc.h
 	"rom.h"
+	<stdio.h>
 
-1315479341 e:\c-project\fc\src\ppu.h
+1315641373 e:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
@@ -30,7 +31,7 @@
 
 1315218280 e:\c-project\fc\src\pad.h
 
-1315479341 e:\c-project\fc\src\cpu.h
+1315631554 e:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 	"ppu.h"
@@ -43,17 +44,20 @@
 	<windows.h>
 	"win/winsys.h"
 
-1314022842 source:e:\c-project\fc\src\mem.cpp
+1315631554 source:e:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
 	<stdio.h>
+	<memory.h>
 
-1315489879 source:e:\c-project\fc\src\mmc.cpp
+1315659232 source:e:\c-project\fc\src\mmc.cpp
 	"mmc.h"
 	"type.h"
-	"stdio.h"
+	"ppu.h"
+	<stdio.h>
+	<memory.h>
 
-1315487839 source:e:\c-project\fc\src\nes_sys.cpp
+1315648426 source:e:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	"debug.h"
 	<stdio.h>
@@ -67,12 +71,12 @@
 
 1315218280 e:\c-project\fc\src\debug.h
 
-1315484977 source:e:\c-project\fc\src\ppu.cpp
+1315648075 source:e:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
 
-1315049558 source:e:\c-project\fc\src\rom.cpp
+1315631554 source:e:\c-project\fc\src\rom.cpp
 	"rom.h"
 	<stdio.h>
 	<stdlib.h>
@@ -113,7 +117,7 @@
 	"cpu.h"
 	"nes_sys.h"
 
-1315555362 source:f:\c-project\fc\src\cpu.cpp
+1315899910 source:f:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
@@ -179,14 +183,14 @@
 	<stdio.h>
 	<memory.h>
 
-1315899517 source:f:\c-project\fc\src\mmc.cpp
+1315900789 source:f:\c-project\fc\src\mmc.cpp
 	"mmc.h"
 	"type.h"
 	"ppu.h"
 	<stdio.h>
 	<memory.h>
 
-1315898098 source:f:\c-project\fc\src\nes_sys.cpp
+1315900179 source:f:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	"debug.h"
 	<stdio.h>
@@ -203,7 +207,7 @@
 	"type.h"
 	"rom.h"
 
-1315872832 source:f:\c-project\fc\src\ppu.cpp
+1315899910 source:f:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
@@ -240,7 +244,7 @@
 1315211505 source:f:\c-project\fc\src\win\winsys.cpp
 	"winsys.h"
 
-1315897431 source:f:\c-project\fc\src\win\main_window.cpp
+1315900525 source:f:\c-project\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
@@ -261,7 +265,7 @@
 	"../nes_sys.h"
 	"ddraw.h"
 
-1315488099 source:e:\c-project\fc\src\win\main_window.cpp
+1315659075 source:e:\c-project\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>

@@ -130,12 +130,6 @@ void PPU::controlWrite(word addr, byte data) {
             ppu_ram_p = (tmp_addr<<8) | data;
             ppuSW     = pH;
             skipWrite = 0;
-
-            /* Ä£ÄâPPU¹Öñ± */
-            if (ppu_ram_p >= 0x3F00) {
-                readBuf = read();
-                ppu_ram_p -= addr_add;
-            }
         }
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::ÐÞ¸ÄPPUÖ¸Õë:%04x\n", ppu_ram_p);
@@ -225,8 +219,12 @@ byte PPU::readState(word addr) {
         break;
 
     case 7:
-        r = readBuf;
-        readBuf = read();
+        if (ppu_ram_p < 0x3F00) {
+            r = readBuf;
+            readBuf = read();
+        } else {
+            r = readBuf = read();
+        }
         break;
 
 #ifdef SHOW_ERR_MEM_OPERATE

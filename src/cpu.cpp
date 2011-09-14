@@ -676,17 +676,17 @@ void cpu_command_TAX(command_parm* parm) {
 
 void cpu_command_TXA(command_parm* parm) {
     _TR(X, A);
-    cpu->checkNZ(cpu->A);
+    cpu->checkNZ(cpu->X);
 }
 
 void cpu_command_TYA(command_parm* parm) {
     _TR(Y, A);
-    cpu->checkNZ(cpu->A);
+    cpu->checkNZ(cpu->Y);
 }
 
 void cpu_command_TSX(command_parm* parm) {
     _TR(SP, X);
-    cpu->checkNZ(cpu->X);
+    cpu->checkNZ(cpu->SP);
 }
 
 void cpu_command_TXS(command_parm* parm) {

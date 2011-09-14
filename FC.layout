@@ -2,7 +2,7 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="debug" />
 	<File name="src\cpu.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="25901" topLine="964" />
+		<Cursor position="15671" topLine="661" />
 	</File>
 	<File name="src\cpu.h" open="0" top="0" tabpos="8">
 		<Cursor position="1694" topLine="0" />
@@ -23,13 +23,13 @@
 		<Cursor position="3125" topLine="16" />
 	</File>
 	<File name="src\mmc.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="1252" topLine="22" />
+		<Cursor position="5338" topLine="158" />
 	</File>
 	<File name="src\mmc.h" open="0" top="0" tabpos="1">
 		<Cursor position="4154" topLine="85" />
 	</File>
-	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="2709" topLine="51" />
+	<File name="src\nes_sys.cpp" open="1" top="1" tabpos="4">
+		<Cursor position="2872" topLine="61" />
 	</File>
 	<File name="src\nes_sys.h" open="0" top="0" tabpos="5">
 		<Cursor position="1788" topLine="18" />
@@ -37,11 +37,11 @@
 	<File name="src\pad.h" open="0" top="0" tabpos="9">
 		<Cursor position="1694" topLine="0" />
 	</File>
-	<File name="src\ppu.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="14761" topLine="527" />
+	<File name="src\ppu.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="7223" topLine="196" />
 	</File>
 	<File name="src\ppu.h" open="1" top="0" tabpos="6">
-		<Cursor position="5084" topLine="79" />
+		<Cursor position="5790" topLine="103" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="2454" topLine="77" />
@@ -62,13 +62,13 @@
 		<Cursor position="1105" topLine="19" />
 	</File>
 	<File name="src\win\main_window.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="2214" topLine="42" />
+		<Cursor position="1821" topLine="42" />
 	</File>
 	<File name="src\win\tilepanel.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="1045" topLine="15" />
 	</File>
-	<File name="src\win\winsys.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="6637" topLine="179" />
+	<File name="src\win\winsys.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="3983" topLine="96" />
 	</File>
 	<File name="src\win\winsys.h" open="0" top="0" tabpos="5">
 		<Cursor position="3977" topLine="85" />

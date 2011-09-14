@@ -107,9 +107,9 @@ DirectXVideo::DirectXVideo(HWND hwnd, int width, int height)
     :lpDD4(0), lpDDSPrimary(0), success(0), pixel(0), m_hwnd(hwnd)
 {
     LPDIRECTDRAW lpDD;
-    m_height = height+8;
-    m_width  = width+8;
-    pixel    = new T_COLOR[m_width * m_height];
+    m_height = height;
+    m_width  = width;
+    pixel    = new T_COLOR[(width+8) * (height+8)];
 
     //创建DirectCraw对象
     if ( DirectDrawCreate( NULL, &lpDD, NULL ) ) {

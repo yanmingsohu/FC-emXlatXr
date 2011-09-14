@@ -21,7 +21,11 @@
 #include "debug.h"
 #include <stdio.h>
 
-NesSystem::NesSystem(Video* video, PlayPad *_pad) : pad(_pad) {
+NesSystem::NesSystem(Video* video, PlayPad *_pad)
+: pad(_pad)
+, state(0)
+, _cyc(0)
+{
     mmc = new MMC();
     ppu = new PPU(mmc, video);
     ram = new memory(mmc, ppu, pad);
@@ -31,8 +35,6 @@ NesSystem::NesSystem(Video* video, PlayPad *_pad) : pad(_pad) {
     ppu->setNMI(&cpu->NMI);
     mmc->setPPU(ppu);
     mmc->setIRQ(&cpu->IRQ);
-
-    state = 0;
 }
 
 NesSystem::~NesSystem() {
@@ -53,9 +55,6 @@ NesSystem::~NesSystem() {
 #define HBLANK_CYC       MID_CYC(340)
 
 void NesSystem::drawFrame() {
-    static int _cyc = 0;
-
-    ppu->oneFrameOver();
 
     while (_cyc < START_CYC) {
         _cyc += MID_CPU_CYC( cpu->process() );
@@ -97,6 +96,8 @@ void NesSystem::drawFrame() {
         _cyc += MID_CPU_CYC( cpu->process() );
     }
     _cyc -= END_CYC;
+
+    ppu->oneFrameOver();
 }
 
 int NesSystem::load_rom(string filename) {
@@ -114,6 +115,7 @@ int NesSystem::load_rom(string filename) {
             ppu->switchMirror(rom->t1 & 0x0B);
             ppu->reset();
             cpu->RES = 1;
+            _cyc = 0;
         } else {
             res = ER_LOAD_ROM_BADMAP;
         }

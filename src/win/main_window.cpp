@@ -9,15 +9,18 @@
 static LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
 static void        displayCpu                 (cpu_6502*, HWND             );
 static void        start_game                 (HWND, PMSG, HINSTANCE       );
-static HMENU       createMainMenu             ();
+static HMENU       createMainMenu             (                            );
+static void        openFile                   (HWND hwnd                   );
 
 /*  Make the class name into a global variable  */
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = "FC 模拟器 DEmo. -=CatfoOD=-";
 static bool active = 1;
 static bool sDebug = 0;
-static win_info* bgpanel = NULL;
-static win_info* tlpanel = NULL;
+static bool run    = 0;
+static win_info*  bgpanel = NULL;
+static win_info*  tlpanel = NULL;
+static NesSystem* fc;
 
 int WINAPI WinMain ( HINSTANCE hThisInstance,
                      HINSTANCE hPrevInstance,
@@ -45,28 +48,34 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 }
 
 #define ROM "rom/NEStress.nes"
-#define ROM "rom/Tennis.nes"
+//#define ROM "rom/Tennis.nes"
 //#define ROM "rom/F-1.nes"
 //#define ROM "rom/dkk.nes"
 //#define ROM "rom/fighter_f8000.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\霸王的大陆.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
+//#define ROM "rom/test/cpu_timing_test/cpu_timing_test.nes"
+
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();
     Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
-    NesSystem fc(video, pad);
+    fc           = new NesSystem(video, pad);
 
-    if (int ret = fc.load_rom(ROM)) {
+#ifdef ROM
+    if (int ret = fc->load_rom(ROM)) {
         MessageBox(hwnd, parseOpenError(ret), "错误", 0);
         return;
     }
+    run = true;
+#endif
 
-	cpu_6502* cpu = fc.getCpu();
+	cpu_6502* cpu = fc->getCpu();
     clock_t usetime = clock();
 
-    bgpanel = bg_panel(hInstance, fc.getPPU());
-    tlpanel = tile_panel(hInstance, fc.getPPU());
+    bgpanel = bg_panel(hInstance, fc->getPPU());
+    tlpanel = tile_panel(hInstance, fc->getPPU());
+
     if (!(bgpanel && tlpanel)) {
         MessageBox(hwnd, "创建调试面板错误", "错误", 0);
         return;
@@ -83,57 +92,88 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 			DispatchMessage(messages);
     	}
 
+    	if (!run) continue;
+
         /* 限速,但是并不准确 */
     	if (clock()-usetime<15) continue;
     	usetime = clock();
 
         if (sDebug) {
-            debugCpu(&fc);
+            debugCpu(fc);
             sDebug = 0;
         }
-        fc.drawFrame();
+        fc->drawFrame();
         displayCpu(cpu, hwnd);
 
         if (active) video->refresh();
     }
 
+    delete fc;
     delete video;
+}
+
+void openFile(HWND hwnd) {
+
+    char filename[1024] = ".\\rom\\*.nes";
+
+    OPENFILENAME ofn;
+    memset(&ofn, 0, sizeof(ofn));
+
+    ofn.lStructSize    = sizeof(ofn);
+    ofn.hwndOwner      = hwnd;
+    ofn.lpstrFilter    = "FC Rom (.nes)\0*.nes\0\0";
+    ofn.nFilterIndex   = 1;
+    ofn.lpstrFile      = filename;
+    ofn.nMaxFile       = sizeof(filename);
+
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle  = 0;
+
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
+
+    if(GetOpenFileName(&ofn))
+    {
+        if (int ret = fc->load_rom(filename)) {
+            MessageBox(hwnd, parseOpenError(ret), "错误", 0);
+            run = false;
+        } else {
+            run = true;
+        }
+    }
 }
 
 void displayCpu(cpu_6502* cpu, HWND hwnd) {
     static long frameC = 0, f2c = 0;
     static clock_t time = clock();
 
-    frameC++; f2c++;
+    ++frameC;
+    ++f2c;
     if (frameC%42!=0) return;
 
     HDC hdc = GetDC(hwnd);
-    int x = 270;
-	int y = 0;
-	//int xIn = 70;
+    SetBkColor(hdc, 0);
+    SetTextColor(hdc, 0xFFFFFF);
+
+    int x   = 270;
+	int y   = 0;
 	int yIn = 18;
 	char buf[128];
 
-    sprintf(buf, "A: %02X", cpu->A);
-    TextOut(hdc, x, y, buf, 5);
-    sprintf(buf, "X: %02X", cpu->X);
-    TextOut(hdc, x, y+=yIn, buf, 5);
-    sprintf(buf, "Y: %02X", cpu->Y);
-    TextOut(hdc, x, y+=yIn, buf, 5);
-
-    sprintf(buf, "SP: %02X", cpu->SP);
-    TextOut(hdc, x, y+=yIn, buf, 6);
-    sprintf(buf, "PC: %04X", cpu->PC);
-    TextOut(hdc, x, y+=yIn, buf, 8);
-    sprintf(buf, "FG: %02X", cpu->FLAGS);
-    TextOut(hdc, x, y+=yIn, buf, 6);
-
     double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
 
-    sprintf(buf, "frame: %09ld", frameC);
-    TextOut(hdc, x, y+=yIn, buf, 16);
-    sprintf(buf, "rate : %02lf/s", f2c/utime);
-    TextOut(hdc, x, y+=yIn, buf, 11);
+#define TEXT_OUT(fmt, parm, len)    sprintf(buf, fmt, parm);  \
+                                    TextOut(hdc, x, y+=yIn, buf, len)
+
+    TEXT_OUT("A: %02X",        cpu->A,     5);
+    TEXT_OUT("X: %02X",        cpu->X,     5);
+    TEXT_OUT("Y: %02X",        cpu->Y,     5);
+    TEXT_OUT("SP: %02X",       cpu->SP,    6);
+    TEXT_OUT("PC: %04X",       cpu->PC,    8);
+    TEXT_OUT("FG: %02X",       cpu->FLAGS, 6);
+    TEXT_OUT("frame: %09ld",   frameC,    16);
+    TEXT_OUT("rate : %02lf/s", f2c/utime, 11);
+
+#undef TEXT_OUT
 
     if (f2c>50) {
         time = clock();
@@ -152,20 +192,19 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     switch (message)              /* handle the messages */
     {
     case WM_ACTIVATE:
+        switch (LOWORD(wParam))
         {
-        switch((LOWORD(wParam)))
-            {
-            case WA_ACTIVE:
-            case WA_CLICKACTIVE:
-                // 活动, 可以继续向主页面绘画了.
-                active = true;
-                break;
-            case WA_INACTIVE:
-                // 不活动, 停止向主页面绘画.
-                //active = false;
-                break;
-            }
+        case WA_ACTIVE:
+        case WA_CLICKACTIVE:
+            // 活动, 可以继续向主页面绘画了.
+            active = true;
+            break;
+        case WA_INACTIVE:
+            // 不活动, 停止向主页面绘画.
+            //active = false;
+            break;
         }
+
         break;
 
     case WM_DESTROY:
@@ -177,6 +216,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         switch (LOWORD(wParam))
         {
         case MENU_FILE:
+            openFile(hwnd);
             break;
 
         case MENU_DEBUG:

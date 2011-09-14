@@ -5,12 +5,12 @@
 |* $ C++语言的第一个项目,就用它练手吧                                         *|
 |* $ 猫饭写作, 如引用本程序代码需注明出处                                     *|
 |* $ 作者对使用本程序造成的后果不负任何责任                                   *|
-|* $ 亦不会对代码的工作原理做进一步解释,如有重大问题请拨打119 & 911           *|
+|* $ 亦不会对代码的工作原理做进一步解释,如有重大问题请拨打119                 *|
 |*                                                                            *|
 |* > 使用 [Code::Block 10.05] 开发环境                                        *|
 |* > 编译器使用 [MinGW 3.81] [gcc 4.4.1]                                      *|
 |* > 参考了来自 [http://nesdev.parodius.com] 网站的资料                       *|
-|* > 感谢 [Flubba] 设计的测试程序, 有了它开发效率成指数提升                   *|
+|* > 感谢 [Flubba,blargg] 设计的测试程序, 有了它开发效率成指数提升            *|
 |*                                                                            *|
 |* ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ | CatfoOD |^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ *|
 |*                                           | yanming-sohu@sohu.com          *|
@@ -24,12 +24,16 @@
 #include "mem.h"
 #include "ppu.h"
 
+#define CPU_NTSC      1789772.5  /* Hz */
+#define CPU_PAL       1773447
+
 struct command_6502;
 struct command_parm;
 struct cpu_6502;
 
 /* cpu寻址方式 */
 enum CPU_ADDRESSING_MODE {
+
     ADD_MODE_$zpgX$  = 0x00,
     ADD_MODE_zpg     = 0x04,
     ADD_MODE_imm     = 0x08,
@@ -95,9 +99,6 @@ private:
                                   * SHOW_CPU_OPERATE 启用后,仍需设置 */
 
 public:
-#define CPU_NTSC      1789772.5  /* Hz */
-#define CPU_PAL       1773447
-
 #define CPU_INTERRUPT_CYC   8    /* 中断命令的执行周期               */
 #define CPU_RESET_CYC       6    /* 复位命令执行周期                 */
 #define CPU_NMI_CYC        17    /* 不可屏蔽中断执行周期             */

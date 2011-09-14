@@ -12,6 +12,7 @@ void initHdcColor(HDC hdc) {
 }
 
 int createWindow(win_info* wi) {
+
     WNDCLASSEX wincl;        /* Data structure for the windowclass */
 
     /* The Window structure */
@@ -29,7 +30,7 @@ int createWindow(win_info* wi) {
     wincl.cbClsExtra   = 0;                   /* No extra bytes after the window class */
     wincl.cbWndExtra   = 0;                   /* structure or the window instance */
     /* Use Windows's default colour as the background of the window */
-    wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
+    wincl.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
 
     /* Register the window class, and if it fails quit the program */
     if (!RegisterClassEx (&wincl))
@@ -63,7 +64,7 @@ WindowsVideo::WindowsVideo(HWND hwnd) {
 }
 
 WindowsVideo::WindowsVideo(HWND hwnd, int w, int h)
-            : x_off(0), y_off(0), width(w), height(h)
+            : x_off(0), y_off(0), width(w+8), height(h+8)
 {
     m_hwnd = hwnd;
     hdc = GetDC(hwnd);
@@ -106,9 +107,9 @@ DirectXVideo::DirectXVideo(HWND hwnd, int width, int height)
     :lpDD4(0), lpDDSPrimary(0), success(0), pixel(0), m_hwnd(hwnd)
 {
     LPDIRECTDRAW lpDD;
-    pixel    = new T_COLOR[width * height];
-    m_height = height;
-    m_width  = width;
+    m_height = height+8;
+    m_width  = width+8;
+    pixel    = new T_COLOR[m_width * m_height];
 
     //创建DirectCraw对象
     if ( DirectDrawCreate( NULL, &lpDD, NULL ) ) {
@@ -219,5 +220,6 @@ WinPad::WinPad() {
 }
 
 byte WinPad::keyPushed(FC_PAD_KEY key, byte id) {
+    if (key>=8) return 0;
     return (GetAsyncKeyState( p1_key_map[key] ) & 0x8000) ? 1 : 0;
 }

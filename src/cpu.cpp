@@ -203,9 +203,8 @@ void cpu_command_BIT(command_parm* parm) {
         b = parm->read(parm->op - 0x20);
     }
 
-    byte _FF = CPU_FLAGS_NEGATIVE | CPU_FLAGS_OVERFLOW;
-    cpu->FLAGS &= 0xFF ^ _FF;
-    cpu->FLAGS |= b    & _FF;
+    cpu->FLAGS &= 0xFF ^ (CPU_FLAGS_NEGATIVE | CPU_FLAGS_OVERFLOW);
+    cpu->FLAGS |= b    & (CPU_FLAGS_NEGATIVE | CPU_FLAGS_OVERFLOW);
 
     cpu->checkZ(cpu->A & b);
 }
@@ -333,8 +332,11 @@ void cpu_command_JMP(command_parm* parm) {
     }
 }
 
-#define JUMP_CODE  parm->cpu->PC += ((signed char)parm->p1); \
-                   parm->mem_time = 1
+#define JUMP_CODE  word base = parm->cpu->PC;                       \
+                   word hi = base & 0xFF00;                         \
+                   base += ((signed char)parm->p1);                 \
+                   parm->mem_time = ((0xFF00 & base) ^ hi) ? 2 : 1; \
+                   parm->cpu->PC = base
 
 /* Ìõ¼þÌø×ª C==0 */
 void cpu_command_BCC(command_parm* parm) {
@@ -867,14 +869,14 @@ command_6502 command_list_6502[] = {
 byte cpu_6502::process() {
     byte cpu_cyc = reset();
 
-    prev_parm.op = ram->readPro(PC);
+    prev_parm.op = ram->read(PC);
     command_6502 *opp = &command_list_6502[prev_parm.op];
 
     switch (opp->len) {
     case 3:
-        prev_parm.p2 = ram->readPro(PC+2);
+        prev_parm.p2 = ram->read(PC+2);
     case 2:
-        prev_parm.p1 = ram->readPro(PC+1);
+        prev_parm.p1 = ram->read(PC+1);
     }
 
     prev_parm.cmd = opp;
@@ -982,8 +984,8 @@ byte cpu_6502::reset() {
         FLAGS  = CPU_FLAGS_CONST | CPU_FLAGS_INTERDICT;
 
         ram->soft_reset();
-        PCH    = ram->readPro(0xFFFD);
-        PCL    = ram->readPro(0xFFFC);
+        PCH    = ram->read(0xFFFD);
+        PCL    = ram->read(0xFFFC);
 
         NMI_idle = 1;
         return CPU_RESET_CYC;

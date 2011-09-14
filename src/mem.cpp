@@ -45,7 +45,8 @@ byte memory::read(const word offset) {
     if (offset<0x8000) {    /* SRAM（电池储存 RAM）            */
         return 0;
     }
-    return readPro(offset); /* 32K 程序代码 ROM                */
+                            /* 32K 程序代码 ROM                */
+    return mmc->readRom(offset);
 }
 
 void memory::write(const word offset, const byte data) {
@@ -71,8 +72,4 @@ void memory::write(const word offset, const byte data) {
     if (offset>=0x8000) {
         mmc->checkSwitch(offset, data);
     }
-}
-
-byte memory::readPro(const word offset) {
-    return mmc->readRom(offset);
 }

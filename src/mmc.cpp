@@ -12,20 +12,44 @@
  * reset_       复位代码
  * ------------------------------------------------------------------ */
 
-#define MMC_PRG_SIZE        rom->rom_size   /* 程序页的数量(x16 K) */
-#define MMC_PPU_SIZE        rom->vrom_size  /* 字库页的数量(x8  K) */
+#define MMC_PRG_SIZE    rom->rom_size   /* 程序页的数量(x16 K) */
+#define MMC_PPU_SIZE    rom->vrom_size  /* 字库页的数量(x8  K) */
 
 //-- 00 --/////////////////////////////////////////////////////////////
 
 class Mapper_0 : public MapperImpl {
+
+private:
+    byte ram[8 * 1024];
+
 public:
-    uint r_prom(word off) {
-        if (MMC_PRG_SIZE==1) {
-            if (off>=0xC000) {
-                return (off - 0xC000);
-            }
+    byte r_prom(word off) {
+        if (MMC_PRG_SIZE==1 && off>=0xC000) {
+            off -= 0xC000;
+        } else {
+            off -= 0x8000;
         }
-        return off - 0x8000;
+        return rom->rom[off];
+    }
+
+    byte r_vrom(word off) {
+        if (MMC_PPU_SIZE) {
+            return rom->vrom[off];
+        } else {
+            return ram[off];
+        }
+    }
+
+    void w_vrom(word off, byte value) {
+        ram[off] = value;
+    }
+
+    uint capability() {
+        return MMC_CAPABILITY_WRITE_VROM;
+    }
+
+    void reset() {
+        memset(ram, 0, sizeof(ram));
     }
 };
 
@@ -74,34 +98,37 @@ private:
     }
 
 public:
-    uint r_prom(word off) {
+    byte r_prom(word off) {
+        uint _off;
         if (off<0x8000) {
             if (!isC000fix) {
-                return off + _prg_fixp_off - 0x8000;
+                _off = off + _prg_fixp_off - 0x8000;
             } else {
-                return off + _prg_page_off - 0x8000;
+                _off = off + _prg_page_off - 0x8000;
             }
         }
         if (off<0xA000) {
-            return off + _prg_A000_off - 0xA000;
+            _off = off + _prg_A000_off - 0xA000;
         }
         if (off<0xC000) {
             if (isC000fix) {
-                return off + _prg_fixp_off - 0xC000;
+                _off = off + _prg_fixp_off - 0xC000;
             } else {
-                return off + _prg_page_off - 0xC000;
+                _off = off + _prg_page_off - 0xC000;
             }
+        } else { /* <0xE000 */
+            _off = off + _prg_E000_off - 0xE000;
         }
-        /* ELSE <0xE000 */
-        return off + _prg_E000_off - 0xE000;
+        return rom->rom[_off];
     }
 
-    uint r_vrom(word off) {
+    byte r_vrom(word off) {
         if (isVRAM) {
             return ex_vram[off];
         }
 
         int idx;
+        uint _off;
 
         if (chr_xor) {
                  if (off<0x0400) idx = 0;
@@ -111,7 +138,7 @@ public:
             else if (off<0x1800) idx = 4;
             else                 idx = 5;
 
-            return off + _vrom_xoff[idx];
+            _off = off + _vrom_xoff[idx];
         }
         else {
                  if (off<0x0800) idx = 0;
@@ -121,8 +148,10 @@ public:
             else if (off<0x1C00) idx = 4;
             else                 idx = 5;
 
-            return off + _vrom_off[idx];
+            _off = off + _vrom_off[idx];
         }
+
+        return rom->vrom[_off];
     }
 
     void w_vrom(word off, byte value) {
@@ -215,7 +244,7 @@ public:
 /* is bad */
 class Mapper_19 : public MapperImpl {
 public:
-    dword r_prom(word off) {
+    byte r_prom(word off) {
         if (off<0xC000) {
             return off;
         } else {

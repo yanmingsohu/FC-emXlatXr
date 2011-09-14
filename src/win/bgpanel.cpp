@@ -35,6 +35,8 @@ win_info* bg_panel(HINSTANCE hThisInstance, PPU *_ppu)
 /*  This function is called by the Windows function DispatchMessage()  */
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static int time = 100;
+
     switch (message)       /* handle the messages */
     {
     case WM_CLOSE:
@@ -46,9 +48,12 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_PAINT:
-        bgPanel->clear(0);
-        ppu->drawBackGround(bgPanel);
-        bgPanel->refresh();
+        if (!(--time)) {
+            bgPanel->clear(0);
+            ppu->drawBackGround(bgPanel);
+            bgPanel->refresh();
+            time = 100;
+        }
         break;
 
     default:               /* for messages that we don't deal with */

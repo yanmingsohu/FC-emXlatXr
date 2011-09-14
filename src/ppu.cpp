@@ -60,6 +60,22 @@ PPU::PPU(MMC *_mmc, Video *_video)
     memset(spWorkRam, 0, sizeof(spWorkRam));
 }
 
+void PPU::reset() {
+    spOverflow = 0;
+    hit        = 0;
+    *NMI       = 0;
+    preheating = 3;
+
+    memset(spWorkRam, 0, sizeof(spWorkRam));
+    memset(bkPalette, 0, sizeof(bkPalette));
+    memset(spPalette, 0, sizeof(spPalette));
+    memset(bg, 0, sizeof(bg));
+}
+
+void PPU::setNMI(byte* cpu_nmi) {
+    NMI = cpu_nmi;
+}
+
 void PPU::controlWrite(word addr, byte data) {
 
     switch (addr % 0x08) {
@@ -320,17 +336,6 @@ void PPU::switchMirror(byte type) {
     }
 }
 
-void PPU::reset() {
-    spOverflow = 0;
-    hit        = 0;
-    *NMI       = 0;
-    preheating = 3;
-}
-
-void PPU::setNMI(byte* cpu_nmi) {
-    NMI = cpu_nmi;
-}
-
 void PPU::drawTileTable(Video *v) {
     byte dataH, dataL;
     byte colorIdx;
@@ -456,13 +461,11 @@ void PPU::_drawSprite(byte i, byte ctrl) {
             if (v) dy = 8 - y + by;
             else   dy =     y + by;
 
-            if (dx<256 || dy<240) {
-                video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
+            video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
 
-                /* 记录0号精灵在屏幕上绘制的像素 */
-                if (!i) sp0hit[dx%8][dy%8] = 1;
-                else    _checkHit(dx, dy);
-            }
+            /* 记录0号精灵在屏幕上绘制的像素 */
+            if (!i) sp0hit[dx%8][dy%8] = 1;
+            else    _checkHit(dx, dy);
         }
 
         if (++x >= 8) {
@@ -521,6 +524,7 @@ void PPU::drawPixel(int X, int Y) {
 
     paletteIdx |= bgHBit(x, y, bgs->attribute);
     byte colorIdx = bkPalette[paletteIdx];
+
     if (colorIdx) {
         video->drawPixel(X, Y, ppu_color_table[colorIdx]);
         _checkHit(X, Y);
@@ -535,11 +539,11 @@ void PPU::oneFrameOver() {
 #endif
     }
     hit        = 0;
-    vblankTime = 1;
+    vblankTime = 0;
 }
 
 void PPU::startNewFrame() {
-    vblankTime = 0;
+    vblankTime = 1;
     ppu_ram_p  = 0x2000;
     video->clear(bkColor);
 

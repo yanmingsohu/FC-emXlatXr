@@ -5,12 +5,12 @@
 |* $ C++语言的第一个项目,就用它练手吧                                         *|
 |* $ 猫饭写作, 如引用本程序代码需注明出处                                     *|
 |* $ 作者对使用本程序造成的后果不负任何责任                                   *|
-|* $ 亦不会对代码的工作原理做进一步解释,如有重大问题请拨打119 & 911           *|
+|* $ 亦不会对代码的工作原理做进一步解释,如有重大问题请拨打119                 *|
 |*                                                                            *|
 |* > 使用 [Code::Block 10.05] 开发环境                                        *|
 |* > 编译器使用 [MinGW 3.81] [gcc 4.4.1]                                      *|
 |* > 参考了来自 [http://nesdev.parodius.com] 网站的资料                       *|
-|* > 感谢 [Flubba] 设计的测试程序, 有了它开发效率成指数提升                   *|
+|* > 感谢 [Flubba,blargg] 设计的测试程序, 有了它开发效率成指数提升            *|
 |*                                                                            *|
 |* ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ | CatfoOD |^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ *|
 |*                                           | yanming-sohu@sohu.com          *|
@@ -56,8 +56,6 @@ public:
     byte read(const word offset);
     /** 可以写入全部地址                           */
     void write(const word offset, const byte data);
-    /** 专门用来读取程序 offset=(0x8000,0xFFFF)    */
-    byte readPro(const word offset);
 };
 
 #endif // MEM_H_INCLUDED

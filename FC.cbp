@@ -48,6 +48,7 @@
 		</Compiler>
 		<Linker>
 			<Add library="gdi32" />
+			<Add library="libcomdlg32.a" />
 		</Linker>
 		<Unit filename="src\cpu.cpp" />
 		<Unit filename="src\cpu.h" />

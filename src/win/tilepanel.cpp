@@ -35,6 +35,8 @@ win_info* tile_panel(HINSTANCE hThisInstance, PPU *_ppu)
 /*  This function is called by the Windows function DispatchMessage()  */
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static byte time = 100;
+
     switch (message)       /* handle the messages */
     {
     case WM_CLOSE:
@@ -46,10 +48,14 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
     case WM_PAINT:
-        tPanel->clear(0);
-        ppu->drawTileTable(tPanel);
-        tPanel->refresh();
+        if (!(--time)) {
+            tPanel->clear(0);
+            ppu->drawTileTable(tPanel);
+            tPanel->refresh();
+            time = 100;
+        }
         break;
+
 
     default:               /* for messages that we don't deal with */
         return DefWindowProc(hwnd, message, wParam, lParam);

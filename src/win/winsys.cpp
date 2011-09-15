@@ -164,14 +164,19 @@ void DirectXVideo::clear(T_COLOR color) {
 void DirectXVideo::refresh() {
     RECT lpDestRect;
 
+    /* 防止绘制到窗口外面 */
+    GetClientRect(m_hwnd, &lpDestRect);
+    int _w = lpDestRect.right < m_width  ? lpDestRect.right : m_width;
+    int _h = lpDestRect.bottom< m_height ? lpDestRect.bottom: m_height;
+
     /* 转换坐标点 */
     point.x = point.y = 0;
     ClientToScreen(m_hwnd, &point);
 
     lpDestRect.top    = point.y;
     lpDestRect.left   = point.x;
-    lpDestRect.bottom = point.y + m_height;
-    lpDestRect.right  = point.x + m_width;
+    lpDestRect.bottom = point.y + _h;
+    lpDestRect.right  = point.x + _w;
 
     if (lpDDSPrimary->Lock(&lpDestRect, &ddsd,
              DDLOCK_SURFACEMEMORYPTR, NULL) != DD_OK) {
@@ -179,13 +184,13 @@ void DirectXVideo::refresh() {
     }
 
     UINT *buffer = (UINT*)ddsd.lpSurface;
-    UINT nPitch = ddsd.lPitch>>2;
+    UINT nPitch = ddsd.lPitch >> 2;
 
     for (int x=0, y=0;;) {
         buffer[x + y*nPitch] = pixel[x + y*m_width];
-        if (++x >= m_width) {
+        if (++x >= _w) {
             x = 0;
-            if (++y >= m_height) break;
+            if (++y >= _h) break;
         }
     }
 

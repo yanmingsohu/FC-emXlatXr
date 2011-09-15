@@ -67,9 +67,9 @@ private:
     static const uint prgBankSize = 8 * 1024;
     static const uint ppuBankSize = 1 * 1024;
 
-    uint _prg_page_off;  /* 如果isC000fix==true,则映射
+    uint _prg_page_off;  /* 如果isC000fix==true,则映射   */
                          /* 到8000 ~ 9FFF否则C000 ~ DFFF */
-    uint _prg_A000_off;  /* A000 ~ BFFF */
+    uint _prg_A000_off;  /* A000 ~ BFFF                  */
     uint _prg_fixp_off;  /* 倒数第二固定映射页面         */
     uint _prg_E000_off;  /* E000 ~ FFFF 固定最后一个页面 */
     bool isC000fix;      /* 如果0xC000地址为固定==true   */
@@ -184,8 +184,8 @@ public:
         //  if (bankSize==prgBankSize) value &= 0x3F; //!!!pitch
             *modify = value * bankSize;
 
-        //  printf("修改映射 A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
-        //         _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
+          printf("修改映射 A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
+                 _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
         }
 
         else if (off==0xA000) {

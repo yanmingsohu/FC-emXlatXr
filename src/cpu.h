@@ -174,7 +174,7 @@ struct command_6502 {
 
     CPU_ADDRESSING_MODE type;
 
-    /* 指向处理函数的指针,                   */
+    /* 指向处理函数的指针 */
     void (*op_func)(command_parm* parm);
 };
 

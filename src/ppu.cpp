@@ -61,10 +61,12 @@ PPU::PPU(MMC *_mmc, Video *_video)
 }
 
 void PPU::reset() {
-    spOverflow = 0;
-    hit        = 0;
-    *NMI       = 0;
-    preheating = 3;
+    spOverflow  = 0;
+    hit         = 0;
+    *NMI        = 0;
+    preheating  = 3;
+    spRomOffset = 0;
+    bgRomOffset = 0;
 
     memset(spWorkRam, 0, sizeof(spWorkRam));
     memset(bkPalette, 0, sizeof(bkPalette));
@@ -86,21 +88,30 @@ void PPU::controlWrite(word addr, byte data) {
         printf("PPU::write addr 2000:%X\n", data);
 #endif
         break;
+
     case 1: /* 0x2001 */
         control_2001(data);
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::write addr 2001:%X\n", data);
 #endif
         break;
+
     case 3: /* 0x2003 修改卡通工作内存指针 */
         spWorkOffset = data;
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::修改精灵指针:%x\n", data);
 #endif
         break;
+
     case 4: /* 0x2004 写入卡通工作内存 */
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::写入精灵数据: %x = %x\n", spWorkOffset, data);
+#endif
+#ifdef SHOW_ERR_MEM_OPERATE
+        if (spWorkOffset>=256) {
+            printf("PPU::写入精灵内存超出256字节中断写入\n");
+            break;
+        }
 #endif
         spWorkRam[spWorkOffset++] = data;
         break;
@@ -197,11 +208,11 @@ byte PPU::readState(word addr) {
     switch (addr % 0x08) {
 
     case 2: /* 0x2002 */
-        r = 0;
         if (preheating) {
             preheating >>= 1;
             vblankTime = 1;
         }
+        r = 0;
         if ( skipWrite  ) r |= ( 1<<4 );
         if ( spOverflow ) r |= ( 1<<5 );
         if ( hit        ) r |= ( 1<<6 );
@@ -212,7 +223,13 @@ byte PPU::readState(word addr) {
         break;
 
     case 4: /* 0x2004 读取卡通工作内存 */
-        r = spWorkRam[spWorkOffset++];
+#ifdef SHOW_ERR_MEM_OPERATE
+        if (spWorkOffset>=256) {
+            printf("PPU::读取精灵内存超出256字节中断读取\n");
+            break;
+        }
+#endif
+        r = spWorkRam[spWorkOffset];
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::读取精灵数据: %X = %x\n", spWorkOffset, r);
 #endif
@@ -223,7 +240,8 @@ byte PPU::readState(word addr) {
             r = readBuf;
             readBuf = read();
         } else {
-            r = readBuf = read();
+            readBuf = read();
+            r = readBuf;
         }
         break;
 
@@ -240,7 +258,7 @@ byte PPU::readState(word addr) {
     return r;
 }
 
-inline BackGround* PPU::swBg() {
+BackGround* PPU::swBg() {
     word offs = 0;
     if (ppu_ram_p<0x3000)
         offs = (ppu_ram_p - 0x2000) / 0x400;
@@ -257,19 +275,19 @@ inline BackGround* PPU::swBg() {
     return pbg[offs];
 }
 
-inline byte PPU::read() {
+byte PPU::read() {
     byte res = 0xFF;
 
     if (ppu_ram_p<0x2000) {
         res = mmc->readVRom(ppu_ram_p);
     } else
 
-    if (ppu_ram_p<0x3EFF) {
+    if (ppu_ram_p<0x3F00) {
         BackGround* pBg = swBg();
         res = pBg->read(ppu_ram_p);
     } else
 
-    if (ppu_ram_p<0x3FFF) {
+    if (ppu_ram_p<0x4000) {
         word off = ppu_ram_p % 0x20;
         if (off<0x10) {
             res = bkPalette[off     ];
@@ -282,7 +300,7 @@ inline byte PPU::read() {
     return res;
 }
 
-inline void PPU::write(byte data) {
+void PPU::write(byte data) {
     if (ppu_ram_p<0x2000) {
         mmc->writeVRom(ppu_ram_p, data);
     } else
@@ -550,7 +568,11 @@ void PPU::startNewFrame() {
 }
 
 void PPU::copySprite(byte *data) {
-    memcpy(spWorkRam, data, 256);
+    memcpy(spWorkRam + spWorkOffset, data, 256 - spWorkOffset);
+
+    if (spWorkOffset) { /* 需不需要完整复制256字节... */
+        memcpy(spWorkRam, data, spWorkOffset);
+    }
 }
 
 void PPU::getWindowPos(int *x, int *y) {
@@ -565,6 +587,6 @@ word PPU::getVRamPoint() {
 inline void PPU::_add_ppu_point() {
     ppu_ram_p += addr_add;
 
-    if (ppu_ram_p>0x3FFF)
+    if (ppu_ram_p > 0x3FFF)
         ppu_ram_p -= 0x4000;
 }

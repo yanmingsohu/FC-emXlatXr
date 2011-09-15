@@ -65,9 +65,9 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 #ifdef ROM
     if (int ret = fc->load_rom(ROM)) {
         MessageBox(hwnd, parseOpenError(ret), "´íÎó", 0);
-        return;
+    } else {
+        run = true;
     }
-    run = true;
 #endif
 
 	cpu_6502* cpu = fc->getCpu();
@@ -171,7 +171,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     TEXT_OUT("PC: %04X",       cpu->PC,    8);
     TEXT_OUT("FG: %02X",       cpu->FLAGS, 6);
     TEXT_OUT("frame: %09ld",   frameC,    16);
-    TEXT_OUT("rate : %02lf/s", f2c/utime, 11);
+    TEXT_OUT("rate : %04lf/s", f2c/utime, 13);
 
 #undef TEXT_OUT
 

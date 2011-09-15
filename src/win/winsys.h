@@ -47,7 +47,9 @@ struct win_info {
     HMENU     menu;
     WNDPROC   procedure;
 
-    win_info() : nCmdShow(SW_SHOW), x(CW_USEDEFAULT), y(CW_USEDEFAULT)
+    win_info() : nCmdShow(SW_SHOW)
+               , x(CW_USEDEFAULT)
+               , y(CW_USEDEFAULT)
                , width(500), height(350)
                , menu(NULL), procedure(NULL)
     {/* do nothing.. */}
@@ -85,8 +87,9 @@ public:
 class DirectXVideo : public Video {
 
 private:
-    LPDIRECTDRAW4         lpDD4;                /* DirectDraw对象 */
+    LPDIRECTDRAW4         lpDD4;                /* DirectDraw对象   */
     LPDIRECTDRAWSURFACE4  lpDDSPrimary;         /* DirectDraw主页面 */
+
     int                   success;
     T_COLOR              *pixel;
     HWND                  m_hwnd;

@@ -54,6 +54,8 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "rom/fighter_f8000.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\霸王的大陆.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
+//#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地.nes"
+#define ROM "H:\\VROMS\\FC_ROMS\\魂斗罗.nes"
 //#define ROM "rom/test/cpu_timing_test/cpu_timing_test.nes"
 
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
@@ -95,7 +97,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	if (!run) continue;
 
         /* 限速,但是并不准确 */
-    	if (clock()-usetime<15) continue;
+    	if (clock()-usetime<14) continue;
     	usetime = clock();
 
         if (sDebug) {

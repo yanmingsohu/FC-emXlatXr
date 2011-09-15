@@ -229,7 +229,7 @@ byte PPU::readState(word addr) {
             break;
         }
 #endif
-        r = spWorkRam[spWorkOffset];
+        r = spWorkRam[spWorkOffset++];
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::读取精灵数据: %X = %x\n", spWorkOffset, r);
 #endif
@@ -370,7 +370,7 @@ void PPU::drawTileTable(Video *v) {
                 if (dataH>>d & 1) {
                     colorIdx |= 2;
                 }
-                v->drawPixel(x++, y, ppu_color_table[colorIdx]);
+                v->drawPixel(x++, y, ppu_color_table[bkPalette[colorIdx]]);
             }
             x-= 8;
             y++;

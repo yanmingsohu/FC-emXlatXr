@@ -100,23 +100,23 @@ private:
 public:
     byte r_prom(word off) {
         uint _off;
-        if (off<0x8000) {
+        if (off<0xA000) {
             if (!isC000fix) {
                 _off = off + _prg_fixp_off - 0x8000;
             } else {
                 _off = off + _prg_page_off - 0x8000;
             }
         }
-        if (off<0xA000) {
+        if (off<0xC000) {
             _off = off + _prg_A000_off - 0xA000;
         }
-        if (off<0xC000) {
+        if (off<0xE000) {
             if (isC000fix) {
                 _off = off + _prg_fixp_off - 0xC000;
             } else {
                 _off = off + _prg_page_off - 0xC000;
             }
-        } else { /* <0xE000 */
+        } else { /* <0x10000 */
             _off = off + _prg_E000_off - 0xE000;
         }
         return rom->rom[_off];
@@ -253,6 +253,102 @@ public:
     }
 };
 
+//-- 23 --/////////////////////////////////////////////////////////////
+
+class Mapper_23 : public MapperImpl {
+
+private:
+    static const uint pSize = 8 * 1024;
+    static const uint cSize = 1 * 1024;
+
+    uint p8000off;
+    uint pA000off;
+    uint pC000off;
+
+    /*    0,  400,  800,  C00
+     * 1000, 1400, 1800, 1C00 */
+    uint chr_off[8];
+
+public:
+    void sw_page(word off, byte value) {
+
+        switch (off) {
+        case 0x8000:
+            p8000off = value * pSize;
+            break;
+
+        case 0x9000:
+            if (value == 0) {
+                ppu->switchMirror(PPU_VMIRROR_VERTICAL);
+            }
+            else if (value == 1) {
+                ppu->switchMirror(PPU_VMIRROR_HORIZONTAL);
+            }
+            break;
+
+        case 0xA000:
+            pA000off = value * pSize;
+            break;
+
+#define O_CASE(v, i) \
+        case v:   chr_off[i] =  0x0F & value;     break; \
+        case v+1: chr_off[i] = (0x0F & value)<<4; break
+
+        O_CASE(0xB000, 0);
+        O_CASE(0xB002, 1);
+        O_CASE(0xC000, 2);
+        O_CASE(0xC002, 3);
+        O_CASE(0xD000, 4);
+        O_CASE(0xD002, 5);
+        O_CASE(0xE000, 6);
+        O_CASE(0xE002, 7);
+
+#undef O_CASE
+        }
+    }
+
+    byte r_prom(word off) {
+        uint _off;
+        if (off < 0xA000) {
+            _off = off + p8000off - 0x8000;
+        }
+        else if (off < 0xC000) {
+            _off = off + pA000off - 0xA000;
+        }
+        else { /* 0xC000 ~ 0xFFFF */
+            _off = off + pC000off - 0xC000;
+        }
+        return rom->rom[_off];
+    }
+
+    byte r_vrom(word off) {
+        uint _off;
+#define IF_DO(o, i, d)     if (off < o) _off = off + chr_off[i] - d
+#define ELS_IF_DO(o,i,d)   else IF_DO(o, i, d)
+        IF_DO    (0x0400, 0, 0);
+        ELS_IF_DO(0x0800, 1, 0x0400);
+        ELS_IF_DO(0x0C00, 2, 0x0800);
+        ELS_IF_DO(0x1000, 3, 0x0C00);
+        ELS_IF_DO(0x1400, 4, 0x1000);
+        ELS_IF_DO(0x1800, 5, 0x1400);
+        ELS_IF_DO(0x1C00, 6, 0x1800);
+        ELS_IF_DO(0x10000,7, 0x1C00);
+#undef ELS_IF_DO, IF_DO
+        return rom->vrom[_off];
+    }
+
+    void reset() {
+        uint _psize = MMC_PRG_SIZE * 2;
+        p8000off = 0;
+        pA000off = 1 * pSize;
+        pC000off = (_psize-2) * pSize;
+    }
+
+    uint capability() {
+        return MMC_CAPABILITY_CHECK_SWITCH;
+    }
+};
+
 /* ------------------------------------------------------------------ */
 
 #define MMC_MAP(x)  case x : return new Mapper_##x
@@ -263,6 +359,7 @@ static MapperImpl* createMapper(int mapper_id) {
         MMC_MAP(  3);
         MMC_MAP(  4);
     //  MMC_MAP( 19);
+        MMC_MAP( 23);
     }
     return NULL;
 }

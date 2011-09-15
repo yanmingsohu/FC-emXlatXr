@@ -52,7 +52,10 @@ NesSystem::~NesSystem() {
 #define ONE_LINE_CYC     1364
 #define START_CYC        MID_CYC(ONE_LINE_CYC*21)
 #define END_CYC          MID_CYC(ONE_LINE_CYC)
+#define ONE_CYC          END_CYC
 #define HBLANK_CYC       MID_CYC(340)
+                         /* 1帧的cpu周期 - 1帧使用的周期 = 空白周期 */
+#define VBLANK_CYC       (MID_CPU_CYC(1789772.5/60) - MID_CYC(ONE_LINE_CYC*262))
 
 void NesSystem::drawFrame() {
 
@@ -98,6 +101,11 @@ void NesSystem::drawFrame() {
     _cyc -= END_CYC;
 
     ppu->oneFrameOver();
+
+    while (_cyc < VBLANK_CYC) {
+        _cyc += MID_CPU_CYC( cpu->process() );
+    }
+    _cyc -= VBLANK_CYC;
 }
 
 int NesSystem::load_rom(string filename) {

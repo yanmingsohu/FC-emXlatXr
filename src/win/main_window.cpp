@@ -55,7 +55,7 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "H:\\VROMS\\FC_ROMS\\霸王的大陆.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地.nes"
-#define ROM "H:\\VROMS\\FC_ROMS\\魂斗罗.nes"
+#define ROM "H:\\VROMS\\FC_ROMS\\魂斗罗.nes" // 7900断点
 //#define ROM "rom/test/cpu_timing_test/cpu_timing_test.nes"
 
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {

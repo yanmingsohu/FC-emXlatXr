@@ -158,7 +158,9 @@ void DirectXVideo::drawPixel(int x, int y, T_COLOR color) {
 }
 
 void DirectXVideo::clear(T_COLOR color) {
-    memset(pixel, color, m_width * m_height * sizeof(int));
+    for (int i=0; i<m_width * m_height; ++i) {
+        pixel[i] = color;
+    }
 }
 
 void DirectXVideo::refresh() {

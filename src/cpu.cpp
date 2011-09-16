@@ -34,7 +34,7 @@ HELP_FNC void check_decimal(command_parm* parm) {
 }
 
 void cpu_command_XXX(command_parm* parm) {
-    printf("! unknow command code[%02x] on %04x exit.\n",
+    printf("! unknow command code[%02x] on %04x skip.\n",
            parm->op, parm->cpu->PC - parm->cmd->len);
 }
 

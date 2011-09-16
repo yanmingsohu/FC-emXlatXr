@@ -311,11 +311,23 @@ void PPU::write(byte data) {
     } else
 
     if (ppu_ram_p<0x3FFF) {
-        word off = ppu_ram_p % 0x20;
-        if (off<0x10) {
-            bkPalette[off     ] = data;
-        } else {
-            spPalette[off-0x10] = data;
+        if (ppu_ram_p % 4 == 0) {
+            bkPalette[  0] = data;
+            bkPalette[  4] = data;
+            bkPalette[  8] = data;
+            bkPalette[0xC] = data;
+            spPalette[  0] = data;
+            spPalette[  4] = data;
+            spPalette[  8] = data;
+            spPalette[0xC] = data;
+        }
+        else {
+            word off = ppu_ram_p % 0x20;
+            if (off<0x10) {
+                bkPalette[off     ] = data;
+            } else {
+                spPalette[off-0x10] = data;
+            }
         }
     }
 
@@ -503,8 +515,9 @@ inline void PPU::_checkHit(int x, int y) {
 void PPU::drawSprite(bgPriority bp) {
     for (int i=63<<2; i>=0; i-=4) { // spriteType
         byte ctrl = spWorkRam[i+2];
-        if ( ((ctrl>>5) & 1)!=bp ) continue;
-        _drawSprite(i, ctrl);
+        if ( ((ctrl>>5) & 1)==bp ) {
+            _drawSprite(i, ctrl);
+        }
     }
 }
 
@@ -536,24 +549,18 @@ void PPU::drawPixel(int X, int Y) {
     word nameIdx = DIV8(x) + (DIV8(y)<<5);
     word tileIdx = bgs->name[nameIdx];
 
-    byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
+    byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset)
+                    | bgHBit(x, y, bgs->attribute);
 
-    paletteIdx |= bgHBit(x, y, bgs->attribute);
+    /* 透明色 */
+    if (paletteIdx%4==0) return;
+
     byte colorIdx = bkPalette[paletteIdx];
-
-    if (colorIdx) {
-        video->drawPixel(X, Y, ppu_color_table[colorIdx]);
-        _checkHit(X, Y);
-    }
+    video->drawPixel(X, Y, ppu_color_table[colorIdx]);
+    _checkHit(X, Y);
 }
 
 void PPU::oneFrameOver() {
-    if (sendNMI) {
-        *NMI = 1;
-#ifdef NMI_DEBUG
-        printf("PPU::发送中断到CPU\n");
-#endif
-    }
     hit        = 0;
     vblankTime = 0;
 }
@@ -561,10 +568,20 @@ void PPU::oneFrameOver() {
 void PPU::startNewFrame() {
     vblankTime = 1;
     ppu_ram_p  = 0x2000;
-    video->clear(bkColor);
+
+    video->clear( ppu_color_table[bkPalette[0]] );
 
     memset(sp0hit, 0, sizeof(sp0hit));
     _drawSprite(0,0);
+}
+
+void PPU::sendingNMI() {
+    if (sendNMI) {
+        *NMI = 1;
+#ifdef NMI_DEBUG
+        printf("PPU::发送中断到CPU\n");
+#endif
+    }
 }
 
 void PPU::copySprite(byte *data) {

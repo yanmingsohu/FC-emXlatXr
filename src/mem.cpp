@@ -18,6 +18,7 @@ void memory::soft_reset() {
 }
 
 byte memory::read(const word offset) {
+
     if (offset<0x2000) {
         return ram[offset%0x0800];
     }
@@ -40,10 +41,10 @@ byte memory::read(const word offset) {
         return 0;
     }
     if (offset<0x6000) {    /* À©Õ¹ ROM                        */
-        return 0;
+        return 0xFF;
     }
-    if (offset<0x8000) {    /* SRAM£¨µç³Ø´¢´æ RAM£©            */
-        return 0;
+    if (offset<0x8000) {    /* SRAM£¨µç³Ø´¢´æ RAM£©6000-8000   */
+        return batteryRam[offset - 0x6000];
     }
                             /* 32K ³ÌÐò´úÂë ROM                */
     return mmc->readRom(offset);
@@ -68,6 +69,9 @@ void memory::write(const word offset, const byte data) {
     if (offset==0x4016 || offset==0x4017) {
         pad->writePort(offset, data);
         return;
+    }
+    if (offset>=0x6000 && offset<0x8000) {
+        batteryRam[offset - 0x6000] = data;
     }
     if (offset>=0x8000) {
         mmc->checkSwitch(offset, data);

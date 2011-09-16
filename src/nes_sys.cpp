@@ -50,22 +50,26 @@ NesSystem::~NesSystem() {
 #define MID_CPU_CYC(x)   (x*3)
 #define MID_CYC(x)       (x/4)
 #define ONE_LINE_CYC     1364
-#define START_CYC        MID_CYC(ONE_LINE_CYC*21)
+#define START_CYC        MID_CYC(ONE_LINE_CYC*20)
 #define END_CYC          MID_CYC(ONE_LINE_CYC)
-#define ONE_CYC          END_CYC
+#define ONE_CYC          MID_CYC(ONE_LINE_CYC)
 #define HBLANK_CYC       MID_CYC(340)
-                         /* 1帧的cpu周期 - 1帧使用的周期 = 空白周期 */
+/* 1帧的cpu周期 - 1帧使用的周期 = 空白周期 */
 #define VBLANK_CYC       (MID_CPU_CYC(1789772.5/60) - MID_CYC(ONE_LINE_CYC*262))
+/* cpu单独运行指定的周期 */
+#define CPU_RUN(cYc)     while (_cyc < cYc) { \
+                            _cyc += MID_CPU_CYC( cpu->process() ); \
+                         } \
+                         _cyc -= cYc
 
 void NesSystem::drawFrame() {
 
-    while (_cyc < START_CYC) {
-        _cyc += MID_CPU_CYC( cpu->process() );
-    }
-    _cyc -= START_CYC;
+    CPU_RUN(START_CYC);
 
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
+
+    CPU_RUN(ONE_CYC);
 
     int x=0, y=0;
 
@@ -84,28 +88,21 @@ void NesSystem::drawFrame() {
         }
 
         mmc->drawLineOver();
-        x = 0; y++;
+        x=0; y++;
 
         /* 水平消隐周期 */
-        while (_cyc < HBLANK_CYC) {
-            _cyc += MID_CPU_CYC( cpu->process() );
-        }
-        _cyc -= HBLANK_CYC;
+        CPU_RUN(HBLANK_CYC);
     }
 
     ppu->drawSprite(PPU::bpFront);
+    ppu->sendingNMI();
 
-    while (_cyc < END_CYC) {
-        _cyc += MID_CPU_CYC( cpu->process() );
-    }
-    _cyc -= END_CYC;
-
+    CPU_RUN(END_CYC);
     ppu->oneFrameOver();
 
-    while (_cyc < VBLANK_CYC) {
-        _cyc += MID_CPU_CYC( cpu->process() );
-    }
-    _cyc -= VBLANK_CYC;
+return;
+    /* 实际使用的周期与cpu周期有差别... */
+    CPU_RUN(VBLANK_CYC);
 }
 
 int NesSystem::load_rom(string filename) {

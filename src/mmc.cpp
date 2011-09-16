@@ -181,7 +181,7 @@ public:
         }
 
         else if (off==0x8001) {
-        //  if (bankSize==prgBankSize) value &= 0x3F; //!!!pitch
+            if (bankSize==prgBankSize) value %= 0x3F; //!!!pitch
             *modify = value * bankSize;
 
           printf("修改映射 A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
@@ -261,6 +261,9 @@ private:
     static const uint pSize = 8 * 1024;
     static const uint cSize = 1 * 1024;
 
+    uint max_prg_size; /* 8K代码页的数量 */
+    uint max_chr_size; /* 1K字库页的数量 */
+
     uint p8000off;
     uint pA000off;
     uint pC000off;
@@ -269,12 +272,15 @@ private:
      * 1000, 1400, 1800, 1C00 */
     uint chr_off[8];
 
+    uint off_latch;
+
 public:
     void sw_page(word off, byte value) {
-
+printf("sw: %X %X\n", off, value);
         switch (off) {
+
         case 0x8000:
-            p8000off = value * pSize;
+            p8000off = (value % max_prg_size) * pSize;
             break;
 
         case 0x9000:
@@ -287,12 +293,14 @@ public:
             break;
 
         case 0xA000:
-            pA000off = value * pSize;
+            pA000off = (value % max_prg_size) * pSize;
             break;
 
 #define O_CASE(v, i) \
-        case v:   chr_off[i] =  0x0F & value;     break; \
-        case v+1: chr_off[i] = (0x0F & value)<<4; break
+        case v:   off_latch  =  0x0F & value;     break; \
+        case v+1: off_latch |= (0x0F & value)<<4;        \
+                  chr_off[i] = (off_latch % max_chr_size) * cSize; \
+                  break
 
         O_CASE(0xB000, 0);
         O_CASE(0xB002, 1);
@@ -323,25 +331,29 @@ public:
 
     byte r_vrom(word off) {
         uint _off;
-#define IF_DO(o, i, d)     if (off < o) _off = off + chr_off[i] - d
-#define ELS_IF_DO(o,i,d)   else IF_DO(o, i, d)
-        IF_DO    (0x0400, 0, 0);
-        ELS_IF_DO(0x0800, 1, 0x0400);
-        ELS_IF_DO(0x0C00, 2, 0x0800);
-        ELS_IF_DO(0x1000, 3, 0x0C00);
-        ELS_IF_DO(0x1400, 4, 0x1000);
-        ELS_IF_DO(0x1800, 5, 0x1400);
-        ELS_IF_DO(0x1C00, 6, 0x1800);
-        ELS_IF_DO(0x10000,7, 0x1C00);
+#define IF_DO(o, i)      if (off < o) _off = off + chr_off[i] - o + 0x0400
+#define ELS_IF_DO(o,i)   else IF_DO(o, i)
+
+        IF_DO    (0x0400, 0);
+        ELS_IF_DO(0x0800, 1);
+        ELS_IF_DO(0x0C00, 2);
+        ELS_IF_DO(0x1000, 3);
+        ELS_IF_DO(0x1400, 4);
+        ELS_IF_DO(0x1800, 5);
+        ELS_IF_DO(0x1C00, 6);
+        ELS_IF_DO(0x10000,7);
+
 #undef ELS_IF_DO, IF_DO
         return rom->vrom[_off];
     }
 
     void reset() {
-        uint _psize = MMC_PRG_SIZE * 2;
-        p8000off = 0;
-        pA000off = 1 * pSize;
-        pC000off = (_psize-2) * pSize;
+        max_chr_size = MMC_PPU_SIZE * 8;
+        max_prg_size = MMC_PRG_SIZE * 2;
+
+        p8000off = pSize * 0;
+        pA000off = pSize * 1;
+        pC000off = pSize * (max_prg_size-2);
     }
 
     uint capability() {

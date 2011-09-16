@@ -194,6 +194,8 @@ public:
     void oneFrameOver();
     /* 当开始绘制一幅新的帧时,该方法被调用                         */
     void startNewFrame();
+    /* 向cpu发送中断信号                                           */
+    void sendingNMI();
     /* 复制256字节的数据到精灵Ram,需要512个CPU周期                 */
     void copySprite(byte *data);
     /* 取得窗口坐标                                                */

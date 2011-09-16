@@ -45,6 +45,7 @@ private:
     PPU     *ppu;
     PlayPad *pad;
     byte    ram[0x07FF];
+    byte    batteryRam[0x2000];
 
 public:
     memory(MMC *mmc, PPU *_ppu, PlayPad* _pad);

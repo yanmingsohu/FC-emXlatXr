@@ -208,16 +208,12 @@ byte PPU::readState(word addr) {
     switch (addr % 0x08) {
 
     case 2: /* 0x2002 */
-        if (preheating) {
-            preheating >>= 1;
-            vblankTime = 1;
-        }
         r = 0;
         if ( skipWrite  ) r |= ( 1<<4 );
         if ( spOverflow ) r |= ( 1<<5 );
         if ( hit        ) r |= ( 1<<6 );
-        if ( vblankTime ) r |= ( 1<<7 );
-        vblankTime = 0;
+        if (!vblankTime ) r |= ( 1<<7 );
+        vblankTime = 1;
         ppuSW      = pH;
         w2005      = wX;
         break;
@@ -562,15 +558,17 @@ void PPU::drawPixel(int X, int Y) {
 
 void PPU::oneFrameOver() {
     hit        = 0;
+    vblankTime = 1;
+}
+
+void PPU::clearVBL() {
     vblankTime = 0;
 }
 
 void PPU::startNewFrame() {
-    vblankTime = 1;
     ppu_ram_p  = 0x2000;
 
     video->clear( ppu_color_table[bkPalette[0]] );
-
     memset(sp0hit, 0, sizeof(sp0hit));
     _drawSprite(0,0);
 }

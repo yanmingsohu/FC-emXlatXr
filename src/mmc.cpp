@@ -67,6 +67,9 @@ private:
     static const uint prgBankSize = 8 * 1024;
     static const uint ppuBankSize = 1 * 1024;
 
+    uint max_prg_size;
+    uint max_chr_size;
+
     uint _prg_page_off;  /* 如果isC000fix==true,则映射   */
                          /* 到8000 ~ 9FFF否则C000 ~ DFFF */
     uint _prg_A000_off;  /* A000 ~ BFFF                  */
@@ -130,27 +133,30 @@ public:
         int idx;
         uint _off;
 
-        if (chr_xor) {
-                 if (off<0x0400) idx = 0;
-            else if (off<0x0800) idx = 1;
-            else if (off<0x0C00) idx = 2;
-            else if (off<0x1000) idx = 3;
-            else if (off<0x1800) idx = 4;
-            else                 idx = 5;
+#define IF_DO(a,i,b)        if (off<a) _DO(i,b)
+#define ELSE_IF_DO(a,i,b)   else IF_DO(a,i,b)
+#define ELSE_DO(i,b)        else _DO(i,b)
 
-            _off = off + _vrom_xoff[idx];
+        if (chr_xor) {
+#define _DO(i,b) _off = off + _vrom_xoff[i] - b
+                 IF_DO(0x0400, 0,      0);
+            ELSE_IF_DO(0x0800, 1, 0x0400);
+            ELSE_IF_DO(0x0C00, 2, 0x0800);
+            ELSE_IF_DO(0x1000, 3, 0x0C00);
+            ELSE_IF_DO(0x1800, 4, 0x1000);
+               ELSE_DO(        5, 0x1800);
         }
         else {
-                 if (off<0x0800) idx = 0;
-            else if (off<0x1000) idx = 1;
-            else if (off<0x1400) idx = 2;
-            else if (off<0x1800) idx = 3;
-            else if (off<0x1C00) idx = 4;
-            else                 idx = 5;
-
-            _off = off + _vrom_off[idx];
+#define _DO(i,b) _off = off + _vrom_off[i] - b
+                 IF_DO(0x0800, 0,      0);
+            ELSE_IF_DO(0x1000, 1, 0x0800);
+            ELSE_IF_DO(0x1400, 2, 0x1000);
+            ELSE_IF_DO(0x1800, 3, 0x1400);
+            ELSE_IF_DO(0x1C00, 4, 0x1800);
+               ELSE_DO(        5, 0x1C00);
         }
 
+#undef IF_DO, _DO, ELSE_DO, ELSE_IF_DO
         return rom->vrom[_off];
     }
 
@@ -181,11 +187,15 @@ public:
         }
 
         else if (off==0x8001) {
-            if (bankSize==prgBankSize) value %= 0x3F; //!!!pitch
+            if (bankSize==prgBankSize)
+                value %= max_prg_size;
+            else
+                value %= max_chr_size;
+
             *modify = value * bankSize;
 
-          printf("修改映射 A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
-                 _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
+        //  printf("修改映射 A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
+          //       _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
         }
 
         else if (off==0xA000) {
@@ -218,12 +228,13 @@ public:
     }
 
     void reset() {
-        uint psize = MMC_PRG_SIZE * 2 - 1;
+        max_prg_size = MMC_PRG_SIZE * 2;
+        max_chr_size = MMC_PPU_SIZE * 8;
 
         _prg_page_off = prg_bank2page(0);
         _prg_A000_off = prg_bank2page(1);
-        _prg_fixp_off = prg_bank2page(psize - 1);
-        _prg_E000_off = prg_bank2page(psize);
+        _prg_fixp_off = prg_bank2page(max_prg_size - 2);
+        _prg_E000_off = prg_bank2page(max_prg_size - 1);
 
         isC000fix = true;
         chr_xor   = false;

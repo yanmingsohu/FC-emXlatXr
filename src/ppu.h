@@ -196,6 +196,8 @@ public:
     void startNewFrame();
     /* 向cpu发送中断信号                                           */
     void sendingNMI();
+    /* 2270 cpu 周期后清除VBL                                      */
+    void clearVBL();
     /* 复制256字节的数据到精灵Ram,需要512个CPU周期                 */
     void copySprite(byte *data);
     /* 取得窗口坐标                                                */

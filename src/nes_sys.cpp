@@ -22,9 +22,9 @@
 #include <stdio.h>
 
 NesSystem::NesSystem(Video* video, PlayPad *_pad)
-: pad(_pad)
-, state(0)
-, _cyc(0)
+    : pad(_pad)
+    , state(0)
+    , _cyc(0)
 {
     mmc = new MMC();
     ppu = new PPU(mmc, video);
@@ -54,6 +54,7 @@ NesSystem::~NesSystem() {
 #define END_CYC          MID_CYC(ONE_LINE_CYC)
 #define ONE_CYC          MID_CYC(ONE_LINE_CYC)
 #define HBLANK_CYC       MID_CYC(340)
+#define CLR_VBL_CYC      MID_CPU_CYC(2270)
 /* 1帧的cpu周期 - 1帧使用的周期 = 空白周期 */
 #define VBLANK_CYC       (MID_CPU_CYC(1789772.5/60) - MID_CYC(ONE_LINE_CYC*262))
 /* cpu单独运行指定的周期 */
@@ -63,9 +64,9 @@ NesSystem::~NesSystem() {
                          _cyc -= cYc
 
 void NesSystem::drawFrame() {
-
     CPU_RUN(START_CYC);
 
+    ppu->clearVBL();
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
 
@@ -95,10 +96,10 @@ void NesSystem::drawFrame() {
     }
 
     ppu->drawSprite(PPU::bpFront);
-    ppu->sendingNMI();
 
     CPU_RUN(END_CYC);
     ppu->oneFrameOver();
+    ppu->sendingNMI();
 
 return;
     /* 实际使用的周期与cpu周期有差别... */

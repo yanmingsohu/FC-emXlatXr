@@ -101,7 +101,7 @@ private:
 public:
 #define CPU_INTERRUPT_CYC   8    /* 中断命令的执行周期               */
 #define CPU_RESET_CYC       6    /* 复位命令执行周期                 */
-#define CPU_NMI_CYC        17    /* 不可屏蔽中断执行周期             */
+#define CPU_NMI_CYC         7    /* 不可屏蔽中断执行周期             */
 
     byte A; 	                 /* 累加器                           */
     byte Y;	    	             /* 索引暂存器                       */

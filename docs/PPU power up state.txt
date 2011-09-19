@@ -1,0 +1,39 @@
+In March 2008, Blargg reverse-engineered the power-up/reset state and behavior of the NES PPU, NTSC version.
+Initial Register Values
+
+Register	 	At Power	After Reset
+PPUCTRL ($2000)	 	0x00 0000	0x00 0000
+PPUMASK ($2001)	 	0000 0xx0	0000 0xx0
+PPUSTATUS ($2002)	+0+x xxxx	U??x xxxx
+$2003	 		$00	 	unchanged
+$2005/$2006 latch	cleared	 	cleared
+PPUSCROLL ($2005)	$0000	 	$0000
+PPUADDR ($2006)	 	$0000	 	unchanged
+PPUDATA ($2007)	 	random	 	$00
+odd frame	 	?	 	?
+CHR RAM	 		pattern		unchanged
+NT RAM	 		mostly $FF	unchanged
+SPR RAM	 		pattern	 	pattern
+
+? = unknown, x = irrelevant, + = often set, U = unchanged
+
+
+Writes to the following registers are ignored if earlier than ~29658 CPU clocks after reset: $2000, $2001, $2005, $2006. The other registers work immediately: $2002, $2003, $2004, $2007, $4014.
+If the NES is powered on after having been off for less than 20 seconds, register writes are ignored as if it were a reset, and register starting values differ: $2002 = $80 (VBL flag set), $2003 = $2F or $01, and $2006 = $0001 .
+The VBL flag ($2002 bit 7) is usually clear at power, and unchanged by reset. It is next set around 27384, then around 57165.
+These cycle values appear to correspond to numbers of scanlines. Specifically, 27384 is almost 241 * 341/3 (241 scanlines), 29658 is 9 clocks less than 261 scanlines, and 57165 is 29781 clocks (one normal frame) after 27384.
+Preliminary testing on a PAL NES shows that writes are ignored until ~33132 CPU clocks after power and reset, 9 clocks less than 311 scanlines. It is conjectured that the first VBL flag setting will be close to 241 * 341/3.2 cycles (241 PAL scanlines); further testing is needed to confirm this.
+It is known that after power and reset, it is as if the APU's $4017 were written 10 clocks before the first code starts executing. This delay is probably the same source of the 9 clock difference in the times for PPU writes being ignored. The cause is likely the reset sequence of the 2A03, when it reads the reset vector.
+Best practice
+
+The easiest way to make sure that 29658 cycles have passed, and the way used by commercial NES games, involves a pair of loops like this in your init code:
+  bit $2002  ; clear the VBL flag if it was set at reset time
+vwait1:
+  bit $2002
+  bpl vwait1  ; at this point, about 27384 cycles have passed
+vwait2:
+  bit $2002
+  bpl vwait2  ; at this point, about 57165 cycles have passed
+
+
+Due to the $2002 race condition, alignment between the CPU and PPU clocks at reset may cause the NES to miss an occasional VBL flag setting, but the only consequence of this is that your program will take one frame longer to start up. You might want to do various other initialization, such as getting the mapper and RAM into a known state, between the two loops.

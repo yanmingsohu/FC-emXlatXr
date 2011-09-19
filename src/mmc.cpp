@@ -156,7 +156,10 @@ public:
                ELSE_DO(        5, 0x1C00);
         }
 
-#undef IF_DO, _DO, ELSE_DO, ELSE_IF_DO
+#undef IF_DO
+#undef _DO
+#undef ELSE_DO
+#undef ELSE_IF_DO
         return rom->vrom[_off];
     }
 
@@ -354,7 +357,8 @@ printf("sw: %X %X\n", off, value);
         ELS_IF_DO(0x1C00, 6);
         ELS_IF_DO(0x10000,7);
 
-#undef ELS_IF_DO, IF_DO
+#undef ELS_IF_DO
+#undef IF_DO
         return rom->vrom[_off];
     }
 
@@ -387,7 +391,9 @@ static MapperImpl* createMapper(int mapper_id) {
     return NULL;
 }
 
-#undef MMC_MAP, MMC_PRG_SIZE, MMC_PPU_SIZE
+#undef MMC_MAP
+#undef MMC_PRG_SIZE
+#undef MMC_PPU_SIZE
 
 /* ------------------------------------------------------------------ */
 

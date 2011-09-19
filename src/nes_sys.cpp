@@ -67,6 +67,8 @@ void NesSystem::drawFrame() {
     CPU_RUN(START_CYC);
 
     ppu->clearVBL();
+    ppu->sendingNMI();
+
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
 
@@ -95,15 +97,23 @@ void NesSystem::drawFrame() {
         CPU_RUN(HBLANK_CYC);
     }
 
-    ppu->drawSprite(PPU::bpFront);
-
     CPU_RUN(END_CYC);
+    ppu->drawSprite(PPU::bpFront);
     ppu->oneFrameOver();
-    ppu->sendingNMI();
 
 return;
     /* 实际使用的周期与cpu周期有差别... */
     CPU_RUN(VBLANK_CYC);
+}
+
+void NesSystem::warmTime() {
+    CPU_RUN( MID_CYC(ONE_LINE_CYC*241) );
+    ppu->oneFrameOver();
+    ppu->sendingNMI();
+
+    CPU_RUN( MID_CYC(ONE_LINE_CYC*262) );
+    ppu->oneFrameOver();
+    ppu->sendingNMI();
 }
 
 int NesSystem::load_rom(string filename) {
@@ -122,6 +132,7 @@ int NesSystem::load_rom(string filename) {
             ppu->reset();
             cpu->RES = 1;
             _cyc = 0;
+            warmTime();
         } else {
             res = ER_LOAD_ROM_BADMAP;
         }

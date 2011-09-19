@@ -64,9 +64,10 @@ void PPU::reset() {
     spOverflow  = 0;
     hit         = 0;
     *NMI        = 0;
-    preheating  = 3;
     spRomOffset = 0;
     bgRomOffset = 0;
+    winX        = 0;
+    winY        = 0;
 
     memset(spWorkRam, 0, sizeof(spWorkRam));
     memset(bkPalette, 0, sizeof(bkPalette));
@@ -212,8 +213,8 @@ byte PPU::readState(word addr) {
         if ( skipWrite  ) r |= ( 1<<4 );
         if ( spOverflow ) r |= ( 1<<5 );
         if ( hit        ) r |= ( 1<<6 );
-        if (!vblankTime ) r |= ( 1<<7 );
-        vblankTime = 1;
+        if ( vblankTime ) r |= ( 1<<7 );
+        vblankTime = 0;
         ppuSW      = pH;
         w2005      = wX;
         break;

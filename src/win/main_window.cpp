@@ -139,6 +139,7 @@ void openFile(HWND hwnd) {
             MessageBox(hwnd, parseOpenError(ret), "´íÎó", 0);
             run = false;
         } else {
+            //fc->warmTime();
             run = true;
         }
     }

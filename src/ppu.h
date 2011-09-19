@@ -136,7 +136,6 @@ private:
 
     byte *NMI;              /* cpu的NMI地址线，用来向cpu发送NMI    */
     byte sendNMI;           /* 是否在刷新一帧后发送NMI             */
-    byte preheating;        /* PPU预热期为3                        */
     byte vblankTime;        /* 如果处于垂直消隐时期则为1           */
     byte skipWrite;         /* 忽略写操作为1                       */
 

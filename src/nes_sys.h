@@ -54,6 +54,8 @@ public:
 
     /* 绘制一帧 */
     void drawFrame();
+    /* PPU预热周期 */
+    void warmTime();
 
     /* 开始cpu单步执行,同时需要打开编译开关 */
     void debug();

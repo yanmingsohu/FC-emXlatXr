@@ -47,7 +47,7 @@ T_COLOR ppu_color_table[0x40] = {
 #undef H
 
 PPU::PPU(MMC *_mmc, Video *_video)
-    : skipWrite   (0)
+    : lockAccess  (0)
     , spWorkOffset(0)
     , addr_add    (1)
     , ppuSW      (pH)
@@ -132,16 +132,15 @@ void PPU::controlWrite(word addr, byte data) {
         break;
 
     case 6: /* 0x2006 PPU地址指针 */
+        if (lockAccess) break;
         if (ppuSW==pH) {
             /* 没有完整写入高低字节不能改变PPU指针 */
             tmp_addr  = data;
             ppuSW     = pL;
-            skipWrite = 1;
         } else {
             /* 全部写入地址才有效 */
             ppu_ram_p = (tmp_addr<<8) | data;
             ppuSW     = pH;
-            skipWrite = 0;
         }
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
@@ -149,6 +148,7 @@ void PPU::controlWrite(word addr, byte data) {
         break;
 
     case 7: /* 0x2007 写数据寄存器 */
+        if (lockAccess) break;
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
 #endif
@@ -210,7 +210,7 @@ byte PPU::readState(word addr) {
 
     case 2: /* 0x2002 */
         r = 0;
-        if ( skipWrite  ) r |= ( 1<<4 );
+        if ( lockAccess ) r |= ( 1<<4 );
         if ( spOverflow ) r |= ( 1<<5 );
         if ( hit        ) r |= ( 1<<6 );
         if ( vblankTime ) r |= ( 1<<7 );
@@ -558,7 +558,6 @@ void PPU::drawPixel(int X, int Y) {
 }
 
 void PPU::oneFrameOver() {
-    hit        = 0;
     vblankTime = 1;
 }
 
@@ -568,6 +567,7 @@ void PPU::clearVBL() {
 
 void PPU::startNewFrame() {
     ppu_ram_p  = 0x2000;
+    hit        = 0;
 
     video->clear( ppu_color_table[bkPalette[0]] );
     memset(sp0hit, 0, sizeof(sp0hit));

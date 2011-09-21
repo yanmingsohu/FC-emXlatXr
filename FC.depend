@@ -140,7 +140,7 @@
 	"rom.h"
 	<stdio.h>
 
-1316414072 f:\c-project\fc\src\ppu.h
+1316487554 f:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
@@ -190,7 +190,7 @@
 	<stdio.h>
 	<memory.h>
 
-1316417659 source:f:\c-project\fc\src\nes_sys.cpp
+1316567297 source:f:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	"debug.h"
 	<stdio.h>
@@ -207,7 +207,7 @@
 	"type.h"
 	"rom.h"
 
-1316417486 source:f:\c-project\fc\src\ppu.cpp
+1316567170 source:f:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
@@ -244,7 +244,7 @@
 1316153601 source:f:\c-project\fc\src\win\winsys.cpp
 	"winsys.h"
 
-1316414904 source:f:\c-project\fc\src\win\main_window.cpp
+1316566240 source:f:\c-project\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>

@@ -63,11 +63,12 @@ NesSystem::~NesSystem() {
                          } \
                          _cyc -= cYc
 
+/* 代码尚未优化 */
 void NesSystem::drawFrame() {
     CPU_RUN(START_CYC);
 
-    ppu->clearVBL();
     ppu->sendingNMI();
+    ppu->clearVBL();
 
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
@@ -101,9 +102,8 @@ void NesSystem::drawFrame() {
     ppu->drawSprite(PPU::bpFront);
     ppu->oneFrameOver();
 
-return;
     /* 实际使用的周期与cpu周期有差别... */
-    CPU_RUN(VBLANK_CYC);
+    //CPU_RUN(VBLANK_CYC);
 }
 
 void NesSystem::warmTime() {

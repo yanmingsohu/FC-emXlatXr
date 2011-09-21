@@ -137,7 +137,7 @@ private:
     byte *NMI;              /* cpu的NMI地址线，用来向cpu发送NMI    */
     byte sendNMI;           /* 是否在刷新一帧后发送NMI             */
     byte vblankTime;        /* 如果处于垂直消隐时期则为1           */
-    byte skipWrite;         /* 忽略写操作为1                       */
+    byte lockAccess;        /* 忽略2006/2007操作为1                */
 
     byte bkleftCol;         /* 背景显示左一列                      */
     byte spleftCol;         /* 卡通显示左一列                      */

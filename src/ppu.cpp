@@ -461,6 +461,7 @@ void PPU::_drawSprite(byte i, byte ctrl) {
     if (!spAllDisp) return;
 
     int x, y, dx, dy;
+    bool notOver = true;
     byte paletteIdx;
 
     byte by   = spWorkRam[i  ]+1;
@@ -477,27 +478,37 @@ void PPU::_drawSprite(byte i, byte ctrl) {
     if (!i) { sp0x = bx;
               sp0y = by; }
 
-    for (x=y=0;;) {
-        paletteIdx = gtLBit(x, y, tile, spRomOffset);
+    for (;;) {
+        for (x=0, y=0;;) {
+            paletteIdx = gtLBit(x, y, tile, spRomOffset);
 
-        if (paletteIdx) {
-            if (h) dx = 8 - x + bx;
-            else   dx =     x + bx;
-            if (v) dy = 8 - y + by;
-            else   dy =     y + by;
+            if (paletteIdx) {
+                if (h) dx = 8 - x + bx;
+                else   dx =     x + bx;
+                if (v) dy = 8 - y + by;
+                else   dy =     y + by;
 
-            video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
+                video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
 
-            /* 记录0号精灵在屏幕上绘制的像素 */
-            if (!i) sp0hit[dx%8][dy%8] = 1;
-            else    _checkHit(dx, dy);
+                /* 记录0号精灵在屏幕上绘制的像素 */
+                if (!i) sp0hit[dx%8][dy%8] = 1;
+                else    _checkHit(dx, dy);
+            }
+
+            if (++x >= 8) {
+                x = 0;
+                if (++y >= 8) {
+                    break;
+                }
+            }
         }
 
-        if (++x >= 8) {
-            x = 0;
-            if (++y >= 8) {
-                break;
-            }
+        if (spriteType==t8x16 && notOver) {
+            tile++;
+            by += 8;
+            notOver = false;
+        } else {
+            break;
         }
     }
 }

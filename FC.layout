@@ -28,17 +28,17 @@
 	<File name="src\mmc.h" open="0" top="0" tabpos="6">
 		<Cursor position="2505" topLine="98" />
 	</File>
-	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="3167" topLine="64" />
+	<File name="src\nes_sys.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="3637" topLine="39" />
 	</File>
-	<File name="src\nes_sys.h" open="0" top="0" tabpos="5">
-		<Cursor position="2376" topLine="20" />
+	<File name="src\nes_sys.h" open="1" top="0" tabpos="6">
+		<Cursor position="2125" topLine="20" />
 	</File>
 	<File name="src\pad.h" open="0" top="0" tabpos="9">
 		<Cursor position="1694" topLine="0" />
 	</File>
-	<File name="src\ppu.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="14137" topLine="485" />
+	<File name="src\ppu.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="14248" topLine="559" />
 	</File>
 	<File name="src\ppu.h" open="1" top="0" tabpos="4">
 		<Cursor position="6861" topLine="118" />

@@ -52,6 +52,7 @@ NesSystem::~NesSystem() {
 #define ONE_LINE_CYC     1364
 #define START_CYC        MID_CYC(ONE_LINE_CYC*20)
 #define END_CYC          MID_CYC(ONE_LINE_CYC)
+#define END_CYC_EVERY    340.5
 #define ONE_CYC          MID_CYC(ONE_LINE_CYC)
 #define HBLANK_CYC       MID_CYC(340)
 #define CLR_VBL_CYC      MID_CPU_CYC(2270)
@@ -67,13 +68,11 @@ NesSystem::~NesSystem() {
 void NesSystem::drawFrame() {
     CPU_RUN(START_CYC);
 
-    ppu->sendingNMI();
+    CPU_RUN(ONE_CYC);
     ppu->clearVBL();
 
     ppu->startNewFrame();
     ppu->drawSprite(PPU::bpBehind);
-
-    CPU_RUN(ONE_CYC);
 
     int x=0, y=0;
 
@@ -98,19 +97,29 @@ void NesSystem::drawFrame() {
         CPU_RUN(HBLANK_CYC);
     }
 
-    CPU_RUN(END_CYC);
     ppu->drawSprite(PPU::bpFront);
     ppu->oneFrameOver();
+
+    if (every_f) {
+        CPU_RUN(END_CYC_EVERY);
+    } else {
+        CPU_RUN(END_CYC);
+    }
+    every_f = !every_f;
+
+    ppu->sendingNMI();
 
     /* 实际使用的周期与cpu周期有差别... */
     //CPU_RUN(VBLANK_CYC);
 }
 
 void NesSystem::warmTime() {
+    ppu->startNewFrame();
     CPU_RUN( MID_CYC(ONE_LINE_CYC*241) );
     ppu->oneFrameOver();
     ppu->sendingNMI();
 
+    ppu->startNewFrame();
     CPU_RUN( MID_CYC(ONE_LINE_CYC*262) );
     ppu->oneFrameOver();
     ppu->sendingNMI();
@@ -132,6 +141,7 @@ int NesSystem::load_rom(string filename) {
             ppu->reset();
             cpu->RES = 1;
             _cyc = 0;
+            every_f = false;
             warmTime();
         } else {
             res = ER_LOAD_ROM_BADMAP;

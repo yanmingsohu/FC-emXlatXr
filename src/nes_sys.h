@@ -37,7 +37,8 @@ private:
     PlayPad*    pad;
 
     int         state;
-    int         _cyc; /* 系统时序,每帧之间互补 */
+    int         _cyc;    /* 系统时序,每帧之间互补 */
+    bool        every_f; /* 偶数帧为true */
 
 public:
     /* PlayPad 在该类销毁时销毁 */

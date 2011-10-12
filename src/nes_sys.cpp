@@ -57,30 +57,18 @@ NesSystem::~NesSystem() {
 #define HBLANK_CYC       MID_CYC(340)
 /* cpu单独运行指定的周期 */
 #define CPU_RUN(cYc)     while (_cyc <= (cYc)) { \
-                            int t = MID_CPU_CYC( cpu->process() ); \
-                            cpu_cyc += t; \
-                            _cyc += t; \
+                            _cyc += MID_CPU_CYC( cpu->process() ); \
                          } \
                          _cyc -= (cYc)
 
-                    /*   while (_cyc < cYc) { \
-                            _cyc += MID_CPU_CYC( cpu->process() ); \
-                         } \
-                         _cyc -= cYc */
-
 /* 代码尚未优化 */
 void NesSystem::drawFrame() {
-    unsigned int cpu_cyc = 0;
 
     ppu->startNewFrame();
     CPU_RUN(START_CYC);
 
-float f1 = 21477270 / 60 / 262 / 4; // 1帧的周期
-printf("-= %f %d \n", f1 * 20, cpu_cyc);
-
     ppu->clearVBL();
     CPU_RUN(ONE_CYC);
-printf("-= %f %d %d \n", f1, cpu_cyc, _cyc);
 
     ppu->drawSprite(PPU::bpBehind);
 
@@ -92,9 +80,7 @@ printf("-= %f %d %d \n", f1, cpu_cyc, _cyc);
             ppu->drawPixel(x++, y);
 
             if (--_cyc < 0) {
-                int t = MID_CPU_CYC( cpu->process() );
-                _cyc += t;
-                cpu_cyc += t;
+                _cyc += MID_CPU_CYC( cpu->process() );
             }
 
             if (x>=256) {
@@ -109,8 +95,6 @@ printf("-= %f %d %d \n", f1, cpu_cyc, _cyc);
         CPU_RUN(HBLANK_CYC);
     }
 
-printf("-= %f %d %f \n", f1*240, cpu_cyc, cpu_cyc-f1*240);
-
     ppu->drawSprite(PPU::bpFront);
 
     if (every_f) {
@@ -120,24 +104,13 @@ printf("-= %f %d %f \n", f1*240, cpu_cyc, cpu_cyc-f1*240);
     }
     every_f = !every_f;
 
-printf("-= %f %d %f \n", f1, cpu_cyc, cpu_cyc-f1);
-
     /* 到此为止算是一帧结束 */
     ppu->sendingNMI();
     /* 设置VBL=1 */
     ppu->oneFrameOver();
-
-
-    float a = 1789772.5/60 * 3;
-    float b = cpu_cyc;
-    printf("cpu: %f :: %f = %f, %d \n", a, b, a-b, _cyc);
-
-    //CPU_RUN(a-b);
 }
 
 void NesSystem::warmTime() {
-    int cpu_cyc =0;
-
     ppu->startNewFrame();
     CPU_RUN( MID_CYC(ONE_LINE_CYC*241) );
     ppu->oneFrameOver();

@@ -47,31 +47,29 @@ NesSystem::~NesSystem() {
 }
 
 /* 所有时钟都是基于cpu*3或ppu/4 */
-#define MID_CPU_CYC(x)   (x*3)
-#define MID_CYC(x)       (x/4)
+#define MID_CPU_CYC(x)   ((x)*3)
+#define MID_CYC(x)       ((x)/4)
 #define ONE_LINE_CYC     1364
 #define START_CYC        MID_CYC(ONE_LINE_CYC*20)
 #define END_CYC          MID_CYC(ONE_LINE_CYC)
-#define END_CYC_EVERY    340.5
+#define END_CYC_EVERY    MID_CYC(ONE_LINE_CYC-2)
 #define ONE_CYC          MID_CYC(ONE_LINE_CYC)
 #define HBLANK_CYC       MID_CYC(340)
-#define CLR_VBL_CYC      MID_CPU_CYC(2270)
-/* 1帧的cpu周期 - 1帧使用的周期 = 空白周期 */
-#define VBLANK_CYC       (MID_CPU_CYC(1789772.5/60) - MID_CYC(ONE_LINE_CYC*262))
 /* cpu单独运行指定的周期 */
-#define CPU_RUN(cYc)     while (_cyc < cYc) { \
+#define CPU_RUN(cYc)     while (_cyc <= (cYc)) { \
                             _cyc += MID_CPU_CYC( cpu->process() ); \
                          } \
-                         _cyc -= cYc
+                         _cyc -= (cYc)
 
 /* 代码尚未优化 */
 void NesSystem::drawFrame() {
-    CPU_RUN(START_CYC);
-
-    CPU_RUN(ONE_CYC);
-    ppu->clearVBL();
 
     ppu->startNewFrame();
+    CPU_RUN(START_CYC);
+
+    ppu->clearVBL();
+    CPU_RUN(ONE_CYC);
+
     ppu->drawSprite(PPU::bpBehind);
 
     int x=0, y=0;
@@ -81,7 +79,7 @@ void NesSystem::drawFrame() {
         for (;;) {
             ppu->drawPixel(x++, y);
 
-            if (--_cyc <= 0) {
+            if (--_cyc < 0) {
                 _cyc += MID_CPU_CYC( cpu->process() );
             }
 
@@ -98,7 +96,6 @@ void NesSystem::drawFrame() {
     }
 
     ppu->drawSprite(PPU::bpFront);
-    ppu->oneFrameOver();
 
     if (every_f) {
         CPU_RUN(END_CYC_EVERY);
@@ -107,10 +104,10 @@ void NesSystem::drawFrame() {
     }
     every_f = !every_f;
 
+    /* 到此为止算是一帧结束 */
     ppu->sendingNMI();
-
-    /* 实际使用的周期与cpu周期有差别... */
-    //CPU_RUN(VBLANK_CYC);
+    /* 设置VBL=1 */
+    ppu->oneFrameOver();
 }
 
 void NesSystem::warmTime() {

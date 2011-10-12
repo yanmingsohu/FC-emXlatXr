@@ -46,6 +46,14 @@ T_COLOR ppu_color_table[0x40] = {
 };
 #undef H
 
+/* 系统启动时的默认配色表 */
+static byte RESET_PALETTE_TABLE[] = {
+     0x09, 0x01, 0x00, 0x01, 0x00, 0x02, 0x02, 0x0D,
+     0x08, 0x10, 0x08, 0x24, 0x00, 0x00, 0x04, 0x2C,
+     0x09, 0x01, 0x34, 0x03, 0x00, 0x04, 0x00, 0x14,
+     0x08, 0x3A, 0x00, 0x02, 0x00, 0x20, 0x2C, 0x08,
+};
+
 PPU::PPU(MMC *_mmc, Video *_video)
     : lockAccess  (0)
     , spWorkOffset(0)
@@ -70,9 +78,9 @@ void PPU::reset() {
     winY        = 0;
 
     memset(spWorkRam, 0, sizeof(spWorkRam));
-    memset(bkPalette, 0, sizeof(bkPalette));
-    memset(spPalette, 0, sizeof(spPalette));
     memset(bg, 0, sizeof(bg));
+    memcpy(bkPalette, RESET_PALETTE_TABLE,    16);
+    memcpy(spPalette, RESET_PALETTE_TABLE+16, 16);
 }
 
 void PPU::setNMI(byte* cpu_nmi) {
@@ -133,11 +141,13 @@ void PPU::controlWrite(word addr, byte data) {
 
     case 6: /* 0x2006 PPU地址指针 */
         if (lockAccess) break;
+
         if (ppuSW==pH) {
             /* 没有完整写入高低字节不能改变PPU指针 */
             tmp_addr  = data;
             ppuSW     = pL;
         } else {
+            word old_p = ppu_ram_p;
             /* 全部写入地址才有效 */
             ppu_ram_p = (tmp_addr<<8) | data;
             ppuSW     = pH;
@@ -232,15 +242,16 @@ byte PPU::readState(word addr) {
 #endif
         break;
 
-    case 7:
+    case 7:{
+        int _p = ppu_ram_p;
         if (ppu_ram_p < 0x3F00) {
             r = readBuf;
             readBuf = read();
         } else {
-            readBuf = read();
-            r = readBuf;
+            r = read();
         }
-        break;
+        printf("PPU::read %x %x %x\n", _p, r, readBuf);
+        break; }
 
 #ifdef SHOW_ERR_MEM_OPERATE
     default:

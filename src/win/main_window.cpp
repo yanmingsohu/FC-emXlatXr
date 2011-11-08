@@ -56,7 +56,8 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\魂斗罗.nes" // 7900断点
-#define ROM "rom\\test\\blargg_ppu_tests_2005.09.15b\\vram_access.nes"
+//#define ROM "rom\\test\\blargg_ppu_tests_2005.09.15b\\vram_access.nes"
+#define ROM "rom/test/NES_Test_Cart.nes"
 
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
@@ -65,11 +66,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     fc           = new NesSystem(video, pad);
 
 #ifdef ROM
-    if (int ret = fc->load_rom(ROM)) {
-        MessageBox(hwnd, parseOpenError(ret), "错误", 0);
-    } else {
-        run = true;
-    }
+    run = !fc->load_rom(ROM);
 #endif
 
 	cpu_6502* cpu = fc->getCpu();
@@ -97,7 +94,8 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	if (!run) continue;
 
         /* 限速,但是并不准确 */
-    	//if (clock()-usetime<14) continue;
+    	if (clock()-usetime<14) continue;
+
     	usetime = clock();
 
         if (sDebug) {

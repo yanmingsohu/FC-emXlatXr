@@ -40,6 +40,8 @@ private:
     int         _cyc;    /* 系统时序,每帧之间互补 */
     bool        every_f; /* 偶数帧为true */
 
+    void cpu_run(int);
+
 public:
     /* PlayPad 在该类销毁时销毁 */
     NesSystem(Video* video, PlayPad*);

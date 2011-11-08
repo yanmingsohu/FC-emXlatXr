@@ -242,16 +242,14 @@ byte PPU::readState(word addr) {
 #endif
         break;
 
-    case 7:{
-        int _p = ppu_ram_p;
+    case 7:
         if (ppu_ram_p < 0x3F00) {
             r = readBuf;
             readBuf = read();
         } else {
             r = read();
         }
-        printf("PPU::read %x %x %x\n", _p, r, readBuf);
-        break; }
+        break;
 
 #ifdef SHOW_ERR_MEM_OPERATE
     default:

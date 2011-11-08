@@ -43,7 +43,7 @@ private:
 
 public:
     static const int PLAYER_1 = 0;
-    static const int PLAYER_2 = 0;
+    static const int PLAYER_2 = 1;
 
     PlayPad() : wcount(0), rcount(0)
     {

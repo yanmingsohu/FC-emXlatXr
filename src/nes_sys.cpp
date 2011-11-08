@@ -55,20 +55,15 @@ NesSystem::~NesSystem() {
 #define END_CYC_EVERY    MID_CYC(ONE_LINE_CYC-2)
 #define ONE_CYC          MID_CYC(ONE_LINE_CYC)
 #define HBLANK_CYC       MID_CYC(340)
-/* cpu单独运行指定的周期 */
-#define CPU_RUN(cYc)     while (_cyc <= (cYc)) { \
-                            _cyc += MID_CPU_CYC( cpu->process() ); \
-                         } \
-                         _cyc -= (cYc)
 
 /* 代码尚未优化 */
 void NesSystem::drawFrame() {
 
     ppu->startNewFrame();
-    CPU_RUN(START_CYC);
+    cpu_run(START_CYC);
 
     ppu->clearVBL();
-    CPU_RUN(ONE_CYC);
+    cpu_run(ONE_CYC);
 
     ppu->drawSprite(PPU::bpBehind);
 
@@ -92,15 +87,15 @@ void NesSystem::drawFrame() {
         x=0; y++;
 
         /* 水平消隐周期 */
-        CPU_RUN(HBLANK_CYC);
+        cpu_run(HBLANK_CYC);
     }
 
     ppu->drawSprite(PPU::bpFront);
 
     if (every_f) {
-        CPU_RUN(END_CYC_EVERY);
+        cpu_run(END_CYC_EVERY);
     } else {
-        CPU_RUN(END_CYC);
+        cpu_run(END_CYC);
     }
     every_f = !every_f;
 
@@ -112,14 +107,21 @@ void NesSystem::drawFrame() {
 
 void NesSystem::warmTime() {
     ppu->startNewFrame();
-    CPU_RUN( MID_CYC(ONE_LINE_CYC*241) );
+    cpu_run( MID_CYC(ONE_LINE_CYC*241) );
     ppu->oneFrameOver();
     ppu->sendingNMI();
 
     ppu->startNewFrame();
-    CPU_RUN( MID_CYC(ONE_LINE_CYC*262) );
+    cpu_run( MID_CYC(ONE_LINE_CYC*262) );
     ppu->oneFrameOver();
     ppu->sendingNMI();
+}
+
+void NesSystem::cpu_run(int cyc) {
+    while (_cyc <= cyc) {
+        _cyc += MID_CPU_CYC( cpu->process() );
+    }
+    _cyc -= cyc;
 }
 
 int NesSystem::load_rom(string filename) {

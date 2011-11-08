@@ -6,16 +6,17 @@
 #include "nes_sys.h"
 
 static void cpu_debug_help() {
-printf(
+    printf(
 "------------------------------------------------------------------------------+\
-\n| 0 :goto next cpu operator               | n :new frame \
-\n| o :frame over                           | m :display memory \
-\n| s :skip 'n' operator,not display        | r :reset cpu \
-\n| i :set operate to send frame IRQ        | d :draw a from \
-\n| g : goto XXXX  \
+\n| 0 :goto next cpu operator             | n :new frame \
+\n| o :frame over                         | m :display memory \
+\n| s :skip 'n' operator,not display      | r :reset cpu \
+\n| i :set operate to send frame IRQ      | d :draw a frame \
+\n| g :goto XXXX  \                       | b :breakpoint \
+\n| p :push key \
 \n| x :exit \
 \n------------------------------------------------------------------------------&\n"
-);
+    );
 }
 
 #define CPU_IS(o, x, y)        \
@@ -76,9 +77,10 @@ void debugCpu(NesSystem *fc) {
 
     cpu->showDebug(1);
 
-    int c        = 0;
-    int frameIrq = 0;
-    int skip     = 0;
+    int c           = 0;
+    int frameIrq    = 0;
+    int skip        = 0;
+    int breakpoint  = -1;
     char ch;
 
     clock_t s = clock();
@@ -103,11 +105,18 @@ void debugCpu(NesSystem *fc) {
         else if (ch=='d') {
             fc->drawFrame();
         }
+        else if (ch=='b') {
+            printf("XX input PC(16) when stop: ");
+            fflush(stdin);
+            scanf("%x", &breakpoint);
+        }
+        else if (ch=='p') {
+        }
 
         else if (ch=='g') {
-            printf("input IP(16): ");
+            printf("input PC(16) to jump: ");
             fflush(stdin);
-            scanf("%x", &cpu->FLAGS);
+            scanf("%x", &cpu->PC);
         }
         else if (ch=='s') {
             printf("input skip number: ");

@@ -86,22 +86,13 @@ void cpu_command_RTI(command_parm* parm) {
 /* 左移0补位 */
 void cpu_command_ASL(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte value = 0;
     byte model = parm->op - 0x02;
 
-    switch (parm->op) {
-    case 0x0A:
+    if (parm->op == 0x0A) {
         model += 0x20;
-    case 0x0E:
-    case 0x06:
-    case 0x1E:
-    case 0x16:
-        value = parm->read(model);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
 
+    byte value = parm->read(model);
     CARRY_WITH(0x80);
 
     value <<= 1;
@@ -114,22 +105,13 @@ void cpu_command_ASL(command_parm* parm) {
 /* 右移0补位 */
 void cpu_command_LSR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte value = 0;
     byte model = parm->op - 0x42;
 
-    switch (parm->op) {
-    case 0x4A:
+    if (parm->op == 0x4A) {
         model += 0x20;
-    case 0x4E:
-    case 0x46:
-    case 0x5E:
-    case 0x56:
-        value = parm->read(model);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
 
+    byte value = parm->read(model);
     CARRY_WITH(0x01);
 
     value >>= 1;
@@ -143,22 +125,13 @@ void cpu_command_LSR(command_parm* parm) {
 /* 左移循环补位 */
 void cpu_command_ROL(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte value = 0;
     byte model = parm->op - 0x22;
 
-    switch (parm->op) {
-    case 0x2A:
+    if (parm->op == 0x2A) {
         model += 0x20;
-    case 0x2E:
-    case 0x26:
-    case 0x3E:
-    case 0x36:
-        value = parm->read(model);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
 
+    byte value = parm->read(model);
     byte ro = cpu->FLAGS & CPU_FLAGS_CARRY ? 1 : 0;
 
     CARRY_WITH(0x80);
@@ -174,22 +147,13 @@ void cpu_command_ROL(command_parm* parm) {
 /* 右移循环补位 */
 void cpu_command_ROR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte value = 0;
     byte model = parm->op - 0x62;
 
-    switch (parm->op) {
-    case 0x6A:
+    if (parm->op == 0x6A) {
         model += 0x20;
-    case 0x6E:
-    case 0x66:
-    case 0x7E:
-    case 0x76:
-        value = parm->read(model);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
 
+    byte value = parm->read(model);
     byte ro = cpu->FLAGS & CPU_FLAGS_CARRY ? 0x80 : 0;
 
     CARRY_WITH(0x01);
@@ -207,16 +171,7 @@ void cpu_command_ROR(command_parm* parm) {
 /* N=M7, V=M6, Z=(执行结果==0) */
 void cpu_command_BIT(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte b = 0;
-
-    switch (parm->op) {
-    case 0x2C:
-    case 0x24:
-        b = parm->read(parm->op - 0x20);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    byte b = parm->read(parm->op - 0x20);
 
     cpu->FLAGS &= 0xFF ^ (CPU_FLAGS_NEGATIVE | CPU_FLAGS_OVERFLOW);
     cpu->FLAGS |= b    & (CPU_FLAGS_NEGATIVE | CPU_FLAGS_OVERFLOW);
@@ -240,119 +195,54 @@ HELP_FNC void cmp_op(command_parm* parm, byte a, byte b) {
 }
 
 void cpu_command_CMP(command_parm* parm) {
-    switch (parm->op) {
-    case 0xC9:
-    case 0xCD:
-    case 0xC5:
-    case 0xDD:
-    case 0xD9:
-    case 0xD5:
-    case 0xD1:
-    case 0xC1: {
-        byte b = parm->read(parm->op - 0xC1);
-        cmp_op(parm, parm->cpu->A, b);
-        } break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    byte b = parm->read(parm->op - 0xC1);
+    cmp_op(parm, parm->cpu->A, b);
 }
 
 void cpu_command_CPX(command_parm* parm) {
-    byte b = 0;
+    byte b;
 
-    switch (parm->op) {
-    case 0xE0:
+    if (parm->op == 0xE0) {
         b = parm->p1;
-        break;
-    case 0xEC:
-    case 0xE4:
+    } else {
         b = parm->read(parm->op - 0xE0);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
 
     cmp_op(parm, parm->cpu->X, b);
 }
 
 void cpu_command_CPY(command_parm* parm) {
-    byte b = 0;
+    byte b;
 
-    switch (parm->op) {
-    case 0xC0:
+    if (parm->op == 0xC0) {
         b = parm->p1;
-        break;
-    case 0xCC:
-    case 0xC4:
+    } else {
         b = parm->read(parm->op - 0xC0);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
 
     cmp_op(parm, parm->cpu->Y, b);
 }
 
 void cpu_command_AND(command_parm* parm) {
-    switch (parm->op) {
-    case 0x29:
-    case 0x2D:
-    case 0x25:
-    case 0x3D:
-    case 0x39:
-    case 0x35:
-    case 0x31:
-    case 0x21: {
-        cpu_6502 *cpu = parm->cpu;
-        cpu->A &= parm->read(parm->op - 0x21);
-        cpu->checkNZ(cpu->A);
-        } break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    cpu_6502 *cpu = parm->cpu;
+    cpu->A &= parm->read(parm->op - 0x21);
+    cpu->checkNZ(cpu->A);
 }
 
 void cpu_command_ORA(command_parm* parm) {
-    switch (parm->op) {
-    case 0x09:
-    case 0x0D:
-    case 0x05:
-    case 0x1D:
-    case 0x19:
-    case 0x15:
-    case 0x11:
-    case 0x01: {
-        cpu_6502 *cpu = parm->cpu;
-        cpu->A |= parm->read(parm->op - 0x01);
-        cpu->checkNZ(cpu->A);
-        } break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    cpu_6502 *cpu = parm->cpu;
+    cpu->A |= parm->read(parm->op - 0x01);
+    cpu->checkNZ(cpu->A);
 }
 
 void cpu_command_EOR(command_parm* parm) {
-    switch (parm->op) {
-    case 0x49:
-    case 0x4D:
-    case 0x45:
-    case 0x5D:
-    case 0x59:
-    case 0x55:
-    case 0x51:
-    case 0x41: {
-        cpu_6502 *cpu = parm->cpu;
-        cpu->A ^= parm->read(parm->op - 0x41);
-        cpu->checkNZ(cpu->A);
-        } break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    cpu_6502 *cpu = parm->cpu;
+    cpu->A ^= parm->read(parm->op - 0x41);
+    cpu->checkNZ(cpu->A);
 }
 
 /* 无条件跳转指令 */
 void cpu_command_JMP(command_parm* parm) {
-
     cpu_6502* cpu = parm->cpu;
 
     if (parm->op==0x4C) {
@@ -435,25 +325,10 @@ void cpu_command_ADC(command_parm* parm) {
 
     cpu_6502* cpu = parm->cpu;
     cpu->clearV();
-    word temp = 0;
-    byte b;
 
-    switch (parm->op) {
-    case 0x69:
-    case 0x6D:
-    case 0x65:
-    case 0x7D:
-    case 0x79:
-    case 0x75:
-    case 0x71:
-    case 0x61:
-        b = parm->read(parm->op - 0x61);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    byte b = parm->read(parm->op - 0x61);
+    word temp = cpu->A + b;
 
-    temp = cpu->A + b;
     if (cpu->FLAGS & CPU_FLAGS_CARRY) {
         ++temp;
     }
@@ -466,7 +341,7 @@ void cpu_command_ADC(command_parm* parm) {
 
     cpu->setV( !((cpu->A ^ b) & 0x80) && ((cpu->A ^ temp) & 0x80) );
     cpu->checkNZ((byte)temp);
-    cpu->A = (byte) temp;
+    cpu->A = (byte)temp;
 }
 
 /* 减法运算 */
@@ -475,25 +350,10 @@ void cpu_command_SBC(command_parm* parm) {
 
     cpu_6502* cpu = parm->cpu;
     cpu->clearV();
-    word temp = 0;
-    byte b;
 
-    switch (parm->op) {
-    case 0xE9:
-    case 0xED:
-    case 0xE5:
-    case 0xFD:
-    case 0xF9:
-    case 0xF5:
-    case 0xF1:
-    case 0xE1:
-        b = parm->read(parm->op - 0xE1);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    byte b = parm->read(parm->op - 0xE1);
+    word temp = cpu->A - b;
 
-    temp = cpu->A - b;
     if (!(cpu->FLAGS & CPU_FLAGS_CARRY)) {
         --temp;
     }
@@ -540,152 +400,84 @@ void cpu_command_INY(command_parm* parm) {
 
 /* --内存 */
 void cpu_command_DEC(command_parm* parm) {
-    switch (parm->op) {
-    case 0xCE:
-    case 0xC6:
-    case 0xDE:
-    case 0xD6: {
-        memory *ram = parm->ram;
-        word addr = parm->getAddr(parm->op - 0xC2);
-        byte value = ram->read(addr) - 1;
-        ram->write(addr, value);
-        parm->cpu->checkNZ(value);
-        } break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    memory *ram = parm->ram;
+
+    word addr = parm->getAddr(parm->op - 0xC2);
+    byte value = ram->read(addr) - 1;
+    ram->write(addr, value);
+    parm->cpu->checkNZ(value);
+
     NOT_MEM_TIME;
 }
 
 /* ++内存 */
 void cpu_command_INC(command_parm* parm) {
-    switch (parm->op) {
-    case 0xEE:
-    case 0xE6:
-    case 0xFE:
-    case 0xF6: {
-        memory *ram = parm->ram;
-        word addr = parm->getAddr(parm->op - 0xE2);
-        byte value = ram->read(addr) + 1;
-        ram->write(addr, value);
-        parm->cpu->checkNZ(value);
-        } break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    memory *ram = parm->ram;
+
+    word addr = parm->getAddr(parm->op - 0xE2);
+    byte value = ram->read(addr) + 1;
+    ram->write(addr, value);
+    parm->cpu->checkNZ(value);
+
     NOT_MEM_TIME;
 }
 
 /* 把A寄存器存入内存 */
 void cpu_command_STA(command_parm* parm) {
-    switch (parm->op) {
-    case 0x8D:
-    case 0x85:
-    case 0x9D:
-    case 0x99:
-    case 0x95:
-    case 0x91:
-    case 0x81:
-        parm->write(parm->op - 0x81, parm->cpu->A);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
-
+    parm->write(parm->op - 0x81, parm->cpu->A);
     NOT_MEM_TIME;
 }
 
 /* 把Y寄存器存入内存 */
 void cpu_command_STY(command_parm* parm) {
-    switch (parm->op) {
-    case 0x8C:
-    case 0x84:
-    case 0x94:
-        parm->write(parm->op - 0x80, parm->cpu->Y);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
+    parm->write(parm->op - 0x80, parm->cpu->Y);
 }
 
 /* 把X寄存器存入内存 */
 void cpu_command_STX(command_parm* parm) {
-    byte mode = parm->op - 0x82;
-    switch (parm->op) {
-    case 0x96:
+    byte mode;
+    if (parm->op == 0x96) {
         mode = ADD_MODE_zpgY;
-    case 0x8E:
-    case 0x86:
-        parm->write(mode, parm->cpu->X);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
+    } else {
+        mode = parm->op - 0x82;
     }
+    parm->write(mode, parm->cpu->X);
 }
 
 /* 由内存载入A寄存器 */
 void cpu_command_LDA(command_parm* parm) {
-
     cpu_6502* cpu = parm->cpu;
-
-    switch (parm->op) {
-    case 0xA9:
-    case 0xAD:
-    case 0xA5:
-    case 0xBD:
-    case 0xB9:
-    case 0xB5:
-    case 0xB1:
-    case 0xA1:
-        cpu->A = parm->read(parm->op - 0xA1);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
-    }
-
+    cpu->A = parm->read(parm->op - 0xA1);
     cpu->checkNZ(cpu->A);
 }
 
 /* 由内存载入Y寄存器 */
 void cpu_command_LDY(command_parm* parm) {
-
     cpu_6502* cpu = parm->cpu;
 
-    switch (parm->op) {
-    case 0xA0:
+    if (parm->op == 0xA0) {
         cpu->Y = parm->p1;
-        break;
-    case 0xAC:
-    case 0xA4:
-    case 0xBC:
-    case 0xB4:
+    } else {
         cpu->Y = parm->read(parm->op - 0xA0);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
     cpu->checkNZ(cpu->Y);
 }
 
 /* 由内存载入X寄存器 */
 void cpu_command_LDX(command_parm* parm) {
-
     cpu_6502* cpu = parm->cpu;
-    byte mode = parm->op - 0xA2;
 
-    switch (parm->op) {
-    case 0xA2:
+    if (parm->op == 0xA2) {
         cpu->X = parm->p1;
-        break;
-    case 0xB6:
-        mode = ADD_MODE_zpgY;
-    case 0xAE:
-    case 0xA6:
-    case 0xBE:
+    } else {
+        byte mode;
+
+        if (parm->op == 0xB6) {
+            mode = ADD_MODE_zpgY;
+        } else {
+            mode = parm->op - 0xA2;
+        }
         cpu->X = parm->read(mode);
-        break;
-    default:
-        printf("error %s\n", parm->cmd->name);
     }
 
     cpu->checkNZ(cpu->X);

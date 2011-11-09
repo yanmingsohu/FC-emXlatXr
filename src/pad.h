@@ -72,6 +72,7 @@ public:
     /* 从4016/4017端口读数据 */
     byte readPort(word port) {
         if (port==0x4016 && rcount<8) {
+            /* 控制器状态读取不是很频繁,无需太优化 */
             if (keySave[rcount]) {
                 keySave[rcount] = 0;
                 ++rcount;

@@ -441,6 +441,7 @@ void cpu_command_STX(command_parm* parm) {
     } else {
         mode = parm->op - 0x82;
     }
+
     parm->write(mode, parm->cpu->X);
 }
 
@@ -460,6 +461,7 @@ void cpu_command_LDY(command_parm* parm) {
     } else {
         cpu->Y = parm->read(parm->op - 0xA0);
     }
+
     cpu->checkNZ(cpu->Y);
 }
 
@@ -477,6 +479,7 @@ void cpu_command_LDX(command_parm* parm) {
         } else {
             mode = parm->op - 0xA2;
         }
+
         cpu->X = parm->read(mode);
     }
 

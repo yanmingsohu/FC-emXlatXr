@@ -40,6 +40,7 @@ class PlayPad {
 private:
     byte wcount;
     byte rcount;
+    byte keySave[16];
 
 public:
     static const int PLAYER_1 = 0;
@@ -70,6 +71,12 @@ public:
             return keyPushed(FC_PAD_KEY(rcount++), PLAYER_1);
         }
         return 0;
+    }
+
+    /* 使用编程的方法按下一个键子,调试时使用 */
+    void pushKey(FC_PAD_KEY key, byte padid) {
+        //if ()
+        keySave[key + padid<<3] = 1;
     }
 };
 

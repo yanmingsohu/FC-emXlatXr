@@ -8,7 +8,7 @@
 		<Cursor position="1844" topLine="137" />
 	</File>
 	<File name="src\debug.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="3204" topLine="114" />
+		<Cursor position="4295" topLine="134" />
 	</File>
 	<File name="src\debug.h" open="0" top="0" tabpos="0">
 		<Cursor position="1694" topLine="0" />
@@ -29,13 +29,13 @@
 		<Cursor position="4162" topLine="107" />
 	</File>
 	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="2771" topLine="49" />
+		<Cursor position="3806" topLine="90" />
 	</File>
 	<File name="src\nes_sys.h" open="1" top="0" tabpos="1">
 		<Cursor position="2079" topLine="21" />
 	</File>
-	<File name="src\pad.h" open="1" top="0" tabpos="6">
-		<Cursor position="2767" topLine="31" />
+	<File name="src\pad.h" open="1" top="1" tabpos="6">
+		<Cursor position="3080" topLine="37" />
 	</File>
 	<File name="src\ppu.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="8683" topLine="309" />
@@ -53,7 +53,7 @@
 		<Cursor position="947" topLine="0" />
 	</File>
 	<File name="src\type.h" open="0" top="0" tabpos="7">
-		<Cursor position="3146" topLine="21" />
+		<Cursor position="2367" topLine="21" />
 	</File>
 	<File name="src\video.h" open="0" top="0" tabpos="2">
 		<Cursor position="2162" topLine="0" />
@@ -67,10 +67,10 @@
 	<File name="src\win\tilepanel.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="1045" topLine="15" />
 	</File>
-	<File name="src\win\winsys.cpp" open="1" top="1" tabpos="7">
+	<File name="src\win\winsys.cpp" open="1" top="0" tabpos="7">
 		<Cursor position="3260" topLine="187" />
 	</File>
 	<File name="src\win\winsys.h" open="1" top="0" tabpos="8">
-		<Cursor position="2532" topLine="88" />
+		<Cursor position="4130" topLine="88" />
 	</File>
 </CodeBlocks_layout_file>

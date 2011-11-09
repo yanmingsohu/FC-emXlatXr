@@ -83,7 +83,7 @@ public:
     void clear(T_COLOR color);
 };
 
-/* 使用DirectX绘图 */
+/* 使用DirectDraw绘图 */
 class DirectXVideo : public Video {
 
 private:

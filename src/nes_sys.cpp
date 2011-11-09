@@ -141,6 +141,7 @@ int NesSystem::load_rom(string filename) {
             cpu->RES = 1;
             _cyc = 0;
             every_f = false;
+
             warmTime();
         } else {
             res = ER_LOAD_ROM_BADMAP;
@@ -164,6 +165,10 @@ PPU* NesSystem::getPPU() {
 
 memory* NesSystem::getMem() {
     return ram;
+}
+
+PlayPad* NesSystem::getPad() {
+    return pad;
 }
 
 void NesSystem::debug() {

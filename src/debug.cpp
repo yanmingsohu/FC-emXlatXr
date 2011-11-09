@@ -4,6 +4,7 @@
 #include    <time.h>
 #include     "cpu.h"
 #include "nes_sys.h"
+#include     "pad.h"
 
 static void cpu_debug_help() {
     printf(
@@ -111,6 +112,11 @@ void debugCpu(NesSystem *fc) {
             scanf("%x", &breakpoint);
         }
         else if (ch=='p') {
+            int key = 0;
+            printf("push key (0-7): ");
+            fflush(stdin);
+            scanf("%d", &key);
+            fc->getPad()->pushKey(FC_PAD_KEY(key), 0);
         }
 
         else if (ch=='g') {

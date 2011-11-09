@@ -20,6 +20,8 @@
 #ifndef PAD_H_INCLUDED
 #define PAD_H_INCLUDED
 
+#include <memory.h>
+
 /* 手柄按键 */
 enum FC_PAD_KEY {
     FC_PAD_BU_A       = 0,
@@ -46,9 +48,11 @@ public:
     static const int PLAYER_1 = 0;
     static const int PLAYER_2 = 1;
 
-    PlayPad() : wcount(0), rcount(0)
-    {
+    PlayPad() : wcount(0), rcount(0) {
+        memset(keySave, 0, sizeof(keySave));
     }
+
+    virtual ~PlayPad() {};
 
     /* 如果该键按下则返回1, id为控制器号码 0==1P */
     virtual byte keyPushed(FC_PAD_KEY key, byte id) = 0;
@@ -67,7 +71,12 @@ public:
 
     /* 从4016/4017端口读数据 */
     byte readPort(word port) {
-        if (port==0x4016) {
+        if (port==0x4016 && rcount<8) {
+            if (keySave[rcount]) {
+                keySave[rcount] = 0;
+                ++rcount;
+                return 1;
+            }
             return keyPushed(FC_PAD_KEY(rcount++), PLAYER_1);
         }
         return 0;
@@ -75,8 +84,11 @@ public:
 
     /* 使用编程的方法按下一个键子,调试时使用 */
     void pushKey(FC_PAD_KEY key, byte padid) {
-        //if ()
-        keySave[key + padid<<3] = 1;
+        if (padid==PLAYER_1) {
+            keySave[key] = 1;
+        } else {
+            keySave[key + 8] = 1;
+        }
     }
 };
 

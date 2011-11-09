@@ -54,6 +54,7 @@ public:
     cpu_6502    *getCpu();
     PPU         *getPPU();
     memory      *getMem();
+    PlayPad     *getPad();
 
     /* ªÊ÷∆“ª÷° */
     void drawFrame();

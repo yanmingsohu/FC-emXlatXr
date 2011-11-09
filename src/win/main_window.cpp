@@ -9,7 +9,7 @@
 static LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
 static void        displayCpu                 (cpu_6502*, HWND             );
 static void        start_game                 (HWND, PMSG, HINSTANCE       );
-static HMENU       createMainMenu             (                            );
+static HMENU       createMainMenu             (/* null */                  );
 static void        openFile                   (HWND hwnd                   );
 
 /*  Make the class name into a global variable  */
@@ -57,7 +57,7 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 //#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地.nes"
 //#define ROM "H:\\VROMS\\FC_ROMS\\魂斗罗.nes" // 7900断点
 //#define ROM "rom\\test\\blargg_ppu_tests_2005.09.15b\\vram_access.nes"
-#define ROM "rom/test/NES_Test_Cart.nes"
+//#define ROM "rom/test/NES_Test_Cart.nes"
 
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
@@ -137,7 +137,6 @@ void openFile(HWND hwnd) {
             MessageBox(hwnd, parseOpenError(ret), "错误", 0);
             run = false;
         } else {
-            //fc->warmTime();
             run = true;
         }
     }
@@ -149,6 +148,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
 
     ++frameC;
     ++f2c;
+    /* 就是不让它每一帧都更新 */
     if (frameC%42!=0) return;
 
     HDC hdc = GetDC(hwnd);

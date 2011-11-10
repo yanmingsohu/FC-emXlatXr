@@ -66,6 +66,7 @@
 		<Unit filename="src\ppu.h" />
 		<Unit filename="src\rom.cpp" />
 		<Unit filename="src\rom.h" />
+		<Unit filename="src\testroms.h" />
 		<Unit filename="src\type.cpp" />
 		<Unit filename="src\type.h" />
 		<Unit filename="src\video.h" />

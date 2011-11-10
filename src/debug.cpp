@@ -13,8 +13,8 @@ static void cpu_debug_help() {
 \n| o :frame over                         | m :display memory \
 \n| s :skip 'n' operator,not display      | r :reset cpu \
 \n| i :set operate to send frame IRQ      | d :draw a frame \
-\n| g :goto XXXX  \                       | b :breakpoint \
-\n| p :push key \
+\n| g :goto XXXX                          | b :breakpoint \
+\n| p :push key                           | c :clear screen \
 \n| x :exit \
 \n------------------------------------------------------------------------------&\n"
     );
@@ -103,9 +103,10 @@ void debugCpu(NesSystem *fc) {
         else if (ch=='h') {
             cpu_debug_help();
         }
-        else if (ch=='d') {
-            fc->drawFrame();
+        else if (ch=='c') {
+            system("cls");
         }
+
         else if (ch=='b') {
             printf("XX input PC(16) when stop: ");
             fflush(stdin);
@@ -141,7 +142,6 @@ void debugCpu(NesSystem *fc) {
             fflush(stdin);
             scanf("%d", &frameIrq);
         }
-
         else if (ch=='r') {
             cpu->RES = 1;
             c = 0;
@@ -152,8 +152,8 @@ void debugCpu(NesSystem *fc) {
         else if (ch=='o') {
             ppu->oneFrameOver();
         }
-        else if (ch=='x') {
-            break;
+        else if (ch=='d') {
+            fc->drawFrame();
         }
 
         else if (ch=='m') {
@@ -174,6 +174,9 @@ void debugCpu(NesSystem *fc) {
                 printf(" %02X", ram->read(i));
             }
             printf("\n|-over-|- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- |\n");
+        }
+        else if (ch=='x') {
+            break;
         }
     }
 

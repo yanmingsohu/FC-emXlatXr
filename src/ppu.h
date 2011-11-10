@@ -66,22 +66,32 @@ struct BackGround {
     byte name      [0x03C0];
     byte attribute [0x0040];
 
+    /* offset=[0 - 0x400] */
     void write(word offset, byte data) {
-        word off = (offset % 0x0400);
-        if (off<0x03C0) {
-            name[off] = data;
+#ifdef SHOW_ERR_MEM_OPERATE
+        _check(offset);
+#endif
+        if (offset<0x03C0) {
+            name[offset] = data;
         } else {
-            attribute[off-0x03C0] = data;
+            attribute[offset-0x03C0] = data;
         }
     }
 
+    /* offset=[0 - 0x400] */
     byte read(word offset) {
-        word off = (offset % 0x0400);
-        if (off<0x03C0) {
-            return name[off];
+#ifdef SHOW_ERR_MEM_OPERATE
+        _check(offset);
+#endif
+        if (offset<0x03C0) {
+            return name[offset];
         } else {
-            return attribute[off-0x03C0];
+            return attribute[offset-0x03C0];
         }
+    }
+
+    void _check(word i) {
+        if (i>=0x400) printf("BackGround::out of offset %x", i);
     }
 };
 
@@ -107,6 +117,7 @@ struct BackGround {
  * $2FC0-$2FFF 背景第四页配色区 0xFFF 4KB                  *
  *                                                         *
  * $3000-$3EFF $2000 - $2EFF 的镜像                        *
+ *                                                         *
  * $3F00-$3F1F 背景卡通配色代码数据 各16字节               *
  * $3F20-$3FFF 为空  $3F00-$3F1F 的7次镜像                 *
  * $4000-$FFFF $0000 - $3FFF 的镜像。                      *
@@ -122,7 +133,7 @@ private:
 
     byte spWorkRam[256];    /* 卡通工作内存                        */
     word spWorkOffset;      /* 卡通工作页面首地址                  */
-    word ppu_ram_p;         /* ppu寄存器指针                       */
+    word ppu_ram_p;         /* ppu寄存器指针,不会超过 0x3FFF       */
     byte addr_add;          /* 地址增长累加值                      */
     enum { pH, pL } ppuSW;  /* 写入ppu寄存器的位置 $0000-$3FFF     */
 
@@ -155,6 +166,7 @@ private:
     byte readBuf;           /* PPU总是返回上一次读取的数据,在每次
                              * 修改指针时<0x3F00则没有预读取导致bug*/
     word tmp_addr;          /* 保存修改地址高位                    */
+    int  currentDrawLine;   /* 当前正在渲染的行, 调试时使用        */
 
     MMC   *mmc;
     Video *video;
@@ -164,7 +176,7 @@ private:
 
     void write(byte);       /* 写数据                              */
     byte read();            /* 读数据                              */
-    BackGround* swBg();     /* 依据ppu_ram_p的值得到相应的背景指针 */
+    BackGround* swBg(word); /* 依据word的值得到相应的背景指针      */
 
     /* 依据x,y的位置从attr属性表中取得颜色的高两位                 */
     byte bgHBit(int x, int y, byte *attr);
@@ -173,7 +185,8 @@ private:
 
     void _drawSprite(byte spriteIdx, byte);
     void _checkHit(int x, int y);
-    void _add_ppu_point();
+    /* 使用mask(1)清除tmp_addr,并用d非0位设置清除tmp_addr */
+    void _setTmpaddr(uint mask, uint d);
 
 public:
     enum bgPriority {bpFront, bpBehind};

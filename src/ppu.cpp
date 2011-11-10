@@ -127,14 +127,18 @@ void PPU::controlWrite(word addr, byte data) {
 
     case 5: /* 0x2005 设置窗口坐标 */
         if (w2005==wX) {
-            tmp_addr = data;
+            //tmp_addr = data;
+            _setTmpaddr(0x31, data >> 3);
             w2005 = wY;
         } else {
-            winX = (0x100 & winX) | tmp_addr;
-            winY = (0x100 & winY) | data;
+            //winX = (0x100 & winX) | tmp_addr;
+            //winY = (0x100 & winY) | data;
+            _setTmpaddr(0x31 << 5, (data & 0xF8) << 2);
+            _setTmpaddr(0x7 << 12, (data & 0x7) << 12);
             w2005 = wX;
 #ifdef SHOW_PPU_REGISTER
-            printf("PPU::设置窗口坐标 x:%d, y:%d\n", winX, winY);
+            printf("PPU::修改窗口坐标 x:%d, y:%d 当前行:%d\n",
+                   winX, winY, currentDrawLine);
 #endif
         }
         break;
@@ -143,18 +147,19 @@ void PPU::controlWrite(word addr, byte data) {
         if (lockAccess) break;
 
         if (ppuSW==pH) {
-            /* 没有完整写入高低字节不能改变PPU指针 */
-            tmp_addr  = data;
+            //tmp_addr  = data;
+            _setTmpaddr(0x3F00, (data & 0x3F) << 8);
+            _setTmpaddr(0xC000, 0);
             ppuSW     = pL;
         } else {
-            word old_p = ppu_ram_p;
-            /* 全部写入地址才有效 */
-            ppu_ram_p = (tmp_addr<<8) | data;
+            //ppu_ram_p = ((tmp_addr<<8) | data) & 0x3FFF;
+            _setTmpaddr(0xFF, data);
+            ppu_ram_p = tmp_addr;
             ppuSW     = pH;
-        }
 #ifdef SHOW_PPU_REGISTER
-        printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
+            printf("PPU::修改PPU指针:%04x\n", ppu_ram_p);
 #endif
+        }
         break;
 
     case 7: /* 0x2007 写数据寄存器 */
@@ -163,6 +168,7 @@ void PPU::controlWrite(word addr, byte data) {
         printf("PPU::向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
 #endif
         write(data);
+        ppu_ram_p = (ppu_ram_p + addr_add) & 0x3FFF;
         break;
     }
 }
@@ -170,20 +176,7 @@ void PPU::controlWrite(word addr, byte data) {
 #define _BIT(x)  (data & (1<<x))
 
 inline void PPU::control_2000(byte data) {
-    if (_BIT(0)) {
-        winX |= 0x0100;
-    } else {
-        winX &= 0x00FF;
-    }
-
-    if (_BIT(1)) {
-        winY |= 0x0100;
-    } else {
-        winY &= 0x00FF;
-    }
-#ifdef SHOW_PPU_REGISTER
-    printf("PPU::窗口坐标 x:%d, y:%d\n", winX, winY);
-#endif
+    _setTmpaddr(0x3 << 10, (data & 0x3) << 10);
 
     addr_add    = _BIT(2) ? 0x20   : 0x01;
     spRomOffset = _BIT(3) ? 0x1000 : 0;
@@ -236,19 +229,21 @@ byte PPU::readState(word addr) {
             break;
         }
 #endif
-        r = spWorkRam[spWorkOffset++];
+        /* Address should not increment on $2004 read */
+        r = spWorkRam[spWorkOffset];
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::读取精灵数据: %X = %x\n", spWorkOffset, r);
 #endif
         break;
 
-    case 7:
+    case 7: /* 0x2007 读取VRAM */
         if (ppu_ram_p < 0x3F00) {
             r = readBuf;
             readBuf = read();
         } else {
             r = read();
         }
+        ppu_ram_p = (ppu_ram_p + addr_add) & 0x3FFF;
         break;
 
 #ifdef SHOW_ERR_MEM_OPERATE
@@ -264,37 +259,44 @@ byte PPU::readState(word addr) {
     return r;
 }
 
-BackGround* PPU::swBg() {
-    word offs = 0;
-    if (ppu_ram_p<0x3000)
-        offs = (ppu_ram_p - 0x2000) / 0x400;
-    else {
-        offs = (ppu_ram_p - 0x3000) / 0x400;
+/* offs => [0x2000 - 0x4000] */
+BackGround* PPU::swBg(word offs) {
+    if (offs >= 0x3000) {
+        offs -= 0x3000;
+    }
+
+    if (offs<0x2400) {
+        return pbg[0];
+    } else
+    if (offs<0x2800) {
+        return pbg[1];
+    } else
+    if (offs<0x2C00) {
+        return pbg[2];
+    } else
+    if (offs<0x3000) {
+        return pbg[3];
     }
 
 #ifdef SHOW_ERR_MEM_OPERATE
-    if (offs>=4) {
-        printf("PPU::无效的显存访问%X.\n", ppu_ram_p);
-        return NULL;
-    }
+    printf("PPU::无效的显存访问%X.\n", offs);
+    return NULL;
 #endif
-    return pbg[offs];
 }
 
 byte PPU::read() {
     byte res = 0xFF;
+    word offset = ppu_ram_p;
 
-    if (ppu_ram_p<0x2000) {
-        res = mmc->readVRom(ppu_ram_p);
-    } else
-
-    if (ppu_ram_p<0x3F00) {
-        BackGround* pBg = swBg();
-        res = pBg->read(ppu_ram_p);
-    } else
-
-    if (ppu_ram_p<0x4000) {
-        word off = ppu_ram_p % 0x20;
+    if (offset<0x2000) {
+        res = mmc->readVRom(offset);
+    }
+    else if (offset<0x3F00) {
+        BackGround* pBg = swBg(offset);
+        res = pBg->read(offset % 0x0400);
+    }
+    else {
+        word off = offset % 0x20;
         if (off<0x10) {
             res = bkPalette[off     ];
         } else {
@@ -302,22 +304,22 @@ byte PPU::read() {
         }
     }
 
-    _add_ppu_point();
     return res;
 }
 
 void PPU::write(byte data) {
-    if (ppu_ram_p<0x2000) {
-        mmc->writeVRom(ppu_ram_p, data);
-    } else
+    word offset = ppu_ram_p;
 
-    if (ppu_ram_p<0x3EFF) {
-        BackGround* pBg = swBg();
-        pBg->write(ppu_ram_p, data);
-    } else
-
-    if (ppu_ram_p<0x3FFF) {
-        if (ppu_ram_p % 4 == 0) {
+    if (offset<0x2000) {
+        mmc->writeVRom(offset, data);
+    }
+    else if (offset<0x3F00) {
+        BackGround* pBg = swBg(offset);
+        pBg->write(offset % 0x0400, data);
+    }
+    else {
+        data &= 0x3F;
+        if (offset % 4 == 0) {
             bkPalette[  0] = data;
             bkPalette[  4] = data;
             bkPalette[  8] = data;
@@ -328,7 +330,7 @@ void PPU::write(byte data) {
             spPalette[0xC] = data;
         }
         else {
-            word off = ppu_ram_p % 0x20;
+            word off = offset % 0x20;
             if (off<0x10) {
                 bkPalette[off     ] = data;
             } else {
@@ -336,8 +338,6 @@ void PPU::write(byte data) {
             }
         }
     }
-
-    _add_ppu_point();
 }
 
 void PPU::switchMirror(byte type) {
@@ -575,6 +575,9 @@ void PPU::drawPixel(int X, int Y) {
     byte colorIdx = bkPalette[paletteIdx];
     video->drawPixel(X, Y, ppu_color_table[colorIdx]);
     _checkHit(X, Y);
+#ifdef SHOW_PPU_REGISTER
+    currentDrawLine = Y;
+#endif
 }
 
 void PPU::oneFrameOver() {
@@ -592,6 +595,10 @@ void PPU::startNewFrame() {
     video->clear( ppu_color_table[bkPalette[0]] );
     memset(sp0hit, 0, sizeof(sp0hit));
     _drawSprite(0,0);
+
+#ifdef SHOW_PPU_REGISTER
+    currentDrawLine = 0;
+#endif
 }
 
 void PPU::sendingNMI() {
@@ -620,9 +627,7 @@ word PPU::getVRamPoint() {
     return ppu_ram_p;
 }
 
-inline void PPU::_add_ppu_point() {
-    ppu_ram_p += addr_add;
-
-    if (ppu_ram_p > 0x3FFF)
-        ppu_ram_p -= 0x4000;
+inline void PPU::_setTmpaddr(uint mask, uint d) {
+    tmp_addr &= (mask) ^ 0xFFFF;
+    tmp_addr |= d;
 }

@@ -1,9 +1,10 @@
-#include  <windows.h>
-#include    <stdio.h>
-#include     <time.h>
-#include  <Winuser.h>
-#include   "winsys.h"
-#include "../debug.h"
+#include     <windows.h>
+#include       <stdio.h>
+#include        <time.h>
+#include     <Winuser.h>
+#include      "winsys.h"
+#include    "../debug.h"
+#include "../testRoms.h"
 
 
 static LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
@@ -47,30 +48,17 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
     return messages.wParam;
 }
 
-#define ROM "rom/NEStress.nes"
-//#define ROM "rom/Tennis.nes"
-//#define ROM "rom/F-1.nes"
-//#define ROM "rom/dkk.nes"
-//#define ROM "rom/fighter_f8000.nes"
-//#define ROM "H:\\VROMS\\FC_ROMS\\霸王的大陆.nes"
-//#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地2.nes"
-//#define ROM "H:\\VROMS\\FC_ROMS\\吞噬天地.nes"
-//#define ROM "H:\\VROMS\\FC_ROMS\\魂斗罗.nes" // 7900断点
-//#define ROM "rom\\test\\blargg_ppu_tests_2005.09.15b\\vram_access.nes"
-//#define ROM "rom/test/NES_Test_Cart.nes"
-
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();
     Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
     fc           = new NesSystem(video, pad);
 
-#ifdef ROM
-    run = !fc->load_rom(ROM);
+#ifdef TEST_ROM
+    run = !fc->load_rom(TEST_ROM);
 #endif
 
 	cpu_6502* cpu = fc->getCpu();
-    clock_t usetime = clock();
 
     bgpanel = bg_panel(hInstance, fc->getPPU());
     tlpanel = tile_panel(hInstance, fc->getPPU());
@@ -81,7 +69,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     }
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
-    for(;;)
+    for(clock_t usetime = clock();;)
     {
     	if (PeekMessage(messages, NULL, 0, 0, PM_REMOVE)) {
     		if (messages->message==WM_QUIT) {
@@ -94,8 +82,8 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	if (!run) continue;
 
         /* 限速,但是并不准确 */
-    	if (clock()-usetime<14) continue;
-
+    	//if (clock()-usetime<14) continue;
+    if (clock()-usetime<50) continue;
     	usetime = clock();
 
         if (sDebug) {

@@ -11,6 +11,11 @@ $ 该文档使用UTF-8编码
 $ 源代码使用GBK编码
 $ 项目由Code::Block 10.05编辑
 
+
+源码:	git@github.com:yanmingsohu/FC-emulator.git
+	https://github.com/yanmingsohu/FC-emulator
+
+
 yanming-sohu@sohu.com - Qq:412475540
 
 ---------------------------------------------按键:

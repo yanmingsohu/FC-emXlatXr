@@ -58,7 +58,7 @@ char* parseOpenError(int load_err_code);
 /* 访问无效内存时提出警告                                         */
 #define SHOW_ERR_MEM_OPERATE
 /* 显示访问PPU的消息                                              */
-#define SHOW_PPU_REGISTER
+//#define SHOW_PPU_REGISTER
 /* 显示CPU寻址消息                                                */
 #define SHOW_CPU_MEMORY_ADDRESSING
 /*-----------------------------------------------| END DEBUG |----*/

@@ -139,6 +139,7 @@ private:
 
     word winX;
     word winY;
+    word tmpwinY, tmpwinX;
     enum { wX, wY } w2005;  /* 写入哪一个参数                      */
 
     word spRomOffset;       /* 卡通字库首地址                      */
@@ -148,7 +149,6 @@ private:
     byte *NMI;              /* cpu的NMI地址线，用来向cpu发送NMI    */
     byte sendNMI;           /* 是否在刷新一帧后发送NMI             */
     byte vblankTime;        /* 如果处于垂直消隐时期则为1           */
-    byte lockAccess;        /* 忽略2006/2007操作为1                */
 
     byte bkleftCol;         /* 背景显示左一列                      */
     byte spleftCol;         /* 卡通显示左一列                      */
@@ -187,6 +187,8 @@ private:
     void _checkHit(int x, int y);
     /* 使用mask(1)清除tmp_addr,并用d非0位设置清除tmp_addr */
     void _setTmpaddr(uint mask, uint d);
+    /* 使用tmp_addr设置当前ppuram指针与屏幕偏移 */
+    void _resetScreenOffset(bool newFrame);
 
 public:
     enum bgPriority {bpFront, bpBehind};
@@ -216,6 +218,8 @@ public:
     void getWindowPos(int *x, int *y);
     /* 返回当前ppu显存指针                                         */
     word getVRamPoint();
+    /* 开始绘制新的扫描线                                          */
+    void startNewLine();
 
     /* 绘制一帧中的精灵                                            */
     void drawSprite(bgPriority);

@@ -55,8 +55,7 @@ static byte RESET_PALETTE_TABLE[] = {
 };
 
 PPU::PPU(MMC *_mmc, Video *_video)
-    : lockAccess  (0)
-    , spWorkOffset(0)
+    : spWorkOffset(0)
     , addr_add    (1)
     , ppuSW      (pH)
     , w2005      (wX)
@@ -128,32 +127,27 @@ void PPU::controlWrite(word addr, byte data) {
     case 5: /* 0x2005 设置窗口坐标 */
         if (w2005==wX) {
             //tmp_addr = data;
+            tmpwinX = (0x100 & tmpwinX) | data;
             _setTmpaddr(0x31, data >> 3);
             w2005 = wY;
         } else {
             //winX = (0x100 & winX) | tmp_addr;
             //winY = (0x100 & winY) | data;
-            _setTmpaddr(0x31 << 5, (data & 0xF8) << 2);
-            _setTmpaddr(0x7 << 12, (data & 0x7) << 12);
+            tmpwinY = (0x100 & tmpwinY) | data;
+            _setTmpaddr(0x03E0, (data & 0x00F8) << 2 );
+            _setTmpaddr(0x7000, (data & 0x0007) << 12);
             w2005 = wX;
-#ifdef SHOW_PPU_REGISTER
-            printf("PPU::修改窗口坐标 x:%d, y:%d 当前行:%d\n",
-                   winX, winY, currentDrawLine);
-#endif
         }
         break;
 
     case 6: /* 0x2006 PPU地址指针 */
-        if (lockAccess) break;
-
         if (ppuSW==pH) {
             //tmp_addr  = data;
-            _setTmpaddr(0x3F00, (data & 0x3F) << 8);
-            _setTmpaddr(0xC000, 0);
+            _setTmpaddr(0x3F00, (data & 0x003F) << 8);
             ppuSW     = pL;
         } else {
             //ppu_ram_p = ((tmp_addr<<8) | data) & 0x3FFF;
-            _setTmpaddr(0xFF, data);
+            _setTmpaddr(0x00FF, data);
             ppu_ram_p = tmp_addr;
             ppuSW     = pH;
 #ifdef SHOW_PPU_REGISTER
@@ -163,7 +157,6 @@ void PPU::controlWrite(word addr, byte data) {
         break;
 
     case 7: /* 0x2007 写数据寄存器 */
-        if (lockAccess) break;
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::向PPU写数据:%04X = %04X\n", ppu_ram_p, data);
 #endif
@@ -176,14 +169,26 @@ void PPU::controlWrite(word addr, byte data) {
 #define _BIT(x)  (data & (1<<x))
 
 inline void PPU::control_2000(byte data) {
-    _setTmpaddr(0x3 << 10, (data & 0x3) << 10);
+    if (_BIT(0)) {
+        tmpwinX |= 0x0100;
+    } else {
+        tmpwinX &= 0x00FF;
+    }
+
+    if (_BIT(1)) {
+        tmpwinY |= 0x0100;
+    } else {
+        tmpwinY &= 0x00FF;
+    }
+
+    _setTmpaddr(0xC00, (data & 0x3) << 10);
 
     addr_add    = _BIT(2) ? 0x20   : 0x01;
     spRomOffset = _BIT(3) ? 0x1000 : 0;
     bgRomOffset = _BIT(4) ? 0x1000 : 0;
     spriteType  = _BIT(5) ? t8x16  : t8x8;
     sendNMI     = _BIT(7) ? 1      : 0;
-    // D6位 PPU 主/从模式, 没有在NES里使用
+    // D6位 PPU 主/从模式, 没有在NES里使用, 双PPU??!!
 }
 
 inline void PPU::control_2001(byte data) {
@@ -213,7 +218,6 @@ byte PPU::readState(word addr) {
 
     case 2: /* 0x2002 */
         r = 0;
-        if ( lockAccess ) r |= ( 1<<4 );
         if ( spOverflow ) r |= ( 1<<5 );
         if ( hit        ) r |= ( 1<<6 );
         if ( vblankTime ) r |= ( 1<<7 );
@@ -592,6 +596,8 @@ void PPU::startNewFrame() {
     ppu_ram_p  = 0x2000;
     hit        = 0;
 
+    _resetScreenOffset(true);
+
     video->clear( ppu_color_table[bkPalette[0]] );
     memset(sp0hit, 0, sizeof(sp0hit));
     _drawSprite(0,0);
@@ -610,12 +616,42 @@ void PPU::sendingNMI() {
     }
 }
 
+void PPU::startNewLine() {
+    _resetScreenOffset(false);
+}
+
 void PPU::copySprite(byte *data) {
     memcpy(spWorkRam + spWorkOffset, data, 256 - spWorkOffset);
 
     if (spWorkOffset) { /* 需不需要完整复制256字节... */
-        memcpy(spWorkRam, data, spWorkOffset);
+        //memcpy(spWorkRam, data, spWorkOffset);
     }
+}
+
+void PPU::_resetScreenOffset(bool newFrame) {
+    if (!bkAllDisp) return;
+    /*
+    winX = ((tmp_addr & 0x001F) << 3);
+    // and tile X offset (3 bits)
+    if (tmp_addr & 0x0400) {
+        winX += 256;
+    } */
+    winX = tmpwinX;
+
+    if (newFrame) {
+        ppu_ram_p = tmp_addr;
+        winY = tmpwinY;
+        /*
+        winY = ((tmp_addr & 0x03E0) >> 2) & ((tmp_addr & 0x7000) >> 12);
+        if (tmp_addr & 0x0800) {
+            winY += 256;
+        } */
+    } else {
+        ppu_ram_p = tmp_addr & 0x041F;
+    }
+#ifdef SHOW_PPU_REGISTER
+    printf("PPU::修改窗口坐标 x:%d, y:%d 当前行:%d\n", winX, winY, currentDrawLine);
+#endif
 }
 
 void PPU::getWindowPos(int *x, int *y) {

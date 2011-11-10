@@ -70,6 +70,7 @@ void NesSystem::drawFrame() {
     int x=0, y=0;
 
     while (y<240) {
+        ppu->startNewLine();
         /* »æÖÆÒ»ÐÐ */
         for (;;) {
             ppu->drawPixel(x++, y);

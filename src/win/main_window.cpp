@@ -82,8 +82,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	if (!run) continue;
 
         /* 限速,但是并不准确 */
-    	//if (clock()-usetime<14) continue;
-    if (clock()-usetime<50) continue;
+    	if (clock()-usetime<14) continue;
     	usetime = clock();
 
         if (sDebug) {

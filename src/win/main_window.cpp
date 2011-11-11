@@ -17,11 +17,13 @@ static void        openFile                   (HWND hwnd                   );
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = "FC 模拟器 DEmo. -=CatfoOD=-";
 static bool active = 1;
-static bool sDebug = 0;
+static bool sDebug = 1;
 static bool run    = 0;
 static win_info*  bgpanel = NULL;
 static win_info*  tlpanel = NULL;
 static NesSystem* fc;
+
+#define FRAME_RATE_60 14
 
 int WINAPI WinMain ( HINSTANCE hThisInstance,
                      HINSTANCE hPrevInstance,
@@ -82,7 +84,7 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
     	if (!run) continue;
 
         /* 限速,但是并不准确 */
-    	if (clock()-usetime<14) continue;
+    	if (clock()-usetime<FRAME_RATE_60) continue;
     	usetime = clock();
 
         if (sDebug) {

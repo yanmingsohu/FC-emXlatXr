@@ -135,12 +135,17 @@ private:
     word spWorkOffset;      /* 卡通工作页面首地址                  */
     word ppu_ram_p;         /* ppu寄存器指针,不会超过 0x3FFF       */
     byte addr_add;          /* 地址增长累加值                      */
-    enum { pH, pL } ppuSW;  /* 写入ppu寄存器的位置 $0000-$3FFF     */
+    byte readBuf;           /* PPU总是返回上一次读取的数据,在每次
+                             * 修改指针时<0x3F00则没有预读取导致bug*/
+    word tmp_addr;          /* PPU $2005/$2006端口地址锁存         */
+    int  currentDrawLine;   /* 当前正在渲染的行, 调试时使用        */
+
+    enum {Flip1w, Flip2w
+         } flipflop;        /* $2005/$2006端口共用翻转触发器       */
 
     word winX;
     word winY;
-    word tmpwinY, tmpwinX;
-    enum { wX, wY } w2005;  /* 写入哪一个参数                      */
+    byte tileXoffset;       /* 3 bits                              */
 
     word spRomOffset;       /* 卡通字库首地址                      */
     word bgRomOffset;       /* 背景字库首地址                      */
@@ -160,13 +165,8 @@ private:
 
     byte spOverflow;        /* 卡通8个溢出                         */
     byte hit;               /* 卡通碰撞                            */
-
     int  sp0x, sp0y;        /* 记录0号卡通的位置                   */
     byte sp0hit[8][8];      /* 用来做碰撞检测                      */
-    byte readBuf;           /* PPU总是返回上一次读取的数据,在每次
-                             * 修改指针时<0x3F00则没有预读取导致bug*/
-    word tmp_addr;          /* 保存修改地址高位                    */
-    int  currentDrawLine;   /* 当前正在渲染的行, 调试时使用        */
 
     MMC   *mmc;
     Video *video;
@@ -186,7 +186,7 @@ private:
     void _drawSprite(byte spriteIdx, byte);
     void _checkHit(int x, int y);
     /* 使用mask(1)清除tmp_addr,并用d非0位设置清除tmp_addr */
-    void _setTmpaddr(uint mask, uint d);
+    void _setTmpaddr(word mask, word d);
     /* 使用tmp_addr设置当前ppuram指针与屏幕偏移 */
     void _resetScreenOffset(bool newFrame);
 

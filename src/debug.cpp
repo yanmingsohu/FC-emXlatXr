@@ -65,7 +65,7 @@ static void condition_code(NesSystem *fc) { /* 实现可能不准确 */
     } else
 
     if (CPU_IS(AD, 07, 20)) {
-        printf("DBG::读取PPU显存数据 地址:%04X\n", ppu->getVRamPoint());
+        printf("DBG::读取PPU显存数据 地址:%04X\n", ppu->getVRamPoint()-1);
     }
 }
 #undef CPU_IS

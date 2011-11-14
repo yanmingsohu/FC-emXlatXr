@@ -18,6 +18,7 @@ int load_rom(nes_file* rom, const string* filename) {
         }
 
         const char* filen = filename->c_str();
+        printf("\nloading rom : '%s' ...\n", filen);
         file = fopen(filen, "rb");
 
         if (!file) {

@@ -15,7 +15,7 @@ static void        openFile                   (HWND hwnd                   );
 
 /*  Make the class name into a global variable  */
 static char szClassName[ ] = "CodeBlocksWindowsApp";
-static char titleName  [ ] = "FC Ä£ÄâÆ÷ DEmo. -=CatfoOD=-";
+static char titleName  [ ] = SF_NAME_JYM SF_VERSION_JYM;
 static bool active = 1;
 static bool sDebug = 0;
 static bool run    = 0;

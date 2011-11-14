@@ -87,11 +87,12 @@ CPU_FUNC cpu_command_RTI(command_parm* parm) {
 /* ×óÒÆ0²¹Î» */
 CPU_FUNC cpu_command_ASL(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte model = parm->op - 0x02;
+    byte model;
 
-    if (parm->op == 0x0A) {
-        model += 0x20;
-    }
+    if (parm->op == 0x0A)
+        model = ADD_MODE_acc;
+    else
+        model = parm->op - 0x02;
 
     byte value = parm->read(model);
     CARRY_WITH(0x80);
@@ -106,11 +107,12 @@ CPU_FUNC cpu_command_ASL(command_parm* parm) {
 /* ÓÒÒÆ0²¹Î» */
 CPU_FUNC cpu_command_LSR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte model = parm->op - 0x42;
+    byte model;
 
-    if (parm->op == 0x4A) {
-        model += 0x20;
-    }
+    if (parm->op == 0x4A)
+        model = ADD_MODE_acc;
+    else
+        model = parm->op - 0x42;
 
     byte value = parm->read(model);
     CARRY_WITH(0x01);
@@ -126,11 +128,12 @@ CPU_FUNC cpu_command_LSR(command_parm* parm) {
 /* ×óÒÆÑ­»·²¹Î» */
 CPU_FUNC cpu_command_ROL(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte model = parm->op - 0x22;
+    byte model;
 
-    if (parm->op == 0x2A) {
-        model += 0x20;
-    }
+    if (parm->op == 0x2A)
+        model = ADD_MODE_acc;
+    else
+        model = parm->op - 0x22;
 
     byte value = parm->read(model);
     byte ro = cpu->FLAGS & CPU_FLAGS_CARRY ? 1 : 0;
@@ -148,11 +151,12 @@ CPU_FUNC cpu_command_ROL(command_parm* parm) {
 /* ÓÒÒÆÑ­»·²¹Î» */
 CPU_FUNC cpu_command_ROR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-    byte model = parm->op - 0x62;
+    byte model;
 
-    if (parm->op == 0x6A) {
-        model += 0x20;
-    }
+    if (parm->op == 0x6A)
+        model = ADD_MODE_acc;
+    else
+        model = parm->op - 0x62;
 
     byte value = parm->read(model);
     byte ro = cpu->FLAGS & CPU_FLAGS_CARRY ? 0x80 : 0;
@@ -436,13 +440,11 @@ CPU_FUNC cpu_command_STY(command_parm* parm) {
 
 /* °ÑX¼Ä´æÆ÷´æÈëÄÚ´æ */
 CPU_FUNC cpu_command_STX(command_parm* parm) {
-    byte mode;
     if (parm->op == 0x96) {
-        mode = ADD_MODE_zpgY;
+        parm->write(ADD_MODE_zpgY, parm->cpu->X);
     } else {
-        mode = parm->op - 0x82;
+        parm->write(parm->op - 0x82, parm->cpu->X);
     }
-    parm->write(mode, parm->cpu->X);
 }
 
 /* ÓÉÄÚ´æÔØÈëA¼Ä´æÆ÷ */
@@ -942,8 +944,6 @@ inline word command_parm::abs() {
 }
 
 inline word command_parm::absX() {
-if (op==0xBE || op==0xBC)
-printf("[abs X] %s %s\n", cpu->cmdInfo(), cpu->debug());
     return CHECK_PAGE_BOUND(abs(), cpu->X, &mem_time);
 }
 

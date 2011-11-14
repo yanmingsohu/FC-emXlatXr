@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="debug" />
+	<ActiveTarget name="Release" />
 	<File name="src\cpu.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="5240" topLine="1002" />
 	</File>
@@ -22,14 +22,14 @@
 	<File name="src\mem.h" open="0" top="0" tabpos="6">
 		<Cursor position="2649" topLine="17" />
 	</File>
-	<File name="src\mmc.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="5370" topLine="147" />
+	<File name="src\mmc.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="1620" topLine="45" />
 	</File>
 	<File name="src\mmc.h" open="0" top="0" tabpos="6">
-		<Cursor position="4324" topLine="83" />
+		<Cursor position="1694" topLine="27" />
 	</File>
 	<File name="src\nes_sys.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="3783" topLine="106" />
+		<Cursor position="2591" topLine="19" />
 	</File>
 	<File name="src\nes_sys.h" open="0" top="0" tabpos="1">
 		<Cursor position="2012" topLine="23" />
@@ -37,20 +37,20 @@
 	<File name="src\pad.h" open="0" top="0" tabpos="5">
 		<Cursor position="3044" topLine="0" />
 	</File>
-	<File name="src\ppu.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="8218" topLine="228" />
+	<File name="src\ppu.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="16721" topLine="590" />
 	</File>
 	<File name="src\ppu.h" open="1" top="0" tabpos="3">
-		<Cursor position="9857" topLine="190" />
+		<Cursor position="9857" topLine="133" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="2453" topLine="0" />
 	</File>
-	<File name="src\rom.h" open="1" top="1" tabpos="6">
-		<Cursor position="3891" topLine="41" />
+	<File name="src\rom.h" open="0" top="0" tabpos="6">
+		<Cursor position="741" topLine="6" />
 	</File>
 	<File name="src\testroms.h" open="1" top="0" tabpos="5">
-		<Cursor position="855" topLine="0" />
+		<Cursor position="248" topLine="0" />
 	</File>
 	<File name="src\type.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="61" topLine="23" />
@@ -65,13 +65,13 @@
 		<Cursor position="1105" topLine="19" />
 	</File>
 	<File name="src\win\main_window.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="1986" topLine="46" />
+		<Cursor position="2090" topLine="67" />
 	</File>
 	<File name="src\win\tilepanel.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="1045" topLine="15" />
 	</File>
 	<File name="src\win\winsys.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="1095" topLine="187" />
+		<Cursor position="1764" topLine="82" />
 	</File>
 	<File name="src\win\winsys.h" open="0" top="0" tabpos="8">
 		<Cursor position="1577" topLine="1" />

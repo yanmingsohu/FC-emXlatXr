@@ -271,7 +271,7 @@ BackGround* PPU::swBg(word offs) {
 
 byte PPU::read() {
     byte res = 0xFF;
-    word offset = ppu_ram_p;
+    word &offset = ppu_ram_p;
 
     if (offset<0x2000) {
         res = mmc->readVRom(offset);
@@ -287,9 +287,9 @@ byte PPU::read() {
         } else {
             res = spPalette[off-0x10];
         }
+        /* In monochrome mode (Port 2001h/Bit0=1)
+           the returned lower 4bit are zero */
         if (!hasColor) {
-            /* In monochrome mode (Port 2001h/Bit0=1)
-               the returned lower 4bit are zero */
             res &= 0xF0;
         }
     }

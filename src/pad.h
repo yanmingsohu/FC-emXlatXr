@@ -59,12 +59,17 @@ public:
 
     /* 向4016/4017端口写数据 */
     void writePort(word port, byte data) {
+        /* 发送1,再发送0开始读取键位 */
         if (port==0x4016) {
-            /* 发送1,再发送0开始读取键位 */
-            if (wcount==0 && data==1) wcount++;
-            if (wcount==1 && data==0) {
-                rcount = 0;
-                wcount = 0;
+            byte _d = data & 0x01;
+
+            if (_d) {
+                if (!wcount) wcount++;
+            } else {
+                if (wcount) {
+                    rcount = 0;
+                    wcount = 0;
+                }
             }
         }
     }

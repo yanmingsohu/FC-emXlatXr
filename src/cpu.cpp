@@ -22,6 +22,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#define CPU_FUNC     static void
 #define NOT_MEM_TIME  parm->mem_time = 0 /* 不需要另加寻址时间 */
 #define SET_FLAGS(x) (parm->cpu->FLAGS |= (x))
 #define CLE_FLAGS(x) (parm->cpu->FLAGS &= 0xFF ^ (x))
@@ -33,17 +34,17 @@ HELP_FNC void check_decimal(command_parm* parm) {
     }
 }
 
-void cpu_command_XXX(command_parm* parm) {
+CPU_FUNC cpu_command_XXX(command_parm* parm) {
     printf("! unknow command code[%02x] on %04x skip.\n",
            parm->op, parm->cpu->PC - parm->cmd->len);
 }
 
-void cpu_command_NOP(command_parm*) {
+CPU_FUNC cpu_command_NOP(command_parm*) {
 /* 不干正事 */
 }
 
 /* 跳跃到子过程 */
-void cpu_command_JSR(command_parm* parm) {
+CPU_FUNC cpu_command_JSR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
 
     cpu->PC--;
@@ -55,7 +56,7 @@ void cpu_command_JSR(command_parm* parm) {
 }
 
 /* 从子过程返回 */
-void cpu_command_RTS(command_parm* parm) {
+CPU_FUNC cpu_command_RTS(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
 
     cpu->PCL = cpu->pop();
@@ -64,14 +65,14 @@ void cpu_command_RTS(command_parm* parm) {
 }
 
 /* 中断 */
-void cpu_command_BRK(command_parm* parm) {
+CPU_FUNC cpu_command_BRK(command_parm* parm) {
     parm->cpu->PC++;
     SET_FLAGS(CPU_FLAGS_BREAK);
     parm->cpu->jump(0xFFFE);
 }
 
 /* 从中断过程中返回 */
-void cpu_command_RTI(command_parm* parm) {
+CPU_FUNC cpu_command_RTI(command_parm* parm) {
     parm->cpu->rti();
 #ifdef NMI_DEBUG
     printf("CPU::中断返回\n");
@@ -84,7 +85,7 @@ void cpu_command_RTI(command_parm* parm) {
                   : CLE_FLAGS(CPU_FLAGS_CARRY);
 
 /* 左移0补位 */
-void cpu_command_ASL(command_parm* parm) {
+CPU_FUNC cpu_command_ASL(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     byte model = parm->op - 0x02;
 
@@ -103,7 +104,7 @@ void cpu_command_ASL(command_parm* parm) {
 }
 
 /* 右移0补位 */
-void cpu_command_LSR(command_parm* parm) {
+CPU_FUNC cpu_command_LSR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     byte model = parm->op - 0x42;
 
@@ -123,7 +124,7 @@ void cpu_command_LSR(command_parm* parm) {
 }
 
 /* 左移循环补位 */
-void cpu_command_ROL(command_parm* parm) {
+CPU_FUNC cpu_command_ROL(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     byte model = parm->op - 0x22;
 
@@ -145,7 +146,7 @@ void cpu_command_ROL(command_parm* parm) {
 }
 
 /* 右移循环补位 */
-void cpu_command_ROR(command_parm* parm) {
+CPU_FUNC cpu_command_ROR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     byte model = parm->op - 0x62;
 
@@ -169,7 +170,7 @@ void cpu_command_ROR(command_parm* parm) {
 #undef CARRY_WITH
 
 /* N=M7, V=M6, Z=(执行结果==0) */
-void cpu_command_BIT(command_parm* parm) {
+CPU_FUNC cpu_command_BIT(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     byte b = parm->read(parm->op - 0x20);
 
@@ -194,12 +195,12 @@ HELP_FNC void cmp_op(command_parm* parm, byte a, byte b) {
     parm->cpu->checkNZ(c);
 }
 
-void cpu_command_CMP(command_parm* parm) {
+CPU_FUNC cpu_command_CMP(command_parm* parm) {
     byte b = parm->read(parm->op - 0xC1);
     cmp_op(parm, parm->cpu->A, b);
 }
 
-void cpu_command_CPX(command_parm* parm) {
+CPU_FUNC cpu_command_CPX(command_parm* parm) {
     byte b;
 
     if (parm->op == 0xE0) {
@@ -211,7 +212,7 @@ void cpu_command_CPX(command_parm* parm) {
     cmp_op(parm, parm->cpu->X, b);
 }
 
-void cpu_command_CPY(command_parm* parm) {
+CPU_FUNC cpu_command_CPY(command_parm* parm) {
     byte b;
 
     if (parm->op == 0xC0) {
@@ -223,26 +224,26 @@ void cpu_command_CPY(command_parm* parm) {
     cmp_op(parm, parm->cpu->Y, b);
 }
 
-void cpu_command_AND(command_parm* parm) {
+CPU_FUNC cpu_command_AND(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     cpu->A &= parm->read(parm->op - 0x21);
     cpu->checkNZ(cpu->A);
 }
 
-void cpu_command_ORA(command_parm* parm) {
+CPU_FUNC cpu_command_ORA(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     cpu->A |= parm->read(parm->op - 0x01);
     cpu->checkNZ(cpu->A);
 }
 
-void cpu_command_EOR(command_parm* parm) {
+CPU_FUNC cpu_command_EOR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     cpu->A ^= parm->read(parm->op - 0x41);
     cpu->checkNZ(cpu->A);
 }
 
 /* 无条件跳转指令 */
-void cpu_command_JMP(command_parm* parm) {
+CPU_FUNC cpu_command_JMP(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
 
     if (parm->op==0x4C) {
@@ -262,56 +263,56 @@ void cpu_command_JMP(command_parm* parm) {
                    parm->cpu->PC = base
 
 /* 条件跳转 C==0 */
-void cpu_command_BCC(command_parm* parm) {
+CPU_FUNC cpu_command_BCC(command_parm* parm) {
     if (!(parm->cpu->FLAGS & CPU_FLAGS_CARRY)) {
         JUMP_CODE;
     }
 }
 
 /* 条件跳转 C==1 */
-void cpu_command_BCS(command_parm* parm) {
+CPU_FUNC cpu_command_BCS(command_parm* parm) {
     if (parm->cpu->FLAGS & CPU_FLAGS_CARRY) {
         JUMP_CODE;
     }
 }
 
 /* 条件跳转 Z==1 */
-void cpu_command_BEQ(command_parm* parm) {
+CPU_FUNC cpu_command_BEQ(command_parm* parm) {
     if (parm->cpu->FLAGS & CPU_FLAGS_ZERO) {
         JUMP_CODE;
     }
 }
 
 /* 条件跳转 Z==0*/
-void cpu_command_BNE(command_parm* parm) {
+CPU_FUNC cpu_command_BNE(command_parm* parm) {
     if (!(parm->cpu->FLAGS & CPU_FLAGS_ZERO)) {
         JUMP_CODE;
     }
 }
 
 /* 条件跳转 N==1 */
-void cpu_command_BMI(command_parm* parm) {
+CPU_FUNC cpu_command_BMI(command_parm* parm) {
     if (parm->cpu->FLAGS & CPU_FLAGS_NEGATIVE) {
         JUMP_CODE;
     }
 }
 
 /* 条件跳转 N==0 */
-void cpu_command_BPL(command_parm* parm) {
+CPU_FUNC cpu_command_BPL(command_parm* parm) {
     if (!(parm->cpu->FLAGS & CPU_FLAGS_NEGATIVE)) {
         JUMP_CODE;
     }
 }
 
 /* 条件跳转 V==1 */
-void cpu_command_BVS(command_parm* parm) {
+CPU_FUNC cpu_command_BVS(command_parm* parm) {
     if (parm->cpu->FLAGS & CPU_FLAGS_OVERFLOW) {
         JUMP_CODE;
     }
 }
 
 /* 条件跳转 V==0 */
-void cpu_command_BVC(command_parm* parm) {
+CPU_FUNC cpu_command_BVC(command_parm* parm) {
     if (!(parm->cpu->FLAGS & CPU_FLAGS_OVERFLOW)) {
         JUMP_CODE;
     }
@@ -320,7 +321,7 @@ void cpu_command_BVC(command_parm* parm) {
 #undef JUMP_CODE
 
 /* 加法运算, 没有处理BCD加法 */
-void cpu_command_ADC(command_parm* parm) {
+CPU_FUNC cpu_command_ADC(command_parm* parm) {
     check_decimal(parm);
 
     cpu_6502* cpu = parm->cpu;
@@ -345,7 +346,7 @@ void cpu_command_ADC(command_parm* parm) {
 }
 
 /* 减法运算 */
-void cpu_command_SBC(command_parm* parm) {
+CPU_FUNC cpu_command_SBC(command_parm* parm) {
     check_decimal(parm);
 
     cpu_6502* cpu = parm->cpu;
@@ -371,35 +372,35 @@ void cpu_command_SBC(command_parm* parm) {
 }
 
 /* --X */
-void cpu_command_DEX(command_parm* parm) {
+CPU_FUNC cpu_command_DEX(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     cpu->X--;
     cpu->checkNZ(cpu->X);
 }
 
 /* ++X */
-void cpu_command_INX(command_parm* parm) {
+CPU_FUNC cpu_command_INX(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     cpu->X++;
     cpu->checkNZ(cpu->X);
 }
 
 /* --Y */
-void cpu_command_DEY(command_parm* parm) {
+CPU_FUNC cpu_command_DEY(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     cpu->Y--;
     cpu->checkNZ(cpu->Y);
 }
 
 /* ++Y */
-void cpu_command_INY(command_parm* parm) {
+CPU_FUNC cpu_command_INY(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
     cpu->Y++;
     cpu->checkNZ(cpu->Y);
 }
 
 /* --内存 */
-void cpu_command_DEC(command_parm* parm) {
+CPU_FUNC cpu_command_DEC(command_parm* parm) {
     memory *ram = parm->ram;
 
     word addr = parm->getAddr(parm->op - 0xC2);
@@ -411,7 +412,7 @@ void cpu_command_DEC(command_parm* parm) {
 }
 
 /* ++内存 */
-void cpu_command_INC(command_parm* parm) {
+CPU_FUNC cpu_command_INC(command_parm* parm) {
     memory *ram = parm->ram;
 
     word addr = parm->getAddr(parm->op - 0xE2);
@@ -423,37 +424,36 @@ void cpu_command_INC(command_parm* parm) {
 }
 
 /* 把A寄存器存入内存 */
-void cpu_command_STA(command_parm* parm) {
+CPU_FUNC cpu_command_STA(command_parm* parm) {
     parm->write(parm->op - 0x81, parm->cpu->A);
     NOT_MEM_TIME;
 }
 
 /* 把Y寄存器存入内存 */
-void cpu_command_STY(command_parm* parm) {
+CPU_FUNC cpu_command_STY(command_parm* parm) {
     parm->write(parm->op - 0x80, parm->cpu->Y);
 }
 
 /* 把X寄存器存入内存 */
-void cpu_command_STX(command_parm* parm) {
+CPU_FUNC cpu_command_STX(command_parm* parm) {
     byte mode;
     if (parm->op == 0x96) {
         mode = ADD_MODE_zpgY;
     } else {
         mode = parm->op - 0x82;
     }
-
     parm->write(mode, parm->cpu->X);
 }
 
 /* 由内存载入A寄存器 */
-void cpu_command_LDA(command_parm* parm) {
+CPU_FUNC cpu_command_LDA(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
     cpu->A = parm->read(parm->op - 0xA1);
     cpu->checkNZ(cpu->A);
 }
 
 /* 由内存载入Y寄存器 */
-void cpu_command_LDY(command_parm* parm) {
+CPU_FUNC cpu_command_LDY(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
 
     if (parm->op == 0xA0) {
@@ -466,47 +466,48 @@ void cpu_command_LDY(command_parm* parm) {
 }
 
 /* 由内存载入X寄存器 */
-void cpu_command_LDX(command_parm* parm) {
+CPU_FUNC cpu_command_LDX(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
 
-    if (parm->op == 0xA2) {
+    switch (parm->op) {
+    case 0xA2:
         cpu->X = parm->p1;
-    } else {
-        byte mode;
-
-        if (parm->op == 0xB6) {
-            mode = ADD_MODE_zpgY;
-        } else {
-            mode = parm->op - 0xA2;
-        }
-
-        cpu->X = parm->read(mode);
+        break;
+    case 0xB6:
+        cpu->X = parm->read(ADD_MODE_zpgY);
+        break;
+    case 0xBE:
+        cpu->X = parm->read(ADD_MODE_abY);
+        break;
+    default:
+        cpu->X = parm->read(parm->op - 0xA2);
+        break;
     }
 
     cpu->checkNZ(cpu->X);
 }
 
 /* 累加器入栈 */
-void cpu_command_PHA(command_parm* parm) {
+CPU_FUNC cpu_command_PHA(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
     cpu->push(cpu->A);
 }
 
 /* 出栈入累加器 */
-void cpu_command_PLA(command_parm* parm) {
+CPU_FUNC cpu_command_PLA(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
     cpu->A = cpu->pop();
     cpu->checkNZ(cpu->A);
 }
 
 /* FLAGS入栈 */
-void cpu_command_PHP(command_parm* parm) {
+CPU_FUNC cpu_command_PHP(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
-    cpu->push(cpu->FLAGS);
+    cpu->push(cpu->FLAGS | 0x20);
 }
 
 /* 出栈入FLAGS */
-void cpu_command_PLP(command_parm* parm) {
+CPU_FUNC cpu_command_PLP(command_parm* parm) {
     cpu_6502* cpu = parm->cpu;
     cpu->FLAGS = cpu->pop() | 0x30;
 }
@@ -515,75 +516,76 @@ void cpu_command_PLP(command_parm* parm) {
 #define _TR(b,a) cpu_6502 *cpu = parm->cpu; \
                  cpu->a = cpu->b
 
-void cpu_command_TAY(command_parm* parm) {
+CPU_FUNC cpu_command_TAY(command_parm* parm) {
     _TR(A, Y);
     cpu->checkNZ(cpu->A);
 }
 
-void cpu_command_TAX(command_parm* parm) {
+CPU_FUNC cpu_command_TAX(command_parm* parm) {
     _TR(A, X);
     cpu->checkNZ(cpu->A);
 }
 
-void cpu_command_TXA(command_parm* parm) {
+CPU_FUNC cpu_command_TXA(command_parm* parm) {
     _TR(X, A);
     cpu->checkNZ(cpu->X);
 }
 
-void cpu_command_TYA(command_parm* parm) {
+CPU_FUNC cpu_command_TYA(command_parm* parm) {
     _TR(Y, A);
     cpu->checkNZ(cpu->Y);
 }
 
-void cpu_command_TSX(command_parm* parm) {
+CPU_FUNC cpu_command_TSX(command_parm* parm) {
     _TR(SP, X);
     cpu->checkNZ(cpu->SP);
 }
 
-void cpu_command_TXS(command_parm* parm) {
+CPU_FUNC cpu_command_TXS(command_parm* parm) {
     _TR(X, SP);
 }
 
 #undef _TR
 
 /* 设置为禁止中断 */
-void cpu_command_SEI(command_parm* parm) {
+CPU_FUNC cpu_command_SEI(command_parm* parm) {
     SET_FLAGS(CPU_FLAGS_INTERDICT);
 }
 
 /* 清除禁止中断位 */
-void cpu_command_CLI(command_parm* parm) {
+CPU_FUNC cpu_command_CLI(command_parm* parm) {
     CLE_FLAGS(CPU_FLAGS_INTERDICT);
 }
 
 /* 设置为十进制(BCD)算术运算 */
-void cpu_command_SED(command_parm* parm) {
+CPU_FUNC cpu_command_SED(command_parm* parm) {
     SET_FLAGS(CPU_FLAGS_DECIMAL);
 }
 
 /* 还原为二进制算术运算 */
-void cpu_command_CLD(command_parm* parm) {
+CPU_FUNC cpu_command_CLD(command_parm* parm) {
     CLE_FLAGS(CPU_FLAGS_DECIMAL);
 }
 
 /* 设置进位标志 */
-void cpu_command_SEC(command_parm* parm) {
+CPU_FUNC cpu_command_SEC(command_parm* parm) {
     SET_FLAGS(CPU_FLAGS_CARRY);
 }
 
 /* 清除进位标志 */
-void cpu_command_CLC(command_parm* parm) {
+CPU_FUNC cpu_command_CLC(command_parm* parm) {
     CLE_FLAGS(CPU_FLAGS_CARRY);
 }
 
 /* 清除溢出位 */
-void cpu_command_CLV(command_parm* parm) {
+CPU_FUNC cpu_command_CLV(command_parm* parm) {
     parm->cpu->clearV();
 }
 
 #undef SET_FLAGS
 #undef CLE_FLAGS
 #undef NOT_MEM_TIME
+#undef CPU_FUNC
 
 /****************************************************************************/
 
@@ -940,6 +942,8 @@ inline word command_parm::abs() {
 }
 
 inline word command_parm::absX() {
+if (op==0xBE || op==0xBC)
+printf("[abs X] %s %s\n", cpu->cmdInfo(), cpu->debug());
     return CHECK_PAGE_BOUND(abs(), cpu->X, &mem_time);
 }
 
@@ -948,7 +952,7 @@ inline word command_parm::absY() {
 }
 
 inline word command_parm::zpg() {
-    return p1 & 0x00FF;
+    return p1;
 }
 
 inline word command_parm::zpgX() {
@@ -968,9 +972,9 @@ inline word command_parm::$zpgX$() {
 }
 
 inline word command_parm::$ind$(byte x) {
-    word offset = (p1 + x) & 0x00FF;
-    byte l = ram->read( offset   );
-    byte h = ram->read( offset+1 );
+    byte offset = (p1 + x);
+    byte l = ram->read(      offset      );
+    byte h = ram->read( byte(offset + 1) );
     return (h<<8 | l);
 }
 

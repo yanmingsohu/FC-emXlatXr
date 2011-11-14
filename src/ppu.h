@@ -90,6 +90,7 @@ struct BackGround {
         }
     }
 
+private:
     void _check(word i) {
         if (i>=0x400) printf("BackGround::out of offset %x", i);
     }

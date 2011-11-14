@@ -60,7 +60,7 @@ char* parseOpenError(int load_err_code);
 /* 显示访问PPU的消息                                              */
 //#define SHOW_PPU_REGISTER
 /* 显示CPU寻址消息                                                */
-#define SHOW_CPU_MEMORY_ADDRESSING
+//#define SHOW_CPU_MEMORY_ADDRESSING
 /*-----------------------------------------------| END DEBUG |----*/
 
 #endif // TYPE_H_INCLUDED

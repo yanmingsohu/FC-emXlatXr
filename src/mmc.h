@@ -106,6 +106,11 @@ public:
 
     /* 读取vrom字库段 addr=(0x0000-0x1FFF) */
     byte readVRom(const word addr) {
+#ifdef SHOW_ERR_MEM_OPERATE
+        if (addr>0x1FFF) {
+            printf("MMC::写入VROM错误:使用了无效的程序地址 0x%x\n", addr);
+        }
+#endif
         return sw->r_vrom(addr);
     }
 
@@ -114,6 +119,11 @@ public:
         if (capability & MMC_CAPABILITY_WRITE_VROM) {
             sw->w_vrom(addr, value);
         }
+#ifdef SHOW_ERR_MEM_OPERATE
+        else {
+            printf("MMC::该ROM不支持写(0x0000-0x1FFF)内存\n");
+        }
+#endif
     }
 
     /* 在向内存写数据时执行换页操作 */

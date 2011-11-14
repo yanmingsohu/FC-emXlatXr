@@ -17,7 +17,7 @@ static void        openFile                   (HWND hwnd                   );
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = "FC Ä£ÄâÆ÷ DEmo. -=CatfoOD=-";
 static bool active = 1;
-static bool sDebug = 1;
+static bool sDebug = 0;
 static bool run    = 0;
 static win_info*  bgpanel = NULL;
 static win_info*  tlpanel = NULL;

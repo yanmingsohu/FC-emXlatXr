@@ -49,7 +49,7 @@ static void condition_code(NesSystem *fc) { /* 实现可能不准确 */
     if (CPU_IS(8D, 05, 20)) {
         int x, y;
         ppu->getWindowPos(&x, &y);
-        printf("DBG::修改PPU窗口坐标低位 x:%d,y:%d\n", x, y);
+        printf("DBG::修改PPU窗口坐标 x:%d,y:%d\n", x, y);
     } else
 
     if (CPU_IS(8D, 06, 20)) {

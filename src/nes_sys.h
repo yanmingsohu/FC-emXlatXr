@@ -36,7 +36,6 @@ private:
     PPU*        ppu;
     PlayPad*    pad;
 
-    int         state;
     int         _cyc;    /* 系统时序,每帧之间互补 */
     bool        every_f; /* 偶数帧为true */
 

@@ -22,9 +22,7 @@
 #include <stdio.h>
 
 NesSystem::NesSystem(Video* video, PlayPad *_pad)
-    : pad(_pad)
-    , state(0)
-    , _cyc(0)
+    : pad(_pad), _cyc(0)
 {
     mmc = new MMC();
     ppu = new PPU(mmc, video);
@@ -137,7 +135,7 @@ int NesSystem::load_rom(string filename) {
             rom->printRom(s, 6);
 
             ram->hard_reset();
-            ppu->switchMirror(rom->t1 & 0x0B);
+            ppu->switchMirror(rom->t1 & 0x05);
             ppu->reset();
             cpu->RES = 1;
             _cyc = 0;
@@ -147,16 +145,12 @@ int NesSystem::load_rom(string filename) {
         } else {
             res = ER_LOAD_ROM_BADMAP;
         }
-        state = res;
     }
 
     return res;
 }
 
 cpu_6502* NesSystem::getCpu() {
-    if (state) {
-        printf("> NesSystem::…–Œ¥≥ı ºªØrom.\n");
-    }
     return cpu;
 }
 

@@ -20,6 +20,9 @@
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
 
+#define SF_NAME_JYM      "FC Ä£ÄâÆ÷ DEmo. -=CatfoOD=- "
+#define SF_VERSION_JYM   "v0.01"
+
 #define HELP_FNC     static inline
 #define _CSTR(x)     const_cast<char*>(x)
 #define TNUL(x, _s)  if (!x) printf("debug::%s at %s %d line", \

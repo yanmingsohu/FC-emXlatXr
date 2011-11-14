@@ -56,6 +56,26 @@ public:
 //-- 03 --/////////////////////////////////////////////////////////////
 
 class Mapper_3 : public Mapper_0 {
+private:
+    uint vram_offset;
+
+public:
+    void sw_page(word off, byte value) {
+        vram_offset = value * 0x2000;
+    }
+
+    byte r_vrom(word off) {
+        return rom->vrom[off + vram_offset];
+    }
+
+    uint capability() {
+        return MMC_CAPABILITY_WRITE_VROM | MMC_CAPABILITY_CHECK_SWITCH;
+    }
+
+    void reset() {
+        Mapper_0::reset();
+        vram_offset = 0;
+    }
 };
 
 //-- 04 --/////////////////////////////////////////////////////////////
@@ -290,7 +310,6 @@ private:
 
 public:
     void sw_page(word off, byte value) {
-printf("sw: %X %X\n", off, value);
         switch (off) {
 
         case 0x8000:
@@ -355,7 +374,7 @@ printf("sw: %X %X\n", off, value);
         ELS_IF_DO(0x1400, 4);
         ELS_IF_DO(0x1800, 5);
         ELS_IF_DO(0x1C00, 6);
-        ELS_IF_DO(0x10000,7);
+        ELS_IF_DO(0x2000, 7);
 
 #undef ELS_IF_DO
 #undef IF_DO
@@ -384,7 +403,7 @@ static MapperImpl* createMapper(int mapper_id) {
     switch (mapper_id) {
         MMC_MAP(  0);
         MMC_MAP(  3);
-        MMC_MAP(  4);
+    //  MMC_MAP(  4);
     //  MMC_MAP( 19);
         MMC_MAP( 23);
     }

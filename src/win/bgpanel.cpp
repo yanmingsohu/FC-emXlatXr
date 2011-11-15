@@ -3,6 +3,7 @@
 #include  <Winuser.h>
 #include   "winsys.h"
 #include   "../ppu.h"
+#include "d3dvideo.h"
 
 static LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 static Video *bgPanel;

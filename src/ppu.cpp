@@ -328,7 +328,7 @@ void PPU::write(byte data) {
                 spPalette[off-0x10] = data;
             }
         }
-        printf("write palette: %4X %2X\n", offset, data);
+        // printf("write palette: %4X %2X\n", offset, data);
     }
 }
 

@@ -403,7 +403,7 @@ static MapperImpl* createMapper(int mapper_id) {
     switch (mapper_id) {
         MMC_MAP(  0);
         MMC_MAP(  3);
-    //  MMC_MAP(  4);
+        MMC_MAP(  4);
     //  MMC_MAP( 19);
         MMC_MAP( 23);
     }

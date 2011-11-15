@@ -2,9 +2,11 @@
 #include       <stdio.h>
 #include        <time.h>
 #include     <Winuser.h>
+
 #include      "winsys.h"
 #include    "../debug.h"
 #include "../testRoms.h"
+#include    "d3dvideo.h"
 
 
 static LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
@@ -53,7 +55,7 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     PlayPad *pad = new WinPad();
-    Video *video = new DirectXVideo(hwnd); // WindowsVideo | DirectXVideo
+    Video *video = new DirectX3DVideo(hwnd, 256, 256); // WindowsVideo | DirectXVideo
     fc           = new NesSystem(video, pad);
 
 #ifdef TEST_ROM
@@ -92,9 +94,9 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
             sDebug = 0;
         }
         fc->drawFrame();
-        displayCpu(cpu, hwnd);
+        //displayCpu(cpu, hwnd);
 
-        if (active) video->refresh();
+        video->refresh();
     }
 
     delete fc;
@@ -162,6 +164,7 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     TEXT_OUT("FG: %02X",       cpu->FLAGS, 6);
     TEXT_OUT("frame: %09ld",   frameC,    16);
     TEXT_OUT("rate : %04lf/s", f2c/utime, 13);
+    printf("rate : %04lf/s\n", f2c/utime);
 
 #undef TEXT_OUT
 

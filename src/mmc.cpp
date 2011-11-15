@@ -150,7 +150,6 @@ public:
             return ex_vram[off];
         }
 
-        int idx;
         uint _off;
 
 #define IF_DO(a,i,b)        if (off<a) _DO(i,b)
@@ -167,6 +166,7 @@ public:
                ELSE_DO(        5, 0x1800);
         }
         else {
+#undef  _DO(i,b)
 #define _DO(i,b) _off = off + _vrom_off[i] - b
                  IF_DO(0x0800, 0,      0);
             ELSE_IF_DO(0x1000, 1, 0x0800);

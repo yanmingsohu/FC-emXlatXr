@@ -328,6 +328,7 @@ void PPU::write(byte data) {
                 spPalette[off-0x10] = data;
             }
         }
+        printf("write palette: %4X %2X\n", offset, data);
     }
 }
 
@@ -344,6 +345,9 @@ void PPU::switchMirror(byte type) {
         pbg[2] = pbg[3] = &bg[1];
     break;
 
+    default: /* use PPU_VMIRROR_SINGLE */
+        printf("PPU::无效的屏幕布局码%d\n", type);
+
     case PPU_VMIRROR_SINGLE:
         pbg[0] = pbg[1] = pbg[2] = pbg[3] = &bg[0];
     break;
@@ -354,10 +358,6 @@ void PPU::switchMirror(byte type) {
         pbg[2] = &bg[2];
         pbg[3] = &bg[3];
     break;
-
-    default:
-        printf("PPU::无效的屏幕布局码%d\n", type);
-        pbg[0] = pbg[1] = pbg[2] = pbg[3] = &bg[0];
     }
 }
 
@@ -409,49 +409,67 @@ inline byte PPU::gtLBit(int x, int y, byte tileIdx, word vromOffset) {
 
 inline byte PPU::bgHBit(int x, int y, byte *attrTable) {
     byte attrIdx = DIV32(x)    + (DIV32(y)    << 3);
-    byte attrBit = DIV16(x%32) | (DIV16(y%32) << 1);
-    byte attr    = attrTable[attrIdx] >> (attrBit<<1);
-    return (attr & 0x3) << 2;
+    byte attrBit =(DIV16(x%32) | (DIV16(y%32) << 1)) << 1; // *2
+    byte attr    =(attrTable[attrIdx] >> attrBit) & 0x03;
+    return attr << 2;
 }
 
 void PPU::drawBackGround(Video *panel) {
     int x  = 0, y  = 0;
     int bx = 0, by = 0;
     int bgIdx = 0;
+    word nameIdx = 0;
+    uint _tmp = 0;
 
     for (;;) {
-        word nameIdx = (x/8) + (y/8*32);
-        word tileIdx = pbg[bgIdx]->name[nameIdx];
-        byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset);
+        /* tmp is attribute index, x/128*8:取整 */
+        _tmp          = nameIdx % 32 / 4 + nameIdx / 128 * 8;
+        byte attrdata = pbg[bgIdx]->attribute[_tmp];
+        /* tmp is attribute data right move length */
+        _tmp          = (DIV16((x)%32) | (DIV16((y)%32) << 1)) << 1;
+        attrdata      = ( (attrdata >> _tmp) & 0x3 ) << 2;
+        /* tmp is tile index */
+        _tmp          = pbg[bgIdx]->name[nameIdx];
+        word tileAddr = bgRomOffset + (_tmp << 4);
+        word tile0, tile1;
 
-        paletteIdx |= bgHBit(x, y, pbg[bgIdx]->attribute);
-        paletteIdx  = bkPalette[paletteIdx];
+        for (int _x=0, _y=0;;) {
+            if (!_x) {
+                tile0 = mmc->readVRom(tileAddr    );
+                tile1 = mmc->readVRom(tileAddr + 8);
+                tileAddr++;
+            }
 
-        if (paletteIdx) {
-            panel->drawPixel(bx + x, by + y, ppu_color_table[ paletteIdx ]);
+            /* tmp is tile data mask(1 bit mask) */
+            _tmp = 1 << (7 - _x);
+            byte paletteIdxLow = 0;
+
+            if (tile0 & _tmp) paletteIdxLow |= 0x01;
+            if (tile1 & _tmp) paletteIdxLow |= 0x02;
+
+            /* tmp is color index */
+            _tmp = bkPalette[attrdata | paletteIdxLow];
+
+            if (_tmp) {
+                panel->drawPixel(bx + x + _x, by + y + _y, ppu_color_table[ _tmp ]);
+            }
+
+            if (++_x>=8) {
+                if (++_y>=8) break;
+                _x = 0;
+            }
         }
 
-        if (++x>=256) {
-            x = 0;
-            if (++y>=240) {
-                y = 0;
-                ++bgIdx;
-
-                if (bgIdx==1) {
-                    bx = 256;
-                    by = 0;
-                }
-                else if (bgIdx==2) {
-                    bx = 0;
-                    by = 240;
-                }
-                else if (bgIdx==3) {
-                    bx = 256;
-                    by = 240;
-                }
-                else {
-                    break;
-                }
+        nameIdx++;
+        x += 8;
+        if (x>=256) {
+            x = 0; y += 8;
+            if (y>=240) {
+                y = 0; nameIdx = 0; ++bgIdx;
+                     if (bgIdx==1) { bx = 256; by = 0;   }
+                else if (bgIdx==2) { bx = 0;   by = 240; }
+                else if (bgIdx==3) { bx = 256; by = 240; }
+                else break;
             }
         }
     }
@@ -496,10 +514,8 @@ void PPU::_drawSprite(byte i, byte ctrl) {
             }
 
             if (++x >= 8) {
+                if (++y >= 8) break;
                 x = 0;
-                if (++y >= 8) {
-                    break;
-                }
             }
         }
 

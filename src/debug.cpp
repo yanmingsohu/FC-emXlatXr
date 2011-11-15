@@ -108,9 +108,10 @@ void debugCpu(NesSystem *fc) {
         }
 
         else if (ch=='b') {
-            printf("XX input PC(16) when stop: ");
+            printf("not support.");
+        /*  printf("XX input PC(16) when stop: ");
             fflush(stdin);
-            scanf("%x", &breakpoint);
+            scanf("%x", &breakpoint);*/
         }
         else if (ch=='p') {
             int key = 0;

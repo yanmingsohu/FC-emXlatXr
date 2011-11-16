@@ -14,8 +14,10 @@ static void        displayCpu                 (cpu_6502*, HWND             );
 static void        start_game                 (HWND, PMSG, HINSTANCE       );
 static HMENU       createMainMenu             (/* null */                  );
 static void        openFile                   (HWND hwnd                   );
+static void        frameRate                  (Video*                      );
 
 /*  Make the class name into a global variable  */
+static const double FRAME_RATE = 1000/60.0;
 static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = SF_NAME_JYM SF_VERSION_JYM;
 static bool active = 1;
@@ -23,9 +25,10 @@ static bool sDebug = 0;
 static bool run    = 0;
 static win_info*  bgpanel = NULL;
 static win_info*  tlpanel = NULL;
-static NesSystem* fc;
 
-#define FRAME_RATE_60 14
+static NesSystem* fc = 0;
+static Video  *video = 0;
+
 
 int WINAPI WinMain ( HINSTANCE hThisInstance,
                      HINSTANCE hPrevInstance,
@@ -35,6 +38,8 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
     MSG messages;            /* Here messages to the application are saved */
     win_info wi;
 
+    wi.height      = 256;
+    wi.width       = 256;
     wi.procedure   = WindowProcedure;
     wi.hInstance   = hThisInstance;
     wi.szClassName = szClassName;
@@ -53,9 +58,9 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
 }
 
 void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
-
+    /* WindowsVideo | DirectXVideo | DirectX3DVideo */
+    video        = new DirectX3DVideo(hwnd, 256, 256);
     PlayPad *pad = new WinPad();
-    Video *video = new DirectX3DVideo(hwnd, 256, 256); // WindowsVideo | DirectXVideo
     fc           = new NesSystem(video, pad);
 
 #ifdef TEST_ROM
@@ -72,9 +77,13 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
         return;
     }
 
+    double sleeptime = 0; /* 用于补偿帧速 */
+
     /* Run the message loop. It will run until GetMessage() returns 0 */
-    for(clock_t usetime = clock();;)
+    for(DWORD currtime;;)
     {
+        currtime = GetTickCount();
+
     	if (PeekMessage(messages, NULL, 0, 0, PM_REMOVE)) {
     		if (messages->message==WM_QUIT) {
 				break;
@@ -85,18 +94,25 @@ void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
 
     	if (!run) continue;
 
-        /* 限速,但是并不准确 */
-    	if (clock()-usetime<FRAME_RATE_60) continue;
-    	usetime = clock();
-
         if (sDebug) {
             debugCpu(fc);
             sDebug = 0;
         }
         fc->drawFrame();
+        video->refresh();
+
+        //frameRate(video);
         //displayCpu(cpu, hwnd);
 
-        video->refresh();
+        /* 限速器部分 */
+        sleeptime += FRAME_RATE - (GetTickCount() - currtime);
+        currtime = GetTickCount();
+        if (sleeptime > 0) {
+            Sleep(sleeptime);
+            sleeptime -= GetTickCount() - currtime;
+        } else {
+            sleeptime = 0;
+        }
     }
 
     delete fc;
@@ -133,6 +149,24 @@ void openFile(HWND hwnd) {
     }
 }
 
+void frameRate(Video *video) {
+    static long frameC = 0;
+    static int f2c = 0;
+    static clock_t time = clock();
+
+    ++frameC;
+    ++f2c;
+
+    if (frameC%42!=0) return;
+
+    double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
+
+    printf("frame: %ld rate : %04lf/s\n", frameC, f2c/utime);
+
+    time = clock();
+    f2c = 0;
+}
+
 void displayCpu(cpu_6502* cpu, HWND hwnd) {
     static long frameC = 0, f2c = 0;
     static clock_t time = clock();
@@ -164,14 +198,11 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
     TEXT_OUT("FG: %02X",       cpu->FLAGS, 6);
     TEXT_OUT("frame: %09ld",   frameC,    16);
     TEXT_OUT("rate : %04lf/s", f2c/utime, 13);
-    printf("rate : %04lf/s\n", f2c/utime);
 
 #undef TEXT_OUT
 
-    if (f2c>50) {
-        time = clock();
-        f2c = 0;
-    }
+    time = clock();
+    f2c = 0;
 }
 
 static const int MENU_FILE   = 1;
@@ -194,10 +225,16 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             break;
         case WA_INACTIVE:
             // 不活动, 停止向主页面绘画.
-            //active = false;
+            active = false;
             break;
         }
 
+        break;
+
+    case WM_SIZE:
+        if (video) {
+            video->resize(LOWORD(lParam), HIWORD(lParam));
+        }
         break;
 
     case WM_DESTROY:

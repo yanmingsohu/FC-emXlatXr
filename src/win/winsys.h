@@ -40,8 +40,8 @@ struct win_info {
     int       nCmdShow;
     int       x;
     int       y;
-    int       width;
-    int       height;
+    int       width;        /* 客户区宽度 */
+    int       height;       /* 客户区高度 */
     char*     szClassName;
     char*     titleName;
     HMENU     menu;
@@ -102,10 +102,10 @@ public:
     DirectXVideo(HWND hwnd, int width = 256, int height = 256);
     ~DirectXVideo();
 
-    int isSuccess();
     void drawPixel(int x, int y, T_COLOR color);
     void refresh();
     void clear(T_COLOR color);
+    int  prepareSuccess();
 };
 
 /* 0 : 0x30, 9 : 0x39

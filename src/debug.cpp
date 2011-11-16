@@ -57,7 +57,7 @@ static void condition_code(NesSystem *fc) { /* 实现可能不准确 */
     } else
 
     if (CPU_IS(8D, 07, 20)) {
-        printf("DBG::向PPU写数据 地址:%04X\n", ppu->getVRamPoint());
+        printf("DBG::向PPU写数据 地址:%04X\n", ppu->getVRamPoint()-1);
     } else
 
     if (CPU_IS(AD, 02, 20)) {

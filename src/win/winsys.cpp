@@ -11,6 +11,22 @@ void initHdcColor(HDC hdc) {
     SetBkColor(hdc, RGB(0, 0, 0));
 }
 
+static void SetClientSize(HWND handle, int w, int h) {
+	RECT r;
+
+	GetClientRect(handle, &r);
+
+	w -= r.right;
+	h -= r.bottom;
+
+	GetWindowRect(handle, &r);
+
+	w += (r.right - r.left);
+	h += (r.bottom - r.top);
+
+	SetWindowPos(handle, NULL, 0, 0, w, h, SWP_NOMOVE);
+}
+
 int createWindow(win_info* wi) {
 
     WNDCLASSEX wincl;        /* Data structure for the windowclass */
@@ -52,6 +68,7 @@ int createWindow(win_info* wi) {
                NULL                 /* No Window Creation data */
                );
 
+    SetClientSize(wi->hwnd, wi->width, wi->height);
     /* Make the window visible on the screen */
     ShowWindow(wi->hwnd, wi->nCmdShow);
     return 1;
@@ -149,7 +166,7 @@ DirectXVideo::DirectXVideo(HWND hwnd, int width, int height)
     success = 1;
 }
 
-int DirectXVideo::isSuccess() {
+int DirectXVideo::prepareSuccess() {
     return success;
 }
 

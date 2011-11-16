@@ -1,4 +1,7 @@
-#include "d3dvideo.h"
+#include  "d3dvideo.h"
+#include     <d3dx9.h>
+#include <d3dx9math.h>
+#include     <stdio.h>
 
 DirectX3DVideo::DirectX3DVideo(HWND hWnd, int w, int h)
     : pD3D(0), pd3dDevice(0), pVertices(0), pTexture(0), pixel(0)
@@ -11,28 +14,41 @@ DirectX3DVideo::DirectX3DVideo(HWND hWnd, int w, int h)
 
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory( &d3dpp, sizeof( d3dpp ) );
-    d3dpp.Windowed = TRUE;
-    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-    d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+    d3dpp.Windowed              = TRUE;
+    d3dpp.SwapEffect            = D3DSWAPEFFECT_DISCARD;
+    d3dpp.BackBufferFormat      = D3DFMT_UNKNOWN;
+    d3dpp.PresentationInterval  = D3DPRESENT_INTERVAL_IMMEDIATE; /* 去掉D3D的限速 */
 
     if( FAILED( pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
                                     D3DCREATE_HARDWARE_VERTEXPROCESSING,
                                     &d3dpp, &pd3dDevice ) ) ) return;
 
+    _initMatrix(w, h);
+    _initVertices(w, h);
+    _createTexture(w, h);
+
+    pixel = new T_COLOR[(w+8) * (h+8)];
+}
+
+int DirectX3DVideo::prepareSuccess() {
+    return !(pD3D && pd3dDevice && pVertices && pTexture);
+}
+
+void DirectX3DVideo::resize(int w, int h) {
+    // 防止画面拉伸的代码
+    // pd3dDevice->Reset(...);
+}
+
+void DirectX3DVideo::_initMatrix(int w, int h) {
     D3DXMATRIX Ortho2D;
     D3DXMATRIX Identity;
 
     D3DXMatrixOrthoLH(&Ortho2D, w, h, 0.0f, 1.0f);
     D3DXMatrixIdentity(&Identity);
 
-    pd3dDevice->SetTransform(D3DTS_PROJECTION, &Ortho2D);
-    pd3dDevice->SetTransform(D3DTS_WORLD, &Identity);
-    pd3dDevice->SetTransform(D3DTS_VIEW, &Identity);
-
-    _initVertices(w, h);
-    _createTexture(w, h);
-
-    pixel = new T_COLOR[(w+8) * (h+8)];
+    pd3dDevice->SetTransform(D3DTS_PROJECTION, &Ortho2D );
+    pd3dDevice->SetTransform(D3DTS_WORLD,      &Identity);
+    pd3dDevice->SetTransform(D3DTS_VIEW,       &Identity);
 }
 
 void DirectX3DVideo::_createTexture(int w, int h) {
@@ -48,7 +64,7 @@ void DirectX3DVideo::_createTexture(int w, int h) {
 
 void DirectX3DVideo::_initVertices(int w, int h) {
 
-    static PANELVERTEX VERTICES_DATA[] = {
+    PANELVERTEX VERTICES_DATA[] = {
         {-w / 2.0f, h / 2.0f, 1.0f, 0xFFFFFF, 0.0f, 0.0f},
         { w / 2.0f, h / 2.0f, 1.0f, 0xFFFFFF, 1.0f, 0.0f},
         { w / 2.0f,-h / 2.0f, 1.0f, 0xFFFFFF, 1.0f, 1.0f},

@@ -31,7 +31,12 @@ public:
     virtual void refresh() {}
     /* 清除缓冲区，使用指定的颜色  */
     virtual void clear(T_COLOR color) = 0;
+    /* 准备完成则返回0, 否则返回错误码 */
+    virtual int prepareSuccess() { return 0; }
+    /* 修改窗口大小后, 调用该方法, 重设比例 */
+    virtual void resize(int w, int h) {}
 
+    virtual ~Video() {};
 };
 
 #endif // VIDEO_H_INCLUDED

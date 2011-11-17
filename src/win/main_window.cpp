@@ -11,8 +11,7 @@
 #include         "wit.h"
 
 
-static void  displayCpu (cpu_6502*, HWND );
-static void  frameRate  (Video*          );
+static void  frameRate  (Video*);
 
 /*  Make the class name into a global variable  */
 static const double FRAME_RATE = 1000/60.0;
@@ -23,16 +22,15 @@ class NesScrollWindow : public wWindow {
 private:
     PPU   *ppu;
     Video *video;
+    int   w,h;
 
 public:
-    NesScrollWindow(wWindow *p, PPU *_ppu)
-    : wWindow(p), ppu(_ppu)
+    NesScrollWindow(wWindow *p, PPU *_ppu, int _w=512, int _h=512)
+    : wWindow(p), ppu(_ppu), w(_w), h(_h)
     {
-        int w, h;
-        getVideoSize(&w, &h);
         setClientSize(w, h);
         setTitle("背景卷轴");
-        video = new DirectXVideo(getWindowHandle(), w, h);
+        video = new DirectX3DVideo(getWindowHandle(), w, h);
     }
 
     ~NesScrollWindow() {
@@ -40,7 +38,7 @@ public:
     }
 
     void on_paint(WIT_EVENT_PARM *p) {
-        static int time = 100;
+        static int time = 50;
 
         if (!(--time)) {
             video->clear(0);
@@ -54,11 +52,6 @@ public:
         _p->drawBackGround(_v);
     }
 
-    virtual void getVideoSize(int *w, int *h) {
-        *w = 512;
-        *h = 480;
-    }
-
     void on_close(WIT_EVENT_PARM* p) {
         setVisible(false);
     }
@@ -67,46 +60,42 @@ public:
 class NesTileWindow : public NesScrollWindow {
 public:
     NesTileWindow(wWindow *p, PPU *_ppu)
-    : NesScrollWindow(p, _ppu)
+    : NesScrollWindow(p, _ppu, 128, 256)
     {
-        setClientSize(128, 280);
         setTitle("瓦片卷轴");
     }
 
     void paintFunc(PPU *_p, Video *_v) {
         _p->drawTileTable(_v);
     }
-
-    void getVideoSize(int *w, int *h) {
-        *w = 128;
-        *h = 280;
-    }
 };
 
 class NesWindow : public wWindow {
 private:
-    static const int WIDTH       = 256;
-    static const int HEIGHT      = 256;
+    static const int WIDTH  = 256;
+    static const int HEIGHT = 256;
 
     enum MenuIDS {
         M_ID_OPEN=1, M_ID_EXIT,  M_ID_STEP,
-        M_DI_TILE,   M_DI_BG
+        M_DI_TILE,   M_DI_BG,    M_ID_PAUSE
     };
 
     NesSystem  *fc;
     Video      *video;
     PlayPad    *pad;
+    wWindow    *tile;
+    wWindow    *bg;
     bool        run;
     bool        quit;
     bool        sDebug;
-    wWindow    *tile;
-    wWindow    *bg;
 
     void _create_menu() {
         pwMenu menu = getMenuBar();
 
-        pwMenu file = menu->createSub(1, "文件");
-        file->addItem(M_ID_OPEN, "打开");
+        pwMenu file = menu->createSub(1, "游戏");
+        file->addItem(M_ID_OPEN, "打开游戏");
+        file->addItem(M_ID_PAUSE,"暂停/继续");
+        file->separator();
         file->addItem(M_ID_EXIT, "退出");
 
         pwMenu debug = menu->createSub(2, "调试");
@@ -149,7 +138,10 @@ public:
 
             if (!wPeekAMessage()) break;
             if (quit) break;
-            if (!run) continue;
+            if (!run) {
+                Sleep(50);
+                continue;
+            }
 
             if (sDebug) {
                 debugCpu(fc);
@@ -158,8 +150,7 @@ public:
             fc->drawFrame();
             video->refresh();
 
-            frameRate(video);
-            //displayCpu(cpu, hwnd);
+            //frameRate(video);
 
             sl.end();
         }
@@ -173,6 +164,10 @@ public:
 
         case M_ID_STEP:
             sDebug = true;
+            break;
+
+        case M_ID_PAUSE:
+            run = !run;
             break;
 
         case M_DI_TILE:
@@ -249,44 +244,6 @@ void frameRate(Video *video) {
     double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
 
     printf("frame: %ld rate : %04lf/s\n", frameC, f2c/utime);
-
-    time = clock();
-    f2c = 0;
-}
-
-void displayCpu(cpu_6502* cpu, HWND hwnd) {
-    static long frameC = 0, f2c = 0;
-    static clock_t time = clock();
-
-    ++frameC;
-    ++f2c;
-    /* 就是不让它每一帧都更新 */
-    if (frameC%42!=0) return;
-
-    HDC hdc = GetDC(hwnd);
-    SetBkColor(hdc, 0);
-    SetTextColor(hdc, 0xFFFFFF);
-
-    int x   = 270;
-	int y   = 0;
-	int yIn = 18;
-	char buf[128];
-
-    double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
-
-#define TEXT_OUT(fmt, parm, len)    sprintf(buf, fmt, parm);  \
-                                    TextOut(hdc, x, y+=yIn, buf, len)
-
-    TEXT_OUT("A: %02X",        cpu->A,     5);
-    TEXT_OUT("X: %02X",        cpu->X,     5);
-    TEXT_OUT("Y: %02X",        cpu->Y,     5);
-    TEXT_OUT("SP: %02X",       cpu->SP,    6);
-    TEXT_OUT("PC: %04X",       cpu->PC,    8);
-    TEXT_OUT("FG: %02X",       cpu->FLAGS, 6);
-    TEXT_OUT("frame: %09ld",   frameC,    16);
-    TEXT_OUT("rate : %04lf/s", f2c/utime, 13);
-
-#undef TEXT_OUT
 
     time = clock();
     f2c = 0;

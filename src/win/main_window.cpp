@@ -7,146 +7,233 @@
 #include    "../debug.h"
 #include "../testRoms.h"
 #include    "d3dvideo.h"
+#include    "../speed.h"
+#include         "wit.h"
 
 
-static LRESULT     CALLBACK WindowProcedure   (HWND, UINT, WPARAM, LPARAM  );
-static void        displayCpu                 (cpu_6502*, HWND             );
-static void        start_game                 (HWND, PMSG, HINSTANCE       );
-static HMENU       createMainMenu             (/* null */                  );
-static void        openFile                   (HWND hwnd                   );
-static void        frameRate                  (Video*                      );
+static void  displayCpu (cpu_6502*, HWND );
+static void  frameRate  (Video*          );
 
 /*  Make the class name into a global variable  */
 static const double FRAME_RATE = 1000/60.0;
-static char szClassName[ ] = "CodeBlocksWindowsApp";
 static char titleName  [ ] = SF_NAME_JYM SF_VERSION_JYM;
-static bool active = 1;
-static bool sDebug = 0;
-static bool run    = 0;
-static win_info*  bgpanel = NULL;
-static win_info*  tlpanel = NULL;
 
-static NesSystem* fc = 0;
-static Video  *video = 0;
 
+class NesScrollWindow : public wWindow {
+private:
+    PPU   *ppu;
+    Video *video;
+
+public:
+    NesScrollWindow(wWindow *p, PPU *_ppu)
+    : wWindow(p), ppu(_ppu)
+    {
+        int w, h;
+        getVideoSize(&w, &h);
+        setClientSize(w, h);
+        setTitle("背景卷轴");
+        video = new DirectXVideo(getWindowHandle(), w, h);
+    }
+
+    ~NesScrollWindow() {
+        delete video;
+    }
+
+    void on_paint(WIT_EVENT_PARM *p) {
+        static int time = 100;
+
+        if (!(--time)) {
+            video->clear(0);
+            paintFunc(ppu, video);
+            video->refresh();
+            time = 100;
+        }
+    }
+
+    virtual void paintFunc(PPU *_p, Video *_v) {
+        _p->drawBackGround(_v);
+    }
+
+    virtual void getVideoSize(int *w, int *h) {
+        *w = 512;
+        *h = 480;
+    }
+
+    void on_close(WIT_EVENT_PARM* p) {
+        setVisible(false);
+    }
+};
+
+class NesTileWindow : public NesScrollWindow {
+public:
+    NesTileWindow(wWindow *p, PPU *_ppu)
+    : NesScrollWindow(p, _ppu)
+    {
+        setClientSize(128, 280);
+        setTitle("瓦片卷轴");
+    }
+
+    void paintFunc(PPU *_p, Video *_v) {
+        _p->drawTileTable(_v);
+    }
+
+    void getVideoSize(int *w, int *h) {
+        *w = 128;
+        *h = 280;
+    }
+};
+
+class NesWindow : public wWindow {
+private:
+    static const int WIDTH       = 256;
+    static const int HEIGHT      = 256;
+
+    enum MenuIDS {
+        M_ID_OPEN=1, M_ID_EXIT,  M_ID_STEP,
+        M_DI_TILE,   M_DI_BG
+    };
+
+    NesSystem  *fc;
+    Video      *video;
+    PlayPad    *pad;
+    bool        run;
+    bool        quit;
+    bool        sDebug;
+    wWindow    *tile;
+    wWindow    *bg;
+
+    void _create_menu() {
+        pwMenu menu = getMenuBar();
+
+        pwMenu file = menu->createSub(1, "文件");
+        file->addItem(M_ID_OPEN, "打开");
+        file->addItem(M_ID_EXIT, "退出");
+
+        pwMenu debug = menu->createSub(2, "调试");
+        debug->addItem(M_ID_STEP,"单步执行");
+        debug->addItem(M_DI_TILE,"显示瓦片");
+        debug->addItem(M_DI_BG,  "显示卷轴");
+    }
+
+public:
+    NesWindow() : run(0), quit(0), sDebug(0) {
+        _create_menu();
+        setTitle(titleName);
+        setClientSize(WIDTH, HEIGHT);
+
+        // WindowsVideo | DirectXVideo | DirectX3DVideo
+        video   = new DirectX3DVideo(getWindowHandle(), WIDTH, HEIGHT);
+        pad     = new WinPad();
+        fc      = new NesSystem(video, pad);
+
+        #ifdef TEST_ROM
+        run = !fc->load_rom(TEST_ROM);
+        #endif
+
+        bg   = new NesScrollWindow(this, fc->getPPU());
+        tile = new NesTileWindow  (this, fc->getPPU());
+    }
+
+    ~NesWindow() {
+        delete fc;
+        delete video;
+        delete tile;
+        delete bg;
+    }
+
+    void gameLoop() {
+        SpeedLimit sl(FRAME_RATE);
+
+        for (;;) {
+            sl.start();
+
+            if (!wPeekAMessage()) break;
+            if (quit) break;
+            if (!run) continue;
+
+            if (sDebug) {
+                debugCpu(fc);
+                sDebug = 0;
+            }
+            fc->drawFrame();
+            video->refresh();
+
+            frameRate(video);
+            //displayCpu(cpu, hwnd);
+
+            sl.end();
+        }
+    }
+
+    void on_menu(WIT_EVENT_PARM *p, UINT menu_id) {
+        switch (menu_id) {
+        case M_ID_OPEN:
+            openFile();
+            break;
+
+        case M_ID_STEP:
+            sDebug = true;
+            break;
+
+        case M_DI_TILE:
+            tile->setVisible(true);
+            break;
+
+        case M_DI_BG:
+            bg->setVisible(true);
+            break;
+
+        case M_ID_EXIT:
+            quit = true;
+            break;
+        }
+    }
+
+    void on_close(WIT_EVENT_PARM* p) {
+        quit = true;
+    }
+
+    void openFile() {
+        HWND hwnd = getWindowHandle();
+        char filename[1024] = ".\\rom\\*.nes";
+
+        OPENFILENAME ofn;
+        memset(&ofn, 0, sizeof(ofn));
+
+        ofn.lStructSize    = sizeof(ofn);
+        ofn.hwndOwner      = hwnd;
+        ofn.lpstrFilter    = "FC Rom (.nes)\0*.nes\0\0";
+        ofn.nFilterIndex   = 1;
+        ofn.lpstrFile      = filename;
+        ofn.nMaxFile       = sizeof(filename);
+
+        ofn.lpstrFileTitle = NULL;
+        ofn.nMaxFileTitle  = 0;
+
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
+
+        if(GetOpenFileName(&ofn))
+        {
+            if (int ret = fc->load_rom(filename)) {
+                MessageBox(hwnd, parseOpenError(ret), "错误", 0);
+                run = false;
+            } else {
+                run = true;
+            }
+        }
+    }
+};
 
 int WINAPI WinMain ( HINSTANCE hThisInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR lpszArgument,
                      int nCmdShow )
 {
-    MSG messages;            /* Here messages to the application are saved */
-    win_info wi;
+    NesWindow nes;
+    nes.setVisible(true);
+    nes.gameLoop();
 
-    wi.height      = 256;
-    wi.width       = 256;
-    wi.procedure   = WindowProcedure;
-    wi.hInstance   = hThisInstance;
-    wi.szClassName = szClassName;
-    wi.titleName   = titleName;
-    wi.nCmdShow    = nCmdShow;
-    wi.menu        = createMainMenu();
-
-    if (!createWindow(&wi)) {
-        return -1;
-    }
-
-    start_game(wi.hwnd, &messages, hThisInstance);
-
-    /* The program return-value is 0 - The value that PostQuitMessage() gave */
-    return messages.wParam;
-}
-
-void start_game(HWND hwnd, PMSG messages, HINSTANCE hInstance) {
-    /* WindowsVideo | DirectXVideo | DirectX3DVideo */
-    video        = new DirectX3DVideo(hwnd, 256, 256);
-    PlayPad *pad = new WinPad();
-    fc           = new NesSystem(video, pad);
-
-#ifdef TEST_ROM
-    run = !fc->load_rom(TEST_ROM);
-#endif
-
-	cpu_6502* cpu = fc->getCpu();
-
-    bgpanel = bg_panel(hInstance, fc->getPPU());
-    tlpanel = tile_panel(hInstance, fc->getPPU());
-
-    if (!(bgpanel && tlpanel)) {
-        MessageBox(hwnd, "创建调试面板错误", "错误", 0);
-        return;
-    }
-
-    double sleeptime = 0; /* 用于补偿帧速 */
-
-    /* Run the message loop. It will run until GetMessage() returns 0 */
-    for(DWORD currtime;;)
-    {
-        currtime = GetTickCount();
-
-    	if (PeekMessage(messages, NULL, 0, 0, PM_REMOVE)) {
-    		if (messages->message==WM_QUIT) {
-				break;
-    		}
-			TranslateMessage(messages);
-			DispatchMessage(messages);
-    	}
-
-    	if (!run) continue;
-
-        if (sDebug) {
-            debugCpu(fc);
-            sDebug = 0;
-        }
-        fc->drawFrame();
-        video->refresh();
-
-        //frameRate(video);
-        //displayCpu(cpu, hwnd);
-
-        /* 限速器部分 */
-        sleeptime += FRAME_RATE - (GetTickCount() - currtime);
-        currtime = GetTickCount();
-        if (sleeptime > 0) {
-            Sleep(sleeptime);
-            sleeptime -= GetTickCount() - currtime;
-        } else {
-            sleeptime = 0;
-        }
-    }
-
-    delete fc;
-    delete video;
-}
-
-void openFile(HWND hwnd) {
-
-    char filename[1024] = ".\\rom\\*.nes";
-
-    OPENFILENAME ofn;
-    memset(&ofn, 0, sizeof(ofn));
-
-    ofn.lStructSize    = sizeof(ofn);
-    ofn.hwndOwner      = hwnd;
-    ofn.lpstrFilter    = "FC Rom (.nes)\0*.nes\0\0";
-    ofn.nFilterIndex   = 1;
-    ofn.lpstrFile      = filename;
-    ofn.nMaxFile       = sizeof(filename);
-
-    ofn.lpstrFileTitle = NULL;
-    ofn.nMaxFileTitle  = 0;
-
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
-
-    if(GetOpenFileName(&ofn))
-    {
-        if (int ret = fc->load_rom(filename)) {
-            MessageBox(hwnd, parseOpenError(ret), "错误", 0);
-            run = false;
-        } else {
-            run = true;
-        }
-    }
+    return 0;
 }
 
 void frameRate(Video *video) {
@@ -203,74 +290,4 @@ void displayCpu(cpu_6502* cpu, HWND hwnd) {
 
     time = clock();
     f2c = 0;
-}
-
-static const int MENU_FILE   = 1;
-static const int MENU_SHOW   = 2;
-static const int MENU_DEBUG  = 3;
-
-/*  This function is called by the Windows function DispatchMessage()  */
-
-LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)              /* handle the messages */
-    {
-    case WM_ACTIVATE:
-        switch (LOWORD(wParam))
-        {
-        case WA_ACTIVE:
-        case WA_CLICKACTIVE:
-            // 活动, 可以继续向主页面绘画了.
-            active = true;
-            break;
-        case WA_INACTIVE:
-            // 不活动, 停止向主页面绘画.
-            active = false;
-            break;
-        }
-
-        break;
-
-    case WM_SIZE:
-        if (video) {
-            video->resize(LOWORD(lParam), HIWORD(lParam));
-        }
-        break;
-
-    case WM_DESTROY:
-        active = false;
-        PostQuitMessage (0);      /* send a WM_QUIT to the message queue */
-        break;
-
-    case WM_COMMAND:
-        switch (LOWORD(wParam))
-        {
-        case MENU_FILE:
-            openFile(hwnd);
-            break;
-
-        case MENU_DEBUG:
-            sDebug = 1;
-            break;
-
-        case MENU_SHOW:
-            bgpanel->show();
-            tlpanel->show();
-            break;
-        }
-        break;
-
-    default:                      /* for messages that we don't deal with */
-        return DefWindowProc (hwnd, message, wParam, lParam);
-    }
-
-    return 0;
-}
-
-HMENU createMainMenu() {
-    HMENU hmenu = CreateMenu();
-	InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING, MENU_FILE,  "文件");
-	InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING, MENU_SHOW,  "显示后台");
-	InsertMenu(hmenu, 2, MF_BYPOSITION | MF_STRING, MENU_DEBUG, "中断调试");
-	return hmenu;
 }

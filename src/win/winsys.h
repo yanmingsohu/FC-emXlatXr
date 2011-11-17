@@ -28,36 +28,8 @@
 struct win_info;
 
 int WINAPI  WinMain       (HINSTANCE, HINSTANCE, LPSTR, int);
-win_info*   bg_panel      (HINSTANCE, PPU*);
-win_info*   tile_panel    (HINSTANCE, PPU*);
 void        initHdcColor  (HDC hdc);
-int         createWindow  (win_info*);
 
-struct win_info {
-
-    HWND      hwnd;
-    HINSTANCE hInstance;
-    int       nCmdShow;
-    int       x;
-    int       y;
-    int       width;        /* 客户区宽度 */
-    int       height;       /* 客户区高度 */
-    char*     szClassName;
-    char*     titleName;
-    HMENU     menu;
-    WNDPROC   procedure;
-
-    win_info() : nCmdShow(SW_SHOW)
-               , x(CW_USEDEFAULT)
-               , y(CW_USEDEFAULT)
-               , width(500), height(350)
-               , menu(NULL), procedure(NULL)
-    {/* do nothing.. */}
-
-    void show() {
-        ShowWindow(hwnd, SW_RESTORE);
-    }
-};
 
 /* 使用GUI绘图 */
 class WindowsVideo : public Video {

@@ -34,6 +34,7 @@
 					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add option="-D__DEBUG_NES__" />
 					<Add directory="dx81sdk" />
 				</Compiler>
 				<Linker>
@@ -51,34 +52,12 @@
 		<Linker>
 			<Add library="gdi32" />
 			<Add library="libcomdlg32.a" />
-			<Add library="..\dx9sdk\Lib\x86\d2d1_beta.lib" />
 			<Add library="..\dx9sdk\Lib\x86\d3d9.lib" />
-			<Add library="..\dx9sdk\Lib\x86\d3d10.lib" />
-			<Add library="..\dx9sdk\Lib\x86\d3d10_1.lib" />
-			<Add library="..\dx9sdk\Lib\x86\D3D10_1_beta.lib" />
-			<Add library="..\dx9sdk\Lib\x86\d3d11_beta.lib" />
 			<Add library="..\dx9sdk\Lib\x86\d3dcompiler.lib" />
 			<Add library="..\dx9sdk\Lib\x86\d3dx9.lib" />
 			<Add library="..\dx9sdk\Lib\x86\d3dx9d.lib" />
-			<Add library="..\dx9sdk\Lib\x86\d3dx10.lib" />
-			<Add library="..\dx9sdk\Lib\x86\d3dx10d.lib" />
-			<Add library="..\dx9sdk\Lib\x86\d3dx11.lib" />
-			<Add library="..\dx9sdk\Lib\x86\d3dxof.lib" />
 			<Add library="..\dx9sdk\Lib\x86\ddraw.lib" />
-			<Add library="..\dx9sdk\Lib\x86\dinput8.lib" />
-			<Add library="..\dx9sdk\Lib\x86\dsetup.lib" />
 			<Add library="..\dx9sdk\Lib\x86\dsound.lib" />
-			<Add library="..\dx9sdk\Lib\x86\dwrite_beta.lib" />
-			<Add library="..\dx9sdk\Lib\x86\DxErr9.lib" />
-			<Add library="..\dx9sdk\Lib\x86\DxErr.lib" />
-			<Add library="..\dx9sdk\Lib\x86\dxgi.lib" />
-			<Add library="..\dx9sdk\Lib\x86\dxgi_beta.lib" />
-			<Add library="..\dx9sdk\Lib\x86\dxguid.lib" />
-			<Add library="..\dx9sdk\Lib\x86\X3DAudio.lib" />
-			<Add library="..\dx9sdk\Lib\x86\xapobase.lib" />
-			<Add library="..\dx9sdk\Lib\x86\xapobased.lib" />
-			<Add library="..\dx9sdk\Lib\x86\XAPOFX.lib" />
-			<Add library="..\dx9sdk\Lib\x86\XInput.lib" />
 		</Linker>
 		<Unit filename="src\cpu.cpp" />
 		<Unit filename="src\cpu.h" />

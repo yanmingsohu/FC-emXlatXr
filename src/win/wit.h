@@ -62,6 +62,7 @@ public:
     wMenu*  createSub   (UINT id,  char* text);
     void    setText     (UINT item,char* text);
     void    setEnable   (UINT id,  bool  b   );
+    void    setChecked  (UINT id,  bool  b   );
     void    separator   ();
 };
 
@@ -104,6 +105,10 @@ public:
     void setEnable(bool en);
     /* 设置窗口比例, 0则不限制, w/h */
     void setScale(double s);
+    /* 创建一个定时器并开始计时,达到uElapse时间(毫秒),on_time方法被调用 */
+    void startTimer(UINT timer_id, UINT uElapse_ms);
+    /* 立即终止一个定时器 */
+    void stopTimer(UINT timer_id);
     /* 取得当前窗口句柄 */
     HWND getWindowHandle();
     /* 返回菜单对象(无需释放), 第一次调用会创建一个 */
@@ -127,6 +132,8 @@ public:
 
     /* 默认会销毁该窗口 */
     EVENT_FUNC_DECL     (on_close)  (WIT_EVENT_PARM*);
+    /* 默认会打印警告, 如果定义了定时器必须重写该方法 */
+    EVENT_FUNC_DECL     (on_time)   (UINT timer_id);
 
     DEF_EVENT_FUNC_IMPL (on_paint);
 

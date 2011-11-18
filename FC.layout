@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release" />
+	<ActiveTarget name="debug" />
 	<File name="src\cpu.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="23890" topLine="840" />
 	</File>
 	<File name="src\cpu.h" open="0" top="0" tabpos="6">
 		<Cursor position="2282" topLine="23" />
 	</File>
-	<File name="src\debug.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="2264" topLine="0" />
+	<File name="src\debug.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="4561" topLine="0" />
+	</File>
+	<File name="src\debug.h" open="0" top="0" tabpos="0">
+		<Cursor position="1908" topLine="0" />
 	</File>
 	<File name="src\main.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="1778" topLine="0" />
@@ -25,8 +28,8 @@
 	<File name="src\mmc.h" open="0" top="0" tabpos="7">
 		<Cursor position="5011" topLine="95" />
 	</File>
-	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="2751" topLine="51" />
+	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="3872" topLine="52" />
 	</File>
 	<File name="src\nes_sys.h" open="0" top="0" tabpos="1">
 		<Cursor position="2392" topLine="23" />
@@ -35,10 +38,10 @@
 		<Cursor position="1806" topLine="18" />
 	</File>
 	<File name="src\ppu.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="17488" topLine="609" />
+		<Cursor position="10201" topLine="332" />
 	</File>
-	<File name="src\ppu.h" open="0" top="0" tabpos="3">
-		<Cursor position="7448" topLine="33" />
+	<File name="src\ppu.h" open="1" top="0" tabpos="3">
+		<Cursor position="9454" topLine="0" />
 	</File>
 	<File name="src\rom.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="580" topLine="0" />
@@ -49,14 +52,14 @@
 	<File name="src\speed.h" open="0" top="0" tabpos="0">
 		<Cursor position="305" topLine="0" />
 	</File>
-	<File name="src\testroms.h" open="1" top="0" tabpos="4">
-		<Cursor position="248" topLine="0" />
+	<File name="src\testroms.h" open="0" top="0" tabpos="4">
+		<Cursor position="212" topLine="0" />
 	</File>
 	<File name="src\type.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="61" topLine="23" />
+		<Cursor position="1747" topLine="0" />
 	</File>
-	<File name="src\type.h" open="0" top="0" tabpos="4">
-		<Cursor position="2048" topLine="0" />
+	<File name="src\type.h" open="1" top="0" tabpos="4">
+		<Cursor position="1923" topLine="0" />
 	</File>
 	<File name="src\video.h" open="0" top="0" tabpos="2">
 		<Cursor position="2365" topLine="0" />
@@ -68,7 +71,7 @@
 		<Cursor position="2122" topLine="40" />
 	</File>
 	<File name="src\win\main_window.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="1953" topLine="66" />
+		<Cursor position="621" topLine="0" />
 	</File>
 	<File name="src\win\winsys.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="387" topLine="0" />
@@ -76,10 +79,10 @@
 	<File name="src\win\winsys.h" open="0" top="0" tabpos="2">
 		<Cursor position="2039" topLine="18" />
 	</File>
-	<File name="src\win\wit.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="8468" topLine="308" />
+	<File name="src\win\wit.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="7348" topLine="331" />
 	</File>
-	<File name="src\win\wit.h" open="0" top="0" tabpos="4">
-		<Cursor position="3833" topLine="93" />
+	<File name="src\win\wit.h" open="1" top="0" tabpos="7">
+		<Cursor position="1156" topLine="100" />
 	</File>
 </CodeBlocks_layout_file>

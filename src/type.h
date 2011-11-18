@@ -21,12 +21,29 @@
 #define TYPE_H_INCLUDED
 
 #define SF_NAME_JYM      "FC 模拟器 DEmo. -=CatfoOD=- "
-#define SF_VERSION_JYM   "v0.01"
+#define SF_VERSION_JYM   "v0.02"
 
 #define HELP_FNC     static inline
 #define _CSTR(x)     const_cast<char*>(x)
-#define TNUL(x, _s)  if (!x) printf("debug::%s at %s %d line", \
-                                    _s, __FILE__, __LINE__)
+
+#define DBG_FILE_NAME_LEN 10
+/* 含有编译信息的打印消息,用于调试 */
+#define PRINT(fmt,...) { char *___p = __FILE__ ; int ___len = strlen(___p); \
+                         if (___len > DBG_FILE_NAME_LEN) \
+                             ___p += ___len - DBG_FILE_NAME_LEN; \
+                         printf("[ %s .%d ] ", ___p, __LINE__); \
+                         printf((fmt), __VA_ARGS__); }
+
+/* if __DEBUG_NES__ start */
+#ifdef __DEBUG_NES__
+#define TNUL(x,fmt, ...) if (!x) PRINT(fmt, __VA_ARGS__)
+#define DBGPRT(fmt, ...) PRINT(fmt, __VA_ARGS__)
+#else
+/* else not define __DEBUG_NES__ */
+#define DBGPRT(fmt, ...)
+#define TNUL(x,fmt, ...)
+#endif
+/* if __DEBUG_NES__ over */
 
 /*------------------| DIV除法定义 |----*/
 #define DIV2(x)     ((x)>>1)

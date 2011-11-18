@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include "type.h"
-#include "rom.h"
-
+#include  <stdio.h>
+#include <stdarg.h>
+#include   "type.h"
+#include    "rom.h"
 
 void welcome() {
     printf(

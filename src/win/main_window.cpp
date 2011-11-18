@@ -11,18 +11,29 @@
 #include         "wit.h"
 
 
-static void  frameRate  (Video*);
-
-/*  Make the class name into a global variable  */
 static const double FRAME_RATE = 1000/60.0;
 static char titleName  [ ] = SF_NAME_JYM SF_VERSION_JYM;
 
 
 class NesScrollWindow : public wWindow {
 private:
-    PPU   *ppu;
-    Video *video;
-    int   w,h;
+    static const UINT TIME_ID = 1;
+    static const UINT UPDATE_TIME = 300;
+
+    PPU*    ppu;
+    Video*  video;
+    int     w, h;
+
+    void _beginUpdate(bool begin) {
+        if (begin) {
+            setVisible(true);
+            startTimer(TIME_ID, UPDATE_TIME);
+            on_time(0);
+        } else {
+            stopTimer(TIME_ID);
+            setVisible(false);
+        }
+    }
 
 public:
     NesScrollWindow(wWindow *p, PPU *_ppu, int _w=512, int _h=512)
@@ -37,15 +48,9 @@ public:
         delete video;
     }
 
-    void on_paint(WIT_EVENT_PARM *p) {
-        static int time = 50;
-
-        if (!(--time)) {
-            video->clear(0);
-            paintFunc(ppu, video);
-            video->refresh();
-            time = 100;
-        }
+    /* 开始循环绘制内容 */
+    void beginUpdate() {
+        _beginUpdate(true);
     }
 
     virtual void paintFunc(PPU *_p, Video *_v) {
@@ -53,7 +58,13 @@ public:
     }
 
     void on_close(WIT_EVENT_PARM* p) {
-        setVisible(false);
+        _beginUpdate(false);
+    }
+
+    void on_time(UINT timer_id) {
+        video->clear(0);
+        paintFunc(ppu, video);
+        video->refresh();
     }
 };
 
@@ -76,32 +87,48 @@ private:
     static const int HEIGHT = 256;
 
     enum MenuIDS {
-        M_ID_OPEN=1, M_ID_EXIT,  M_ID_STEP,
-        M_DI_TILE,   M_DI_BG,    M_ID_PAUSE
+        M_ID_OPEN=1, M_ID_EXIT,   M_ID_STEP,
+        M_DI_TILE,   M_DI_BG,     M_ID_PAUSE,
+        MM_ID_GAME,  MM_ID_DEBUG
     };
 
-    NesSystem  *fc;
-    Video      *video;
-    PlayPad    *pad;
-    wWindow    *tile;
-    wWindow    *bg;
-    bool        run;
-    bool        quit;
-    bool        sDebug;
+    NesSystem       *fc;
+    Video           *video;
+    PlayPad         *pad;
+    NesTileWindow   *tile;
+    NesScrollWindow *bg;
+
+    bool run;
+    bool quit;
+    bool sDebug;
 
     void _create_menu() {
         pwMenu menu = getMenuBar();
 
-        pwMenu file = menu->createSub(1, "游戏");
+        pwMenu file = menu->createSub(MM_ID_GAME, "游戏");
         file->addItem(M_ID_OPEN, "打开游戏");
         file->addItem(M_ID_PAUSE,"暂停/继续");
         file->separator();
         file->addItem(M_ID_EXIT, "退出");
 
-        pwMenu debug = menu->createSub(2, "调试");
+        pwMenu debug = menu->createSub(MM_ID_DEBUG, "调试");
         debug->addItem(M_ID_STEP,"单步执行");
         debug->addItem(M_DI_TILE,"显示瓦片");
         debug->addItem(M_DI_BG,  "显示卷轴");
+    }
+
+    void frameRate() {
+        static long frameC = 0;
+        static int f2c = 0;
+        static clock_t time = clock();
+        static char txt[20];
+
+        ++frameC; ++f2c;
+        if (frameC%42!=0) return;
+
+        double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
+        printf("frame: %ld rate : %04lf/s\n", frameC, f2c/utime);
+        time = clock(); f2c = 0;
     }
 
 public:
@@ -150,7 +177,7 @@ public:
             fc->drawFrame();
             video->refresh();
 
-            //frameRate(video);
+            //frameRate();
 
             sl.end();
         }
@@ -171,11 +198,11 @@ public:
             break;
 
         case M_DI_TILE:
-            tile->setVisible(true);
+            tile->beginUpdate();
             break;
 
         case M_DI_BG:
-            bg->setVisible(true);
+            bg->beginUpdate();
             break;
 
         case M_ID_EXIT:
@@ -229,22 +256,4 @@ int WINAPI WinMain ( HINSTANCE hThisInstance,
     nes.gameLoop();
 
     return 0;
-}
-
-void frameRate(Video *video) {
-    static long frameC = 0;
-    static int f2c = 0;
-    static clock_t time = clock();
-
-    ++frameC;
-    ++f2c;
-
-    if (frameC%42!=0) return;
-
-    double utime = (double)(clock() - time)/CLOCKS_PER_SEC;
-
-    printf("frame: %ld rate : %04lf/s\n", frameC, f2c/utime);
-
-    time = clock();
-    f2c = 0;
 }

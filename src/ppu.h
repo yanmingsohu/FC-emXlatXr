@@ -177,7 +177,7 @@ private:
 
     void write(byte);       /* 写数据                              */
     byte read();            /* 读数据                              */
-    BackGround* swBg(word); /* 依据word的值得到相应的背景指针      */
+    BackGround* gtBg(word); /* 依据word的值得到相应的背景指针      */
 
     /* 依据x,y的位置从attr属性表中取得颜色的高两位                 */
     byte bgHBit(int x, int y, byte *attr);

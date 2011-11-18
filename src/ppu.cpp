@@ -245,7 +245,7 @@ byte PPU::readState(word addr) {
 }
 
 /* offs => [0x2000 - 0x4000] */
-BackGround* PPU::swBg(word offs) {
+BackGround* PPU::gtBg(word offs) {
     if (offs >= 0x3000) {
         offs -= 0x3000;
     }
@@ -277,7 +277,7 @@ byte PPU::read() {
         res = mmc->readVRom(offset);
     }
     else if (offset<0x3F00) {
-        BackGround* pBg = swBg(offset);
+        BackGround* pBg = gtBg(offset);
         res = pBg->read(offset % 0x0400);
     }
     else {
@@ -304,7 +304,7 @@ void PPU::write(byte data) {
         mmc->writeVRom(offset, data);
     }
     else if (offset<0x3F00) {
-        BackGround* pBg = swBg(offset);
+        BackGround* pBg = gtBg(offset);
         pBg->write(offset % 0x0400, data);
     }
     else {
@@ -328,7 +328,7 @@ void PPU::write(byte data) {
                 spPalette[off-0x10] = data;
             }
         }
-        // printf("write palette: %4X %2X\n", offset, data);
+        PRINT("PPU::write palette: %4X %2X\n", offset, data);
     }
 }
 

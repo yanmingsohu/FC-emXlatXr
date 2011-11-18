@@ -7,7 +7,7 @@
 //#define TEST_ROM "rom/dkk.nes"
 //#define TEST_ROM "rom/fighter_f8000.nes"
 //#define TEST_ROM "rom/F-1.nes"
-#define TEST_ROM "rom/Battle City.NES"
+//#define TEST_ROM "rom/Battle City.NES"
 //#define TEST_ROM "rom/super-mario-bros.nes"
 //#define TEST_ROM "rom/3D Block (Unl) [p1].nes"
 

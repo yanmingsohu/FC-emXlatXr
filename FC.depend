@@ -132,7 +132,7 @@
 	"ppu.h"
 	"pad.h"
 
-1321254945 f:\c-project\fc\src\type.h
+1321580949 f:\c-project\fc\src\type.h
 
 1315969343 f:\c-project\fc\src\rom.h
 	"type.h"
@@ -142,7 +142,7 @@
 	"rom.h"
 	<stdio.h>
 
-1321233796 f:\c-project\fc\src\ppu.h
+1321575236 f:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
@@ -157,7 +157,7 @@
 	"mem.h"
 	"ppu.h"
 
-1321416639 source:f:\c-project\fc\src\debug.cpp
+1321596931 source:f:\c-project\fc\src\debug.cpp
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -206,12 +206,13 @@
 	<stdio.h>
 	<stdlib.h>
 
-1314928987 source:f:\c-project\fc\src\type.cpp
+1321577118 source:f:\c-project\fc\src\type.cpp
 	<stdio.h>
+	<stdarg.h>
 	"type.h"
 	"rom.h"
 
-1321399765 source:f:\c-project\fc\src\ppu.cpp
+1321581058 source:f:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
@@ -248,7 +249,7 @@
 1321519120 source:f:\c-project\fc\src\win\winsys.cpp
 	"winsys.h"
 
-1321519302 source:f:\c-project\fc\src\win\main_window.cpp
+1321596050 source:f:\c-project\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
@@ -442,7 +443,7 @@
 1315579798 source:e:\fc\src\win\winsys.cpp
 	"winsys.h"
 
-1321399765 f:\c-project\fc\src\testroms.h
+1321575268 f:\c-project\fc\src\testroms.h
 
 1321530808 e:\c-project\fc\src\testroms.h
 
@@ -642,12 +643,12 @@
 
 1234010226 f:\c-project\dx9sdk\include\d3dx9anim.h
 
-1321509692 source:f:\c-project\fc\src\win\wit.cpp
+1321595264 source:f:\c-project\fc\src\win\wit.cpp
 	"wit.h"
 	<map>
 	<stdio.h>
 
-1321509659 f:\c-project\fc\src\win\wit.h
+1321595147 f:\c-project\fc\src\win\wit.h
 	<windows.h>
 
 1321513217 f:\c-project\fc\src\speed.h

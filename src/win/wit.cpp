@@ -112,7 +112,7 @@ static void registerWinClass(HINSTANCE hThisInstance) {
 wMenu::wMenu(HMENU _menu)
 : menu(_menu), position(0), parent(0), lastsub(0), previous(0)
 {
-#ifdef __DEBUG__
+#ifdef __DEBUG_WIT__
     printf("::create Menu %X\n", this);
 #endif
 }
@@ -123,7 +123,7 @@ wMenu::wMenu(wMenu *parent, HMENU _menu)
     this->parent = parent;
     this->previous = parent->lastsub;
     parent->lastsub = this;
-#ifdef __DEBUG__
+#ifdef __DEBUG_WIT__
     printf("::create Menu %X\n", this);
 #endif
 }
@@ -153,6 +153,13 @@ void wMenu::setText(UINT id, char* text) {
 
 void wMenu::setEnable(UINT id, bool b) {
     EnableMenuItem(menu, id, b ? MF_ENABLED : MF_GRAYED);
+}
+
+void wMenu::setChecked(UINT id, bool b) {
+    char text[256];
+    GetMenuString(menu, id, text, sizeof(text), MF_BYCOMMAND);
+    UINT CH = b ? MF_CHECKED : MF_UNCHECKED;
+    ModifyMenu(menu, id, MF_BYCOMMAND | CH, id, text);
 }
 
 void wMenu::separator() {
@@ -186,7 +193,7 @@ void wMenu::_free() {
 }
 
 wMenu::~wMenu() {
-#ifdef __DEBUG__
+#ifdef __DEBUG_WIT__
     printf("::delete Menu %X\n", this);
 #endif
 }
@@ -269,6 +276,14 @@ void wWindow::setScale(double s) {
     scale = s;
 }
 
+void wWindow::startTimer(UINT timer_id, UINT uElapse_ms) {
+    SetTimer(hwnd, timer_id, uElapse_ms, NULL);
+}
+
+void wWindow::stopTimer(UINT timer_id) {
+    KillTimer(hwnd, timer_id);
+}
+
 HWND wWindow::getWindowHandle() {
     return hwnd;
 }
@@ -314,6 +329,10 @@ LRESULT wWindow::_event_procedure(UINT message, WPARAM wParam, LPARAM lParam) {
         }
         break;
 
+    case WM_TIMER:
+        on_time(wParam);
+        break;
+
 #define CASE(_a,_b) case _a: _b(&parm); break
     CASE(WM_CLOSE,      on_close);
     CASE(WM_PAINT,      on_paint);
@@ -350,4 +369,8 @@ EVENT_FUNC_DEF(on_widget)(WIT_EVENT_PARM *p, HWND widget) {
 
 EVENT_FUNC_DEF(on_close)(WIT_EVENT_PARM *p) {
     destroy();
+}
+
+EVENT_FUNC_DEF(on_time)(UINT timer_id) {
+    printf("Timer %d Arrival.\n");
 }

@@ -43,7 +43,7 @@ private:
 
 public:
     /* PlayPad 在该类销毁时销毁 */
-    NesSystem(Video* video, PlayPad*);
+    NesSystem(PlayPad*);
     ~NesSystem();
 
     /* 读取rom文件,成功返回0,失败返回错误代码, *
@@ -56,9 +56,9 @@ public:
     PlayPad     *getPad();
 
     /* 绘制一帧 */
-    void drawFrame();
+    void drawFrame(Video* video);
     /* PPU预热周期 */
-    void warmTime();
+    void warmTime(Video* video);
 
     /* 开始cpu单步执行,同时需要打开编译开关 */
     void debug();

@@ -170,8 +170,8 @@ DirectXVideo::~DirectXVideo() {
 /****|WinPad|******************************************************************/
 
 WinPad::WinPad() {
-    p1_key_map[ FC_PAD_BU_A      ] = K_J;
-    p1_key_map[ FC_PAD_BU_B      ] = K_K;
+    p1_key_map[ FC_PAD_BU_A      ] = K_K;
+    p1_key_map[ FC_PAD_BU_B      ] = K_J;
     p1_key_map[ FC_PAD_BU_START  ] = K_H;
     p1_key_map[ FC_PAD_BU_SELECT ] = K_F;
     p1_key_map[ FC_PAD_BU_UP     ] = K_W;

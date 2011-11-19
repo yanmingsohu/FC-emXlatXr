@@ -21,11 +21,15 @@
 #include "debug.h"
 #include <stdio.h>
 
-NesSystem::NesSystem(Video* video, PlayPad *_pad)
+#ifdef ANY_WHERE_STEPDBG
+bool __stop_and_debug__ = 0;
+#endif
+
+NesSystem::NesSystem(PlayPad *_pad)
     : pad(_pad), _cyc(0)
 {
     mmc = new MMC();
-    ppu = new PPU(mmc, video);
+    ppu = new PPU(mmc);
     ram = new memory(mmc, ppu, pad);
     cpu = new cpu_6502(ram);
     rom = new nes_file();
@@ -55,29 +59,34 @@ NesSystem::~NesSystem() {
 #define HBLANK_CYC       MID_CYC(340)
 
 /* 代码尚未优化 */
-void NesSystem::drawFrame() {
+void NesSystem::drawFrame(Video* video) {
 
-    ppu->startNewFrame();
+    PPU::pPainter ptr = ppu->startNewFrame(video);
     cpu_run(START_CYC);
 
-    ppu->clearVBL();
+    ptr->clearVBL();
     cpu_run(ONE_CYC);
 
-    ppu->drawSprite(PPU::bpBehind);
+    ptr->drawSprite(PPU::bpBehind);
 
     int x=0, y=0;
 
     while (y<240) {
-        ppu->startNewLine();
+        ptr->startNewLine();
         /* 绘制一行 */
         for (;;) {
-            ppu->drawPixel(x++, y);
+            ptr->drawNextPixel();
 
             if (--_cyc < 0) {
+                #ifdef ANY_WHERE_STEPDBG
+                if (__stop_and_debug__) {
+                    debugCpu(this);
+                }
+                #endif
                 _cyc += MID_CPU_CYC( cpu->process() );
             }
 
-            if (x>=256) {
+            if (++x>=256) {
                 break;
             }
         }
@@ -89,7 +98,7 @@ void NesSystem::drawFrame() {
         cpu_run(HBLANK_CYC);
     }
 
-    ppu->drawSprite(PPU::bpFront);
+    ptr->drawSprite(PPU::bpFront);
 
     if (every_f) {
         cpu_run(END_CYC_EVERY);
@@ -99,25 +108,34 @@ void NesSystem::drawFrame() {
     every_f = !every_f;
 
     /* 到此为止算是一帧结束 */
-    ppu->sendingNMI();
+    ptr->sendingNMI();
     /* 设置VBL=1 */
-    ppu->oneFrameOver();
+    ppu->oneFrameOver(ptr);
 }
 
-void NesSystem::warmTime() {
-    ppu->startNewFrame();
+void NesSystem::warmTime(Video* video) {
+    /*
+    pPainter ptr = ppu->startNewFrame(video);
     cpu_run( MID_CYC(ONE_LINE_CYC*241) );
-    ppu->oneFrameOver();
-    ppu->sendingNMI();
+    prt->oneFrameOver();
+    ptr->sendingNMI();
+    ppu->oneFrameOver(ptr);
 
-    ppu->startNewFrame();
+    ptr = ppu->startNewFrame(video);
     cpu_run( MID_CYC(ONE_LINE_CYC*262) );
     ppu->oneFrameOver();
     ppu->sendingNMI();
+    ppu->oneFrameOver(ptr);
+    */
 }
 
 void NesSystem::cpu_run(int cyc) {
     while (_cyc <= cyc) {
+        #ifdef ANY_WHERE_STEPDBG
+        if (__stop_and_debug__) {
+            debugCpu(this);
+        }
+        #endif
         _cyc += MID_CPU_CYC( cpu->process() );
     }
     _cyc -= cyc;
@@ -141,7 +159,7 @@ int NesSystem::load_rom(string filename) {
             _cyc = 0;
             every_f = false;
 
-            warmTime();
+            warmTime(0);
         } else {
             res = ER_LOAD_ROM_BADMAP;
         }

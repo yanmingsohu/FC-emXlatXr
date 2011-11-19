@@ -54,16 +54,20 @@ static byte RESET_PALETTE_TABLE[] = {
      0x08, 0x3A, 0x00, 0x02, 0x00, 0x20, 0x2C, 0x08,
 };
 
-PPU::PPU(MMC *_mmc, Video *_video)
+PPU::PPU(MMC *_mmc)
     : spWorkOffset (0)
     , addr_add     (1)
     , flipflop(Flip1w)
     , bkAllDisp    (0)
     , spAllDisp    (0)
     , mmc       (_mmc)
-    , video   (_video)
 {
     memset(spWorkRam, 0, sizeof(spWorkRam));
+    painter = new Painter(this);
+}
+
+PPU::~PPU() {
+    delete painter;
 }
 
 void PPU::reset() {
@@ -115,12 +119,6 @@ void PPU::controlWrite(word addr, byte data) {
 #ifdef SHOW_PPU_REGISTER
         printf("PPU::写入精灵数据: %x = %x\n", spWorkOffset, data);
 #endif
-#ifdef SHOW_ERR_MEM_OPERATE
-        if (spWorkOffset>=256) {
-            printf("PPU::写入精灵内存超出256字节中断写入\n");
-            break;
-        }
-#endif
         spWorkRam[spWorkOffset++] = data;
         break;
 
@@ -139,7 +137,7 @@ void PPU::controlWrite(word addr, byte data) {
     case 6: /* 0x2006 PPU地址指针 */
         if (flipflop == Flip1w) {
             flipflop = Flip2w;
-            _setTmpaddr(0x3F00, (data & 0x003F) << 8);
+            _setTmpaddr(0xFF00, (data & 0x003F) << 8);
         } else {
             flipflop = Flip1w;
             _setTmpaddr(0x00FF, data);
@@ -208,12 +206,6 @@ byte PPU::readState(word addr) {
         break;
 
     case 4: /* 0x2004 读取卡通工作内存 */
-#ifdef SHOW_ERR_MEM_OPERATE
-        if (spWorkOffset>=256) {
-            printf("PPU::读取精灵内存超出256字节中断读取\n");
-            break;
-        }
-#endif
         /* Address should not increment on $2004 read */
         r = spWorkRam[spWorkOffset];
 #ifdef SHOW_PPU_REGISTER
@@ -328,7 +320,8 @@ void PPU::write(byte data) {
                 spPalette[off-0x10] = data;
             }
         }
-        PRINT("PPU::write palette: %4X %2X\n", offset, data);
+        //PRINT("PPU::write palette: %4X %2X\n", offset, data);
+        //__stop_and_debug__=1;
     }
 }
 
@@ -475,30 +468,34 @@ void PPU::drawBackGround(Video *panel) {
     }
 }
 
-void PPU::_drawSprite(byte i, byte ctrl) {
+void PPU::_drawSprite(Video *video, byte i) {
     if (!spAllDisp) return;
 
-    int x, y, dx, dy;
-
-    byte by   = spWorkRam[i  ]+1;
-    if (by > 0xEF) return;
-
+    byte by   = spWorkRam[i  ]+1; if (by > 0xEF) return;
     byte tile = spWorkRam[i+1];
-    if (!ctrl)
-         ctrl = spWorkRam[i+2];
+    byte ctrl = spWorkRam[i+2];
     byte bx   = spWorkRam[i+3];
 
+    int  x, y, dx, dy;
+    word pattern;
     /* 8x8 个像素都需要判断，所以提前算好 */
     bool h    = ctrl & (1<<6);
     bool v    = ctrl & (1<<7);
     byte hiC  = (ctrl & 0x03) << 2;
+
+    if (spriteType==t8x16) {
+        pattern = (tile & 1) ? 0x1000 : 0;
+        tile &= 0xFE;
+    } else {
+        pattern = spRomOffset;
+    }
 
     if (!i) { sp0x = bx;
               sp0y = by; }
 
     for (bool notOver = true;;) {
         for (x=0, y=0;;) {
-            byte paletteIdx = gtLBit(x, y, tile, spRomOffset);
+            byte paletteIdx = gtLBit(x, y, tile, pattern);
 
             if (paletteIdx) {
                 if (h) dx = 8 - x + bx;
@@ -536,91 +533,26 @@ inline void PPU::_checkHit(int x, int y) {
     }
 }
 
-void PPU::drawSprite(bgPriority bp) {
-    for (int i=63<<2; i>=0; i-=4) { // spriteType
-        byte ctrl = spWorkRam[i+2];
-        if ( ((ctrl>>5) & 1)==bp ) {
-            _drawSprite(i, ctrl);
-        }
-    }
-}
-
-void PPU::drawPixel(int X, int Y) {
-    if (!bkAllDisp) return;
-
-    int x = (winX + X) % 512;
-    int y = (winY + Y) % 480;
-    BackGround *bgs;
-
-    if (x<256) {
-        if (y<240) {
-            bgs = pbg[0];
-        } else {
-            bgs = pbg[2];
-            y   = (winY + Y) % 240;
-        }
-    } else {
-        if (y<240) {
-            bgs = pbg[1];
-            x   = (winX + X) % 256;
-        } else {
-            bgs = pbg[3];
-            x   = (winX + X) % 256;
-            y   = (winY + Y) % 240;
-        }
-    }
-
-    word nameIdx = DIV8(x) + (DIV8(y)<<5);
-    word tileIdx = bgs->name[nameIdx];
-
-    byte paletteIdx = gtLBit(x, y, tileIdx, bgRomOffset)
-                    | bgHBit(x, y, bgs->attribute);
-
-    /* 透明色 */
-    if (paletteIdx%4==0) return;
-
-    byte colorIdx = bkPalette[paletteIdx];
-    video->drawPixel(X, Y, ppu_color_table[colorIdx]);
-    _checkHit(X, Y);
-}
-
-void PPU::oneFrameOver() {
+void PPU::oneFrameOver(pPainter pat) {
     vblankTime = 1;
     spWorkOffset = 0;
 }
 
-void PPU::clearVBL() {
-    vblankTime = 0;
-}
-
-void PPU::startNewFrame() {
-    hit = 0;
-
-    _resetScreenOffset(true);
-
-    video->clear( ppu_color_table[bkPalette[0]] );
-    memset(sp0hit, 0, sizeof(sp0hit));
-    _drawSprite(0,0);
-
+PPU::pPainter PPU::startNewFrame(Video *video) {
 #ifdef SHOW_PPU_REGISTER
     currentDrawLine = 0;
 #endif
-}
+    hit = 0;
+    _resetScreenOffset(true);
+    memset(sp0hit, 0, sizeof(sp0hit));
 
-void PPU::sendingNMI() {
-    if (sendNMI) {
-        *NMI = 1;
-#ifdef NMI_DEBUG
-        printf("PPU::发送中断到CPU\n");
-#endif
-    }
-}
+    if (!video) return NULL;
 
-void PPU::startNewLine() {
-    _resetScreenOffset(false);
-#ifdef SHOW_PPU_REGISTER
-    currentDrawLine++;
-#endif
+    video->clear( ppu_color_table[bkPalette[0]] );
+    _drawSprite(video, 0);
+
+    painter->setVideo(video);
+    return painter;
 }
 
 void PPU::copySprite(byte *data) {
@@ -661,6 +593,106 @@ word PPU::getVRamPoint() {
 }
 
 inline void PPU::_setTmpaddr(word mask, word d) {
-    tmp_addr &= mask ^ 0xFFFF;
-    tmp_addr |= d;
+    tmp_addr = (tmp_addr & (~mask)) | d;
+}
+
+// 绘制器部分 ------------------------------------------- // --PPU::Painter-- //
+
+PPU::Painter::Painter(PPU *parent) : _p(parent) {
+    reset();
+}
+
+void PPU::Painter::reset() {
+    baseX = 0;
+    baseY = 0;
+    currX = 0;
+    currY = 0;
+}
+
+void PPU::Painter::startNewLine() {
+    _p->_resetScreenOffset(false);
+    baseX = _p->winX;
+    baseY = _p->winY;
+#ifdef SHOW_PPU_REGISTER
+    _p->currentDrawLine++;
+#endif
+}
+
+void PPU::Painter::drawNextPixel() {
+    if (_p->bkAllDisp) {
+        _drawPixel();
+    }
+    if (++currX>=256) {
+        if (++currY>=240) {
+            currY = 0;
+        }
+        currX = 0;
+    }
+}
+
+void PPU::Painter::drawSprite(bgPriority bp) {
+    for (int i=63<<2; i>=0; i-=4) { // spriteType
+        byte ctrl = _p->spWorkRam[i+2];
+        if ( ((ctrl>>5) & 1)==bp ) {
+            _p->_drawSprite(panel, i);
+        }
+    }
+}
+
+void PPU::Painter::setVideo(Video* v) {
+    panel = v;
+}
+
+void PPU::Painter::sendingNMI() {
+    if (_p->sendNMI) {
+        *(_p->NMI) = 1;
+#ifdef NMI_DEBUG
+        printf("PPU::发送中断到CPU\n");
+#endif
+    }
+}
+
+void PPU::Painter::clearVBL() {
+    _p->vblankTime = 0;
+}
+
+
+void PPU::Painter::_drawPixel() {
+    int cx = baseX + currX;
+    int cy = baseY + currY;
+
+    int x = cx % 512;
+    int y = cy % 480;
+    BackGround *bgs;
+
+    if (x<256) {
+        if (y<240) {
+            bgs = _p->pbg[0];
+        } else {
+            bgs = _p->pbg[2];
+            y   = cy % 240;
+        }
+    } else {
+        if (y<240) {
+            bgs = _p->pbg[1];
+            x   = cx % 256;
+        } else {
+            bgs = _p->pbg[3];
+            x   = cx % 256;
+            y   = cy % 240;
+        }
+    }
+
+    word nameIdx = DIV8(x) + (DIV8(y)<<5);
+    word tileIdx = bgs->name[nameIdx];
+
+    byte paletteIdx = _p->gtLBit(x, y, tileIdx, _p->bgRomOffset)
+                    | _p->bgHBit(x, y, bgs->attribute);
+
+    /* 透明色 */
+    if (paletteIdx%4==0) return;
+
+    byte colorIdx = _p->bkPalette[paletteIdx];
+    panel->drawPixel(currX, currY, ppu_color_table[colorIdx]);
+    _p->_checkHit(currX, currY);
 }

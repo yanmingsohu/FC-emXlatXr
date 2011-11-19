@@ -342,7 +342,7 @@ LRESULT wWindow::_event_procedure(UINT message, WPARAM wParam, LPARAM lParam) {
         if (scale) {
             int w = LOWORD(lParam);
             int h = w / scale;
-            setClientSize(w, h);;
+            setClientSize(w, h);
         }
 
     default: parm.defproc = true;

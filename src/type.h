@@ -23,6 +23,21 @@
 #define SF_NAME_JYM      "FC 模拟器 DEmo. -=CatfoOD=- "
 #define SF_VERSION_JYM   "v0.02"
 
+/*-------------------------------------------| 定义DEBUG消息 |----*/
+/* 显示NMI调用与返回的消息                                        */
+//#define NMI_DEBUG
+/* 可以显示CPU命令的相关代码                                      */
+//#define SHOW_CPU_OPERATE
+/* 访问无效内存时提出警告                                         */
+#define SHOW_ERR_MEM_OPERATE
+/* 显示访问PPU的消息                                              */
+//#define SHOW_PPU_REGISTER
+/* 显示CPU寻址消息                                                */
+//#define SHOW_CPU_MEMORY_ADDRESSING
+/* 启用全局中断变量, 只要变量为1则立即中断执行, 并开始调试        */
+#define ANY_WHERE_STEPDBG
+/*-----------------------------------------------| END DEBUG |----*/
+
 #define HELP_FNC     static inline
 #define _CSTR(x)     const_cast<char*>(x)
 
@@ -36,7 +51,7 @@
 
 /* if __DEBUG_NES__ start */
 #ifdef __DEBUG_NES__
-#define TNUL(x,fmt, ...) if (!x) PRINT(fmt, __VA_ARGS__)
+#define TNUL(x,fmt, ...) if (!(x)) PRINT(fmt, __VA_ARGS__)
 #define DBGPRT(fmt, ...) PRINT(fmt, __VA_ARGS__)
 #else
 /* else not define __DEBUG_NES__ */
@@ -70,17 +85,8 @@ void printArr(byte* arr, int startIdx, int length);
 /* 把load_rom方法返回的错误代码转义为消息字符串 */
 char* parseOpenError(int load_err_code);
 
-/*---------------------------| 如果定义则显示相关的DEBUG消息 |----*/
-/* 显示NMI调用与返回的消息                                        */
-//#define NMI_DEBUG
-/* 可以显示CPU命令的相关代码                                      */
-//#define SHOW_CPU_OPERATE
-/* 访问无效内存时提出警告                                         */
-#define SHOW_ERR_MEM_OPERATE
-/* 显示访问PPU的消息                                              */
-//#define SHOW_PPU_REGISTER
-/* 显示CPU寻址消息                                                */
-//#define SHOW_CPU_MEMORY_ADDRESSING
-/*-----------------------------------------------| END DEBUG |----*/
+#ifdef ANY_WHERE_STEPDBG
+extern bool __stop_and_debug__;
+#endif
 
 #endif // TYPE_H_INCLUDED

@@ -34,6 +34,10 @@ int main()
 {
     welcome();
 
+#ifdef ANY_WHERE_STEPDBG
+    printf("注意:启用了全局调试开关.\n");
+#endif
+
 #ifdef __WIN32__
     HINSTANCE hInstance = GetModuleHandle(NULL);
     WinMain(hInstance, NULL, NULL, SW_SHOW);

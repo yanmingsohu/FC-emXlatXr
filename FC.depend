@@ -12,7 +12,7 @@
 	"ppu.h"
 	"pad.h"
 
-1321267003 e:\c-project\fc\src\type.h
+1321669446 e:\c-project\fc\src\type.h
 
 1315994112 e:\c-project\fc\src\rom.h
 	"type.h"
@@ -22,7 +22,7 @@
 	"rom.h"
 	<stdio.h>
 
-1321267003 e:\c-project\fc\src\ppu.h
+1321669277 e:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
@@ -37,7 +37,7 @@
 	"mem.h"
 	"ppu.h"
 
-1315218280 source:e:\c-project\fc\src\main.cpp
+1321658125 source:e:\c-project\fc\src\main.cpp
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -45,7 +45,7 @@
 	<windows.h>
 	"win/winsys.h"
 
-1320920068 source:e:\c-project\fc\src\mem.cpp
+1321622429 source:e:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
 	<stdio.h>
@@ -58,12 +58,12 @@
 	<stdio.h>
 	<memory.h>
 
-1321531101 source:e:\c-project\fc\src\nes_sys.cpp
+1321667602 source:e:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	"debug.h"
 	<stdio.h>
 
-1321267003 e:\c-project\fc\src\nes_sys.h
+1321666364 e:\c-project\fc\src\nes_sys.h
 	"cpu.h"
 	"mem.h"
 	"rom.h"
@@ -72,7 +72,7 @@
 
 1315994112 e:\c-project\fc\src\debug.h
 
-1321531108 source:e:\c-project\fc\src\ppu.cpp
+1321669521 source:e:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
@@ -82,8 +82,9 @@
 	<stdio.h>
 	<stdlib.h>
 
-1315043518 source:e:\c-project\fc\src\type.cpp
+1321611189 source:e:\c-project\fc\src\type.cpp
 	<stdio.h>
+	<stdarg.h>
 	"type.h"
 	"rom.h"
 
@@ -110,7 +111,7 @@
 1314701755 source:e:\c-project\fc\src\winsys.cpp
 	"winsys.h"
 
-1321438387 source:e:\c-project\fc\src\debug.cpp
+1321667085 source:e:\c-project\fc\src\debug.cpp
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -275,7 +276,7 @@
 	"../nes_sys.h"
 	"ddraw.h"
 
-1321531317 source:e:\c-project\fc\src\win\main_window.cpp
+1321667524 source:e:\c-project\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
@@ -287,7 +288,7 @@
 	"../speed.h"
 	"wit.h"
 
-1321526089 source:e:\c-project\fc\src\win\winsys.cpp
+1321657874 source:e:\c-project\fc\src\win\winsys.cpp
 	"winsys.h"
 
 1321357778 source:e:\c-project\fc\src\win\bgpanel.cpp
@@ -445,7 +446,7 @@
 
 1321575268 f:\c-project\fc\src\testroms.h
 
-1321530808 e:\c-project\fc\src\testroms.h
+1321620953 e:\c-project\fc\src\testroms.h
 
 1234010226 e:\c-project\d3d\dx9sdk\include\ddraw.h
 	<objbase.h>
@@ -712,12 +713,12 @@
 
 1234010226 e:\c-project\dx9sdk\include\d3dx9anim.h
 
-1321526089 source:e:\c-project\fc\src\win\wit.cpp
+1321612639 source:e:\c-project\fc\src\win\wit.cpp
 	"wit.h"
 	<map>
 	<stdio.h>
 
-1321526089 e:\c-project\fc\src\win\wit.h
+1321612147 e:\c-project\fc\src\win\wit.h
 	<windows.h>
 
 1321526089 e:\c-project\fc\src\speed.h

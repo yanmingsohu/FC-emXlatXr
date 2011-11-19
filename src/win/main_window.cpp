@@ -12,7 +12,7 @@
 
 
 static const double FRAME_RATE = 1000/60.0;
-static char titleName  [ ] = SF_NAME_JYM SF_VERSION_JYM;
+static char titleName[] = SF_NAME_JYM SF_VERSION_JYM;
 
 
 class NesScrollWindow : public wWindow {
@@ -140,7 +140,7 @@ public:
         // WindowsVideo | DirectXVideo | DirectX3DVideo
         video   = new DirectX3DVideo(getWindowHandle(), WIDTH, HEIGHT);
         pad     = new WinPad();
-        fc      = new NesSystem(video, pad);
+        fc      = new NesSystem(pad);
 
         #ifdef TEST_ROM
         run = !fc->load_rom(TEST_ROM);
@@ -174,10 +174,10 @@ public:
                 debugCpu(fc);
                 sDebug = 0;
             }
-            fc->drawFrame();
+            fc->drawFrame(video);
             video->refresh();
 
-            //frameRate();
+            frameRate();
 
             sl.end();
         }

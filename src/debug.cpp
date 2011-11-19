@@ -20,6 +20,11 @@ static void cpu_debug_help() {
     );
 }
 
+class NullVideo : public Video {
+    void drawPixel(int x, int y, T_COLOR color) {};
+    void clear(T_COLOR color) {};
+} NULL_VIDEO;
+
 #define CPU_IS(o, x, y)        \
          ( (parm->op==(0x##o)) \
          &&(parm->p1==(0x##x)) \
@@ -94,7 +99,7 @@ void debugCpu(NesSystem *fc) {
         if (ch=='0') {
             cpu->process();
             ++c;
-            if (frameIrq && (c%frameIrq==0)) ppu->oneFrameOver();
+            if (frameIrq && (c%frameIrq==0)) ppu->oneFrameOver(NULL);
             condition_code(fc);
             printf(cpu->cmdInfo());
             printf(cpu->debug());
@@ -134,7 +139,7 @@ void debugCpu(NesSystem *fc) {
             while (skip-- > 0) {
                 cpu->process();
                 ++c;
-                if (frameIrq && (c%frameIrq==0)) ppu->oneFrameOver();
+                if (frameIrq && (c%frameIrq==0)) ppu->oneFrameOver(NULL);
             }
         }
 
@@ -148,13 +153,13 @@ void debugCpu(NesSystem *fc) {
             c = 0;
         }
         else if (ch=='n') {
-            ppu->startNewFrame();
+            ppu->startNewFrame(0);
         }
         else if (ch=='o') {
-            ppu->oneFrameOver();
+            ppu->oneFrameOver(0);
         }
         else if (ch=='d') {
-            fc->drawFrame();
+            fc->drawFrame(&NULL_VIDEO);
         }
 
         else if (ch=='m') {
@@ -183,6 +188,9 @@ void debugCpu(NesSystem *fc) {
 
     clock_t e = clock();
     cpu->showDebug(0);
+#ifdef ANY_WHERE_STEPDBG
+    __stop_and_debug__ = 0;
+#endif
 
     printf("执行 %d 条指令使用了 %lf 毫秒\n", c,
            (double)(e - s)*(CLOCKS_PER_SEC/1000));

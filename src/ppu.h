@@ -124,6 +124,7 @@ private:
  * $4000-$FFFF $0000 - $3FFF 的镜像。                      *
 -*----------------------------------------| vram 映射 |----*/
 struct PPU {
+    struct Painter;
 
 private:
     BackGround  bg[4];
@@ -133,7 +134,7 @@ private:
     byte spPalette[16];     /* 卡通调色板                          */
 
     byte spWorkRam[256];    /* 卡通工作内存                        */
-    word spWorkOffset;      /* 卡通工作页面首地址                  */
+    byte spWorkOffset;      /* 卡通工作页面首地址                  */
     word ppu_ram_p;         /* ppu寄存器指针,不会超过 0x3FFF       */
     byte addr_add;          /* 地址增长累加值                      */
     byte readBuf;           /* PPU总是返回上一次读取的数据,在每次
@@ -169,8 +170,8 @@ private:
     int  sp0x, sp0y;        /* 记录0号卡通的位置                   */
     byte sp0hit[8][8];      /* 用来做碰撞检测                      */
 
-    MMC   *mmc;
-    Video *video;
+    Painter *painter;
+    MMC     *mmc;
 
     void control_2000(byte data);
     void control_2001(byte data);
@@ -184,7 +185,7 @@ private:
     /* 依据x,y的位置从attr属性表中取得颜色的低两位                 */
     byte gtLBit(int x, int y, byte tileIdx, word vromOffset);
 
-    void _drawSprite(byte spriteIdx, byte);
+    void _drawSprite(Video*, byte spriteIdx);
     void _checkHit(int x, int y);
     /* 使用mask(1)清除tmp_addr,并用d非0位设置清除tmp_addr */
     void _setTmpaddr(word mask, word d);
@@ -194,7 +195,8 @@ private:
 public:
     enum bgPriority {bpFront, bpBehind};
 
-    PPU(MMC *mmc, Video *video);
+    PPU(MMC *mmc);
+    ~PPU();
 
     void reset();
     /* cpu通过写0x2000~0x2007(0x3FFF)控制PPU                       */
@@ -205,31 +207,48 @@ public:
     void switchMirror(byte type);
     /* 设置cpu的NMI地址线                                          */
     void setNMI(byte* cpu_nmi);
-    /* 当一帧绘制完成时调用以发送中断, 系统预热时也需要调用两次    */
-    void oneFrameOver();
-    /* 当开始绘制一幅新的帧时,该方法被调用                         */
-    void startNewFrame();
-    /* 向cpu发送中断信号                                           */
-    void sendingNMI();
-    /* 2270 cpu 周期后清除VBL                                      */
-    void clearVBL();
+
     /* 复制256字节的数据到精灵Ram,需要512个CPU周期                 */
     void copySprite(byte *data);
     /* 取得窗口坐标                                                */
     void getWindowPos(int *x, int *y);
     /* 返回当前ppu显存指针                                         */
     word getVRamPoint();
-    /* 开始绘制新的扫描线                                          */
-    void startNewLine();
 
-    /* 绘制一帧中的精灵                                            */
-    void drawSprite(bgPriority);
+    /* 当开始绘制一幅新的帧时,该方法被调用                         */
+    Painter* startNewFrame(Video*);
+    /* 当一帧绘制完成时调用以发送中断, 系统预热时也需要调用两次    */
+    void oneFrameOver(Painter*);
     /* 在video上绘制四个背景 512*480                               */
     void drawBackGround(Video *v);
     /* 立即绘制背景字库                                            */
     void drawTileTable(Video *v);
     /* 绘制指定位置的像素                                          */
-    void drawPixel(int x, int y);
+    //void drawPixel(Video*, int x, int y);
+
+    /* 绘制帧的算法 */
+    struct Painter {
+        friend class PPU;
+    private:
+        Video *panel;  /* 绘制图形的面板 */
+        word   baseX;
+        word   baseY;  /* 当前的卷轴偏移量 */
+        word   currX;
+        word   currY;  /* 当前绘制坐标 */
+        PPU   *_p;
+
+        Painter(PPU *ppu);
+        void setVideo(Video* v);
+        void reset();
+        void _drawPixel();
+    public:
+        void startNewLine();
+        void drawNextPixel();
+        void drawSprite(bgPriority);
+        void sendingNMI();              /* 向cpu发送中断信号                  */
+        void clearVBL();                /* 2270 cpu 周期后清除VBL             */
+    };
+    typedef Painter *pPainter;
 };
 
 #endif // PPU_H_INCLUDED

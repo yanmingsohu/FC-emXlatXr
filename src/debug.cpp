@@ -15,6 +15,7 @@ static void cpu_debug_help() {
 \n| i :set operate to send frame IRQ      | d :draw a frame \
 \n| g :goto XXXX                          | b :breakpoint \
 \n| p :push key                           | c :clear screen \
+\n| w :write memory \
 \n| x :exit \
 \n------------------------------------------------------------------------------&\n"
     );
@@ -162,6 +163,17 @@ void debugCpu(NesSystem *fc) {
             fc->drawFrame(&NULL_VIDEO);
         }
 
+        else if (ch=='w') {
+            byte d;
+            word addr;
+            printf("input address(16):");
+            fflush(stdin);
+            scanf("%x", &addr);
+            printf("input data(16): ");
+            fflush(stdin);
+            scanf("%x", &d);
+            ram->write(addr, d);
+        }
         else if (ch=='m') {
             word addr = 0;
             word len = 0x20;

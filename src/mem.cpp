@@ -66,6 +66,10 @@ void memory::write(const word offset, const byte data) {
         ppu->copySprite(ram + (data<<8));
         return;
     }
+    if (offset<=0x4015) {   /* pApu ¼Ä´æÆ÷                     */
+        //printf("[%4X=%2X]\t", offset, data);
+        return;
+    }
     if (offset==0x4016 || offset==0x4017) {
         pad->writePort(offset, data);
         return;

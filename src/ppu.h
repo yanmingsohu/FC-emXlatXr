@@ -226,7 +226,7 @@ public:
     /* 绘制指定位置的像素                                          */
     //void drawPixel(Video*, int x, int y);
 
-    /* 绘制帧的算法 */
+    /** 绘制帧的算法 利用该类优化绘制速度:每一帧预读取提高效率  */
     struct Painter {
         friend class PPU;
     private:

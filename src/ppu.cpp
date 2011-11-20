@@ -494,14 +494,15 @@ void PPU::_drawSprite(Video *video, byte i) {
               sp0y = by; }
 
     for (bool notOver = true;;) {
+        if (v) dy = by + 7; // y=0
+        else   dy = by;
+
         for (x=0, y=0;;) {
             byte paletteIdx = gtLBit(x, y, tile, pattern);
 
             if (paletteIdx) {
-                if (h) dx = 8 - x + bx;
+                if (h) dx = 7 - x + bx;
                 else   dx =     x + bx;
-                if (v) dy = 8 - y + by;
-                else   dy =     y + by;
 
                 video->drawPixel(dx, dy, ppu_color_table[ spPalette[paletteIdx | hiC] ]);
 
@@ -512,6 +513,8 @@ void PPU::_drawSprite(Video *video, byte i) {
 
             if (++x >= 8) {
                 if (++y >= 8) break;
+                if (v) dy = 7 - y + by;
+                else   dy =     y + by;
                 x = 0;
             }
         }

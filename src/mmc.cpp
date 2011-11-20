@@ -53,6 +53,41 @@ public:
     }
 };
 
+//-- 02 --/////////////////////////////////////////////////////////////
+
+class Mapper_2 : public Mapper_0 {
+private:
+    static const uint ONE_PAGE = 16 * 1024;
+    uint p8000off;
+    uint pC000off;
+
+public:
+
+    byte r_prom(word off) {
+        if (off < 0xC000) {
+            return rom->rom[p8000off + off - 0x8000];
+        } else {
+            return rom->rom[pC000off + off - 0xC000];
+        }
+    }
+
+    void sw_page(word off, byte value) {
+        p8000off = value * ONE_PAGE;
+    }
+
+    uint capability() {
+        return MMC_CAPABILITY_CHECK_SWITCH | MMC_CAPABILITY_WRITE_VROM;
+    }
+
+    void reset() {
+        Mapper_0::reset();
+
+        uint max_prg_size = MMC_PRG_SIZE;
+        pC000off = (max_prg_size-1) * ONE_PAGE;
+        p8000off = 0;
+    }
+};
+
 //-- 03 --/////////////////////////////////////////////////////////////
 
 class Mapper_3 : public Mapper_0 {
@@ -210,10 +245,11 @@ public:
         }
 
         else if (off==0x8001) {
-            if (bankSize==prgBankSize)
-                value %= max_prg_size;
-            else
-                value %= max_chr_size;
+            if (bankSize==prgBankSize) {
+                value = (value &    3) % max_prg_size;
+            } else {
+                value = (value & 0x3f) % max_chr_size;
+            }
 
             *modify = value * bankSize;
 
@@ -402,6 +438,7 @@ public:
 static MapperImpl* createMapper(int mapper_id) {
     switch (mapper_id) {
         MMC_MAP(  0);
+        MMC_MAP(  2);
         MMC_MAP(  3);
     //  MMC_MAP(  4);
     //  MMC_MAP( 19);

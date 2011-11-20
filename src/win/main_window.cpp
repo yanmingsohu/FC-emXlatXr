@@ -135,6 +135,7 @@ public:
     NesWindow() : run(0), quit(0), sDebug(0) {
         _create_menu();
         setTitle(titleName);
+        setVisible(true);
         setClientSize(WIDTH, HEIGHT);
 
         // WindowsVideo | DirectXVideo | DirectX3DVideo
@@ -177,7 +178,7 @@ public:
             fc->drawFrame(video);
             video->refresh();
 
-            frameRate();
+            //frameRate();
 
             sl.end();
         }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="debug" />
-	<File name="src\cpu.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="24103" topLine="717" />
+	<ActiveTarget name="Release" />
+	<File name="src\cpu.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="7610" topLine="249" />
 	</File>
 	<File name="src\cpu.h" open="0" top="0" tabpos="6">
-		<Cursor position="2282" topLine="23" />
+		<Cursor position="4196" topLine="91" />
 	</File>
 	<File name="src\debug.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="4925" topLine="162" />
@@ -22,14 +22,14 @@
 	<File name="src\mem.h" open="0" top="0" tabpos="6">
 		<Cursor position="2649" topLine="17" />
 	</File>
-	<File name="src\mmc.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="7030" topLine="234" />
+	<File name="src\mmc.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="4873" topLine="197" />
 	</File>
 	<File name="src\mmc.h" open="1" top="0" tabpos="2">
 		<Cursor position="3672" topLine="78" />
 	</File>
 	<File name="src\nes_sys.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="2870" topLine="62" />
+		<Cursor position="3787" topLine="81" />
 	</File>
 	<File name="src\nes_sys.h" open="0" top="0" tabpos="1">
 		<Cursor position="2587" topLine="32" />
@@ -37,8 +37,8 @@
 	<File name="src\pad.h" open="0" top="0" tabpos="3">
 		<Cursor position="2932" topLine="0" />
 	</File>
-	<File name="src\ppu.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="6261" topLine="149" />
+	<File name="src\ppu.cpp" open="0" top="0" tabpos="6">
+		<Cursor position="6107" topLine="149" />
 	</File>
 	<File name="src\ppu.h" open="0" top="0" tabpos="6">
 		<Cursor position="5294" topLine="0" />
@@ -52,14 +52,14 @@
 	<File name="src\speed.h" open="0" top="0" tabpos="0">
 		<Cursor position="305" topLine="0" />
 	</File>
-	<File name="src\testroms.h" open="1" top="0" tabpos="3">
-		<Cursor position="807" topLine="0" />
+	<File name="src\testroms.h" open="0" top="0" tabpos="3">
+		<Cursor position="505" topLine="0" />
 	</File>
 	<File name="src\type.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1747" topLine="0" />
 	</File>
-	<File name="src\type.h" open="1" top="0" tabpos="4">
-		<Cursor position="4290" topLine="47" />
+	<File name="src\type.h" open="0" top="0" tabpos="4">
+		<Cursor position="2000" topLine="16" />
 	</File>
 	<File name="src\video.h" open="0" top="0" tabpos="2">
 		<Cursor position="1932" topLine="6" />

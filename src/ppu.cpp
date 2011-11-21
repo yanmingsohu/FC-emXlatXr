@@ -171,8 +171,6 @@ inline void PPU::control_2000(byte data) {
     // D6位 PPU 主/从模式, 没有在NES里使用, 双PPU??!!
 #ifdef NMI_DEBUG
     printf("PPU::中断状态 %s\n", sendNMI ? "启用" : "禁止");
-
-__stop_and_debug__=1;
 #endif
 }
 

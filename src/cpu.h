@@ -94,7 +94,6 @@ struct command_parm {
 struct cpu_6502 {
 
 private:
-    byte NMI_idle;               /* NMI空闲则为1                     */
     byte m_showDebug;            /* SHOW_CPU_MEMORY_ADDRESSING,
                                   * SHOW_CPU_OPERATE 启用后,仍需设置 */
 

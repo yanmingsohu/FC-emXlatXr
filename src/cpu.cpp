@@ -46,7 +46,6 @@ CPU_FUNC cpu_command_NOP(command_parm*) {
 /* 跳跃到子过程 */
 CPU_FUNC cpu_command_JSR(command_parm* parm) {
     cpu_6502 *cpu = parm->cpu;
-
     cpu->PC--;
     cpu->push(cpu->PCH);
     cpu->push(cpu->PCL);
@@ -750,7 +749,7 @@ byte cpu_6502::process() {
 }
 
 cpu_6502::cpu_6502(memory* ram)
-        : NMI_idle(1), m_showDebug(0)
+        : m_showDebug(0)
         , NMI(0), IRQ(0), RES(1), ram(ram)
 {
     prev_parm.cpu = this;
@@ -839,14 +838,13 @@ byte cpu_6502::reset() {
         PCH    = ram->read(0xFFFD);
         PCL    = ram->read(0xFFFC);
 
-        NMI_idle = 1;
         return CPU_RESET_CYC;
     }
     return 0;
 }
 
 inline byte cpu_6502::irq() {
-    if (NMI_idle && IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
+    if (IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
 #ifdef NMI_DEBUG
         printf("CPU::IRQ中断\n");
 #endif
@@ -858,14 +856,13 @@ inline byte cpu_6502::irq() {
 }
 
 inline byte cpu_6502::nmi() {
-    if (NMI && NMI_idle) {
-        //NMI = 0;
-        NMI_idle = 0;
-        jump(0xFFFA);
+    if (NMI) {
+        NMI = 0;
 #ifdef NMI_DEBUG
-        printf("CPU::NMI中断\n");
+        printf("CPU::NMI中断 %4X\n", PC);
         printf(debug());
 #endif
+        jump(0xFFFA);
         return CPU_NMI_CYC;
     }
     return 0;
@@ -875,10 +872,8 @@ inline void cpu_6502::rti() {
     FLAGS = pop();
     PCL   = pop();
     PCH   = pop();
-    NMI   = 0;
-    NMI_idle = 1;
 #ifdef NMI_DEBUG
-    printf("CPU::NMI中断返回\n");
+    printf("CPU::NMI中断返回 %4X\n", PC);
 #endif
 }
 

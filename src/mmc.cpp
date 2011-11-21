@@ -156,10 +156,10 @@ public:
         if (off<0xA000) {
             _off = off + _prg_8000_off - 0x8000;
         }
-        if (off<0xC000) {
+        else if (off<0xC000) {
             _off = off + _prg_A000_off - 0xA000;
         }
-        if (off<0xE000) {
+        else if (off<0xE000) {
             _off = off + _prg_C000_off - 0xC000;
         }
         else { /* <0x10000 */
@@ -234,8 +234,6 @@ public:
                 value = value % max_chr_size;
             }
             *modify = value * bankSize;
-        //  printf("ÐÞ¸ÄÓ³Éä A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
-        //         _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
         }   break;
 
         case 0xA000:

@@ -5,15 +5,17 @@
 #define TEST_ROM "rom/NEStress.nes"
 //#define TEST_ROM "rom/Tennis.nes"
 //#define TEST_ROM "rom/dkk.nes"
-//#define TEST_ROM "rom/fighter_f8000.nes"
+#define TEST_ROM "rom/fighter_f8000.nes"
 //#define TEST_ROM "rom/F-1.nes"
 //#define TEST_ROM "rom/Battle City.NES"
 //#define TEST_ROM "rom/super-mario-bros.nes"
 //#define TEST_ROM "rom/3D Block (Unl) [p1].nes"
-#define TEST_ROM "rom/most/魂斗罗.nes"
+//#define TEST_ROM "rom/most/魂斗罗.nes"
 
 //#define TEST_ROM "H:/VROMS/FC_ROMS/霸王的大陆.nes" // mapper19
-//#define TEST_ROM "H:/VROMS/FC_ROMS/吞噬天地2.nes"  // mapper 4
+//#define TEST_ROM "H:/VROMS/FC_ROMS/吞噬天地2.nes"  // mapper 4 only prom
+//#define TEST_ROM "H:/VROMS/FC_ROMS/快打旋风.nes"   // mapper 4
+
 //#define TEST_ROM "H:/VROMS/FC_ROMS/吞噬天地1.nes"  // mapper 1
 //#define TEST_ROM "H:/VROMS/FC_ROMS/魂斗罗.nes"     // mapper23
 //#define TEST_ROM "H:/VROMS/FC_ROMS/俄罗斯.nes"     // mapper 3

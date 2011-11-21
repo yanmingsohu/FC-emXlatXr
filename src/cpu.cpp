@@ -74,9 +74,6 @@ CPU_FUNC cpu_command_BRK(command_parm* parm) {
 /* 从中断过程中返回 */
 CPU_FUNC cpu_command_RTI(command_parm* parm) {
     parm->cpu->rti();
-#ifdef NMI_DEBUG
-    printf("CPU::中断返回\n");
-#endif
 }
 
 /* value & x == true, 则设置'进位'位 */
@@ -850,6 +847,9 @@ byte cpu_6502::reset() {
 
 inline byte cpu_6502::irq() {
     if (NMI_idle && IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
+#ifdef NMI_DEBUG
+        printf("CPU::IRQ中断\n");
+#endif
         IRQ = 0;
         jump(0xFFFE);
         return CPU_INTERRUPT_CYC;
@@ -877,6 +877,9 @@ inline void cpu_6502::rti() {
     PCH   = pop();
     NMI   = 0;
     NMI_idle = 1;
+#ifdef NMI_DEBUG
+    printf("CPU::NMI中断返回\n");
+#endif
 }
 
 inline void cpu_6502::jump(word addr) {

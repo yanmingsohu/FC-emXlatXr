@@ -125,12 +125,10 @@ private:
     uint max_prg_size;
     uint max_chr_size;
 
-    uint _prg_page_off;  /* 如果isC000fix==true,则映射   */
-                         /* 到8000 ~ 9FFF否则C000 ~ DFFF */
-    uint _prg_A000_off;  /* A000 ~ BFFF                  */
-    uint _prg_fixp_off;  /* 倒数第二固定映射页面         */
+    uint _prg_8000_off;
+    uint _prg_A000_off;
+    uint _prg_C000_off;
     uint _prg_E000_off;  /* E000 ~ FFFF 固定最后一个页面 */
-    bool isC000fix;      /* 如果0xC000地址为固定==true   */
 
     uint *modify;
     uint bankSize;           /* 每次切换页面的大小,1K|8K */
@@ -140,15 +138,12 @@ private:
     byte ex_vram[vramSize];  /* 卡带提供显存             */
 
     bool enableIrq;
-    uint irqLatch;
-    uint irqConter;
+    byte irqLatch;
+    byte irqConter;
 
     /* 0:[0000 ~ 07FF]  1:[0800 ~ 0FFF]  2:[1000 ~ 13FF] *
      * 3:[1400 ~ 17FF]  4:[1800 ~ 1BFF]  5:[1C00 ~ 1FFF] */
     uint _vrom_off[6];
-    /* 0:[0000 ~ 03FF]  1:[0400 ~ 07FF]  2:[0800 ~ 0BFF] *
-     * 3:[0C00 ~ 0FFF]  4:[1000 ~ 17FF]  5:[1800 ~ 1FFF] */
-    uint _vrom_xoff[6];
 
 
     uint prg_bank2page(uint prgBank) {
@@ -159,22 +154,15 @@ public:
     byte r_prom(word off) {
         uint _off;
         if (off<0xA000) {
-            if (!isC000fix) {
-                _off = off + _prg_fixp_off - 0x8000;
-            } else {
-                _off = off + _prg_page_off - 0x8000;
-            }
+            _off = off + _prg_8000_off - 0x8000;
         }
         if (off<0xC000) {
             _off = off + _prg_A000_off - 0xA000;
         }
         if (off<0xE000) {
-            if (isC000fix) {
-                _off = off + _prg_fixp_off - 0xC000;
-            } else {
-                _off = off + _prg_page_off - 0xC000;
-            }
-        } else { /* <0x10000 */
+            _off = off + _prg_C000_off - 0xC000;
+        }
+        else { /* <0x10000 */
             _off = off + _prg_E000_off - 0xE000;
         }
         return rom->rom[_off];
@@ -187,30 +175,19 @@ public:
 
         uint _off;
 
+        if (chr_xor) {
+            off ^= 0x1000;
+        }
+#define _DO(i,b)            _off = off + _vrom_off[i] - b
 #define IF_DO(a,i,b)        if (off<a) _DO(i,b)
 #define ELSE_IF_DO(a,i,b)   else IF_DO(a,i,b)
 #define ELSE_DO(i,b)        else _DO(i,b)
-
-        if (chr_xor) {
-#define _DO(i,b) _off = off + _vrom_xoff[i] - b
-                 IF_DO(0x0400, 0,      0);
-            ELSE_IF_DO(0x0800, 1, 0x0400);
-            ELSE_IF_DO(0x0C00, 2, 0x0800);
-            ELSE_IF_DO(0x1000, 3, 0x0C00);
-            ELSE_IF_DO(0x1800, 4, 0x1000);
-               ELSE_DO(        5, 0x1800);
-        }
-        else {
-#undef  _DO(i,b)
-#define _DO(i,b) _off = off + _vrom_off[i] - b
-                 IF_DO(0x0800, 0,      0);
-            ELSE_IF_DO(0x1000, 1, 0x0800);
-            ELSE_IF_DO(0x1400, 2, 0x1000);
-            ELSE_IF_DO(0x1800, 3, 0x1400);
-            ELSE_IF_DO(0x1C00, 4, 0x1800);
-               ELSE_DO(        5, 0x1C00);
-        }
-
+             IF_DO(0x0400, 0,      0);
+        ELSE_IF_DO(0x0800, 1, 0x0400);
+        ELSE_IF_DO(0x0C00, 2, 0x0800);
+        ELSE_IF_DO(0x1000, 3, 0x0C00);
+        ELSE_IF_DO(0x1800, 4, 0x1000);
+           ELSE_DO(        5, 0x1800);
 #undef IF_DO
 #undef _DO
 #undef ELSE_DO
@@ -218,69 +195,82 @@ public:
         return rom->vrom[_off];
     }
 
-    void w_vrom(word off, byte value) {
-        ex_vram[off] = value;
-    }
-
     void sw_page(word off, byte value) {
-        if (off==0x8000) {
-            chr_xor   = value & (1<<7);
-            isC000fix = !(value & (1<<6));
-            byte low  = value & 0x7;
+        PRINT("sw page: %4X %2X\n", off, value);
+        /* 过滤off,使之支持镜像端口 */
+        switch (off & 0xE001) {
 
-            if (low<6) {
+        case 0x8000: {
+            byte comm = value & 0x7;
+
+            if (comm < 0x06) {
+                chr_xor  = value & (1<<7);
                 bankSize = ppuBankSize;
-                modify   = chr_xor
-                         ? &_vrom_xoff[low]
-                         : &_vrom_off[low];
+                modify   = _vrom_off + comm;
             }
-            else if (low==6) {
+            else { /* comm >= 6 */
                 bankSize = prgBankSize;
-                modify   = &_prg_page_off;
-            }
-            else if (low==7) {
-                bankSize = prgBankSize;
-                modify   = &_prg_A000_off;
-            }
-        }
 
-        else if (off==0x8001) {
+                if (comm & 0x01) { /* comm==7 */
+                    modify = &_prg_A000_off;
+                } else {
+                    if (value & (1<<6)) { /* value is 0x46 */
+                        _prg_8000_off = prg_bank2page(max_prg_size - 2);
+                        modify = &_prg_C000_off;
+                    } else { /* value is 0x06 */
+                        _prg_E000_off = prg_bank2page(max_prg_size - 2);
+                        modify = &_prg_8000_off;
+                    }
+                }
+            }
+        }   break;
+
+        case 0x8001: {
             if (bankSize==prgBankSize) {
-                value = (value &    3) % max_prg_size;
+                if (!max_prg_size) break;
+                value = value % max_prg_size;
             } else {
-                value = (value & 0x3f) % max_chr_size;
+                if (!max_chr_size) break;
+                value = value % max_chr_size;
             }
-
             *modify = value * bankSize;
-
         //  printf("修改映射 A000:%6X E000:%6X FIX:%6X DYN:%6X C0fix:%d\n",
-          //       _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
-        }
+        //         _prg_A000_off, _prg_E000_off, _prg_fixp_off, _prg_page_off, isC000fix);
+        }   break;
 
-        else if (off==0xA000) {
+        case 0xA000:
             ppu->switchMirror(value & 1);
-        }
+            break;
 
-        else if (off==0xC000) {
+        case 0xA001:
+        /*  D7 ：用来控制SRAM的使能， 0 禁止使用SRAM（Disable）；1 可以使用SRAM（Enable）
+            D6 ：用来控制SRAM的写保护 0 SRAM可写；1 SRAM只读 */
+            break;
+
+        case 0xC000:
             irqLatch = value;
-        }
-        else if (off==0xC001) {
+            break;
+
+        case 0xC001:
             irqConter = 0;
-        }
-        else if (off==0xE000) {
+            break;
+
+        case 0xE000:
             enableIrq = false;
-        }
-        else if (off==0xE001) {
+            break;
+
+        case 0xE001:
             enableIrq = true;
+            break;
         }
     }
 
     void draw_line() {
-        if (enableIrq) {
-            if (!irqConter) {
-                irqConter = irqLatch;
-            }
-            else if (--irqConter==0) {
+        if (!irqConter) {
+            irqConter = irqLatch;
+        } else {
+            --irqConter;
+            if ((!irqConter) && enableIrq) {
                 *IRQ = 1;
             }
         }
@@ -290,16 +280,20 @@ public:
         max_prg_size = MMC_PRG_SIZE * 2;
         max_chr_size = MMC_PPU_SIZE * 8;
 
-        _prg_page_off = prg_bank2page(0);
+        _prg_8000_off = prg_bank2page(0);
         _prg_A000_off = prg_bank2page(1);
-        _prg_fixp_off = prg_bank2page(max_prg_size - 2);
+        _prg_C000_off = prg_bank2page(max_prg_size - 2);
         _prg_E000_off = prg_bank2page(max_prg_size - 1);
 
-        isC000fix = true;
         chr_xor   = false;
         isVRAM    = MMC_PPU_SIZE==0;
+        memset(ex_vram,   0, sizeof(ex_vram)  );
+        memset(_vrom_off, 0, sizeof(_vrom_off));
+    }
 
-        memset(ex_vram, 0, sizeof(ex_vram));
+    void w_vrom(word off, byte value) {
+        //printf("write vrom %4X %2X\n", off, value);
+        ex_vram[off] = value;
     }
 
     uint capability() {
@@ -315,11 +309,7 @@ public:
 class Mapper_19 : public MapperImpl {
 public:
     byte r_prom(word off) {
-        if (off<0xC000) {
-            return off;
-        } else {
-            return off + ( MMC_PRG_SIZE-1 ) * 16 * 1024;
-        }
+        return 0;
     }
 };
 
@@ -440,7 +430,7 @@ static MapperImpl* createMapper(int mapper_id) {
         MMC_MAP(  0);
         MMC_MAP(  2);
         MMC_MAP(  3);
-    //  MMC_MAP(  4);
+        MMC_MAP(  4);
     //  MMC_MAP( 19);
         MMC_MAP( 23);
     }

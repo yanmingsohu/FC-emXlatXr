@@ -169,6 +169,11 @@ inline void PPU::control_2000(byte data) {
     spriteType  = _BIT(5) ? t8x16  : t8x8;
     sendNMI     = _BIT(7) ? 1      : 0;
     // D6位 PPU 主/从模式, 没有在NES里使用, 双PPU??!!
+#ifdef NMI_DEBUG
+    printf("PPU::中断状态 %s\n", sendNMI ? "启用" : "禁止");
+
+__stop_and_debug__=1;
+#endif
 }
 
 inline void PPU::control_2001(byte data) {

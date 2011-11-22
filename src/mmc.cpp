@@ -168,20 +168,20 @@ public:
         if (chr_xor) {
             off ^= 0x1000;
         }
-#define _IF(y, i)  if (off>=0x##y) _off = off + _vrom_off[i] - 0x##y;
-        _IF(1C00, 5);
-        _IF(1800, 4);
-        _IF(1400, 3);
-        _IF(1000, 2);
-        _IF(0800, 1);
-        _IF(0000, 0);
+#define _IF(y, i)  if (off>=0x##y) _off = off + _vrom_off[i] - 0x##y
+             _IF(1C00, 5);
+        else _IF(1800, 4);
+        else _IF(1400, 3);
+        else _IF(1000, 2);
+        else _IF(0800, 1);
+        else _IF(0000, 0);
 #undef _IF
         if (isVRAM)  return ex_vram[_off];
         else         return rom->vrom[_off];
     }
 
     void sw_page(word off, byte value) {
-        PRINT("sw page: %4X %2X\n", off, value);
+        //PRINT("sw page: %4X %2X\n", off, value);
         /* 过滤off,使之支持镜像端口 */
         switch (off & 0xE001) {
 
@@ -220,7 +220,7 @@ public:
             break;
 
         case 0xA000:
-            ppu->switchMirror(value & 1);
+            ppu->switchMirror(~value & 1);
             break;
 
         case 0xA001:

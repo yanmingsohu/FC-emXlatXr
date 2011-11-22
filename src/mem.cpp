@@ -70,8 +70,11 @@ void memory::write(const word offset, const byte data) {
         //printf("[%4X=%2X]\t", offset, data);
         return;
     }
-    if (offset==0x4016 || offset==0x4017) {
+    if (offset==0x4016) {
         pad->writePort(offset, data);
+        return;
+    }
+    if (offset==0x4017) {   /* pApu */
         return;
     }
     if (offset>=0x6000 && offset<0x8000) {

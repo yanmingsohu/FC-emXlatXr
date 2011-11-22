@@ -21,11 +21,11 @@
 #define TYPE_H_INCLUDED
 
 #define SF_NAME_JYM      "FC 模拟器 DEmo. -=CatfoOD=- "
-#define SF_VERSION_JYM   "v0.02"
+#define SF_VERSION_JYM   "v0.03"
 
 /*-------------------------------------------| 定义DEBUG消息 |----*/
 /* 显示NMI调用与返回的消息                                        */
-//#define NMI_DEBUG
+#define NMI_DEBUG
 /* 可以显示CPU命令的相关代码                                      */
 //#define SHOW_CPU_OPERATE
 /* 访问无效内存时提出警告                                         */

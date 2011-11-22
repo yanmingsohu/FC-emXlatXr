@@ -100,12 +100,11 @@ void NesSystem::drawFrame(Video* video) {
 
     ptr->drawSprite(PPU::bpFront);
 
-    if (every_f) {
+    if (every_f = !every_f && ppu->enableBG()) {
         cpu_run(END_CYC_EVERY);
     } else {
         cpu_run(END_CYC);
     }
-    every_f = !every_f;
 
     /* 到此为止算是一帧结束 */
     ptr->sendingNMI();

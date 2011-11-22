@@ -65,9 +65,11 @@ CPU_FUNC cpu_command_RTS(command_parm* parm) {
 
 /* 中断 */
 CPU_FUNC cpu_command_BRK(command_parm* parm) {
+    //if (~parm->cpu->FLAGS & CPU_FLAGS_INTERDICT) {
     parm->cpu->PC++;
     SET_FLAGS(CPU_FLAGS_BREAK);
     parm->cpu->jump(0xFFFE);
+    //}
 }
 
 /* 从中断过程中返回 */
@@ -548,11 +550,17 @@ CPU_FUNC cpu_command_TXS(command_parm* parm) {
 /* 设置为禁止中断 */
 CPU_FUNC cpu_command_SEI(command_parm* parm) {
     SET_FLAGS(CPU_FLAGS_INTERDICT);
+#ifdef NMI_DEBUG
+    printf("CPU::set INTERDICT\n");
+#endif
 }
 
 /* 清除禁止中断位 */
 CPU_FUNC cpu_command_CLI(command_parm* parm) {
     CLE_FLAGS(CPU_FLAGS_INTERDICT);
+#ifdef NMI_DEBUG
+    printf("CPU::clear INTERDICT\n");
+#endif
 }
 
 /* 设置为十进制(BCD)算术运算 */
@@ -847,6 +855,7 @@ inline byte cpu_6502::irq() {
     if (IRQ && (~FLAGS & CPU_FLAGS_INTERDICT)) {
 #ifdef NMI_DEBUG
         printf("CPU::IRQ中断\n");
+        printf(debug());
 #endif
         IRQ = 0;
         jump(0xFFFE);

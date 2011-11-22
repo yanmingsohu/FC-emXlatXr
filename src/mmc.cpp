@@ -153,46 +153,31 @@ private:
 public:
     byte r_prom(word off) {
         uint _off;
-        if (off<0xA000) {
-            _off = off + _prg_8000_off - 0x8000;
-        }
-        else if (off<0xC000) {
-            _off = off + _prg_A000_off - 0xA000;
-        }
-        else if (off<0xE000) {
-            _off = off + _prg_C000_off - 0xC000;
-        }
-        else { /* <0x10000 */
-            _off = off + _prg_E000_off - 0xE000;
-        }
+#define _IF(y)  if (off>=0x##y) _off = off + _prg_##y##_off - 0x##y
+             _IF(E000);
+        else _IF(C000);
+        else _IF(A000);
+        else _IF(8000);
+#undef _IF
         return rom->rom[_off];
     }
 
     byte r_vrom(word off) {
-        if (isVRAM) {
-            return ex_vram[off];
-        }
-
         uint _off;
 
         if (chr_xor) {
             off ^= 0x1000;
         }
-#define _DO(i,b)            _off = off + _vrom_off[i] - b
-#define IF_DO(a,i,b)        if (off<a) _DO(i,b)
-#define ELSE_IF_DO(a,i,b)   else IF_DO(a,i,b)
-#define ELSE_DO(i,b)        else _DO(i,b)
-             IF_DO(0x0400, 0,      0);
-        ELSE_IF_DO(0x0800, 1, 0x0400);
-        ELSE_IF_DO(0x0C00, 2, 0x0800);
-        ELSE_IF_DO(0x1000, 3, 0x0C00);
-        ELSE_IF_DO(0x1800, 4, 0x1000);
-           ELSE_DO(        5, 0x1800);
-#undef IF_DO
-#undef _DO
-#undef ELSE_DO
-#undef ELSE_IF_DO
-        return rom->vrom[_off];
+#define _IF(y, i)  if (off>=0x##y) _off = off + _vrom_off[i] - 0x##y;
+        _IF(1C00, 5);
+        _IF(1800, 4);
+        _IF(1400, 3);
+        _IF(1000, 2);
+        _IF(0800, 1);
+        _IF(0000, 0);
+#undef _IF
+        if (isVRAM)  return ex_vram[_off];
+        else         return rom->vrom[_off];
     }
 
     void sw_page(word off, byte value) {
@@ -204,37 +189,35 @@ public:
             byte comm = value & 0x7;
 
             if (comm < 0x06) {
-                chr_xor  = value & (1<<7);
                 bankSize = ppuBankSize;
+                chr_xor  = value & (1<<7);
                 modify   = _vrom_off + comm;
             }
-            else { /* comm >= 6 */
+            else {                          /* comm >= 6 */
                 bankSize = prgBankSize;
 
-                if (comm & 0x01) { /* comm==7 */
+                if (comm & 0x01) {          /* comm==7 */
                     modify = &_prg_A000_off;
-                } else {
-                    if (value & (1<<6)) { /* value is 0x46 */
-                        _prg_8000_off = prg_bank2page(max_prg_size - 2);
-                        modify = &_prg_C000_off;
-                    } else { /* value is 0x06 */
-                        _prg_E000_off = prg_bank2page(max_prg_size - 2);
-                        modify = &_prg_8000_off;
-                    }
+                }
+                else if (value & (1<<6)) {  /* comm==6 and value==0x46 */
+                    _prg_8000_off = prg_bank2page(max_prg_size - 2);
+                    modify = &_prg_C000_off;
+                }
+                else {                      /* comm==6 and value==0x06 */
+                    _prg_C000_off = prg_bank2page(max_prg_size - 2);
+                    modify = &_prg_8000_off;
                 }
             }
         }   break;
 
-        case 0x8001: {
+        case 0x8001:
             if (bankSize==prgBankSize) {
-                if (!max_prg_size) break;
                 value = value % max_prg_size;
             } else {
-                if (!max_chr_size) break;
                 value = value % max_chr_size;
             }
             *modify = value * bankSize;
-        }   break;
+            break;
 
         case 0xA000:
             ppu->switchMirror(value & 1);
@@ -270,6 +253,7 @@ public:
             --irqConter;
             if ((!irqConter) && enableIrq) {
                 *IRQ = 1;
+                //PRINT("mmc send IRQ %d\n", irqLatch);
             }
         }
     }
@@ -278,13 +262,17 @@ public:
         max_prg_size = MMC_PRG_SIZE * 2;
         max_chr_size = MMC_PPU_SIZE * 8;
 
+        if (!max_chr_size) {
+            isVRAM = true;
+            max_chr_size = 8;
+        }
+
         _prg_8000_off = prg_bank2page(0);
         _prg_A000_off = prg_bank2page(1);
         _prg_C000_off = prg_bank2page(max_prg_size - 2);
         _prg_E000_off = prg_bank2page(max_prg_size - 1);
 
-        chr_xor   = false;
-        isVRAM    = MMC_PPU_SIZE==0;
+        chr_xor = false;
         memset(ex_vram,   0, sizeof(ex_vram)  );
         memset(_vrom_off, 0, sizeof(_vrom_off));
     }

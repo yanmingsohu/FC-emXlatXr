@@ -602,6 +602,10 @@ inline void PPU::_setTmpaddr(word mask, word d) {
     tmp_addr = (tmp_addr & (~mask)) | d;
 }
 
+bool PPU::enableBG() {
+    return bkAllDisp;
+}
+
 // »æÖÆÆ÷²¿·Ö ------------------------------------------- // --PPU::Painter-- //
 
 PPU::Painter::Painter(PPU *parent) : _p(parent) {

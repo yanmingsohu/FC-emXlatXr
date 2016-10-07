@@ -1,0 +1,128 @@
+NES汇编相关的开发教程，废话我就不翻译了，挑重点翻
+
+第一步：获取编译器
+编译器可以使用NESASM，不过这篇文章使用的是CA65，它是CC65开发套装中的汇编器，源代码可以从附件中获取，编译方法如下(不想编译也可以直接从附件中下载编译后的ca65.exe和ld65.exe)
+如果在windows下编译，先安装cygwin(相关教程请google)，开一个cygwin控制台窗口，然后做以下2步
+1.编译common库
+进入src目录下的common目录，然后输入下面命令
+make -f make/gcc.mak lib
+完成后会在common目录下产生common.a库文件
+2.编译ca65
+进入src目录下的ca65目录，然后输入下面命令
+make -f make/gcc.mak all
+完成后会在ca65目录下产生ca65.exe文件。
+3.编译ld65
+进入src目录下的ld65目录，然后输入下面命令
+make -f make/gcc.mak all
+完成后会在ld65目录下产生ld65.exe文件。
+
+ca65是汇编器，ld65是链接器，之后写好nes的6502汇编，要编译成rom就要靠这两个程序。
+
+第二步：编写一个简单的程序：
+有了汇编器，接下来就是试着编译一个小程序
+; Displays a message on the screen. Demonstrates how to set up PPU
+; and nametable
+
+.segment "HEADER"
+ .byte "NES", 26, 2, 1 
+; CHR ROM data
+.segment "CHARS"
+
+.segment "VECTORS"
+ .word 0, 0, 0, nmi, reset, irq 
+
+.segment "STARTUP"
+
+.segment "CODE" 
+
+; ===============================================
+; NES Registers
+; ===============================================
+PPUCTRL = $2000 ; 这两个寄存器用来控制PPU的各种行为
+PPUMASK = $2001
+PPUSTATUS = $2002 ; 用来读取PPU当前状态
+PPUSCROLL = $2005 ; 设置背景卷轴的X/Y坐标
+PPUADDR = $2006 ; 设置PPU中的VRAM地址
+PPUDATA = $2007 ; 往当前VRAM地址中写入数据
+
+; ===============================================
+; 程序入口 - 开机或Reset的时候会跳到这里
+; ===============================================
+reset:
+ ; 初始化NES硬件
+ ldx #$FF ; 重置栈顶指针到$FF (255)
+ txs
+ sei ; 禁用IRQ中断
+ lda #0
+ sta PPUCTRL ; 关闭NMI(将PPUCTRL置零)
+ sta PPUMASK ; 关闭PPU渲染(将PPUMASK置零)
+ 
+ ; 等待PPU预热（一共等待2次，第一次VBlank发生当作预热完成，第二次才正式当作VBlank）
+ @wait1: bit PPUSTATUS ; 循环等待PPUSTATUS最高位置位(位的高低从右到左是从低到高，最高位即最左端D7，一旦置位，表示VBlank发生)
+ bpl @wait1
+ ; 读取PPUSTATUS也会清除最高位
+ ; 所以到这里D7位已经清0了
+ @wait2: bit PPUSTATUS ; 再次等待PPUSTATUS的D7置位
+ bpl @wait2
+ 
+ ; 设置头四个调色板
+ lda #$3F ; 设置PPU地址为调色板RAM（$3F00）
+ sta PPUADDR
+ lda #0
+ sta PPUADDR
+ lda #$51 ; 设置背景色为黑色
+ sta PPUDATA
+ lda #$FF ; 设置3个前景色为白色
+ sta PPUDATA
+ sta PPUDATA
+ sta PPUDATA
+ 
+ ; 显示前等待VBlank
+ bit PPUSTATUS
+ @wait3: bit PPUSTATUS
+ bpl @wait3
+ 
+ ; 启用背景显示
+ lda #%00001000 ; 启用背景
+ sta PPUMASK
+ lda #0 ; 滚动背景到最左上角(即$2000处的nametable)
+ sta PPUCTRL
+ sta PPUSCROLL
+ sta PPUSCROLL
+ 
+ ; 不断循环(什么都不做，保持当前PPU状态，不断显示蓝色背景)
+ forever:
+ jmp forever
+  
+
+; ===============================================
+; 中断处理
+; ===============================================
+irq:
+ rti
+nmi:
+ rti
+将这段代码另存为myprogram.asm，注意用ansi编码不要用unicode或utf-8
+然后在cygwin控制台输入以下命令(假设ca65.exe和ld65.exe在当前目录)：
+./ca65.exe myprogram.asm
+执行完毕后生成myprogram.o的object文件，然后再输入以下命令：
+./ld65.exe -t nes -o myprogram.nes myprogram.o
+其中的参数-t表示target system，后面跟nes表示我们要生成目标文件要运行在nes平台上，这样ld65会自动生成ines头，方便模拟器直接运行
+执行完毕，就会生成myprogram.nes
+
+第三步：运行我们编译的程序：
+这个应该不用指导了，找个模拟器，打开刚才生成的myprogram.nes就可以了。
+如果正确运行的话，应该可以看到一个纯天蓝的背景，其他的什么都没有。  
+
+第四步：分析我们的程序：
+首先解析一下ROM的结构，每个ROM都有一个描述头段(Header)，用来描述一些ROM的信息给模拟器（所以实际的dump出来的ROM没有这个iNES头）。这个头总是由NES三个字母开头，并跟一个16进制数0x1A，即换行符。接下去两个字节用来描述有多少个PRG-ROM块和CHR-ROM块，简单的理解就是程序块和图形块。接下去的是CHAR段，用来存放角色的图形数据。之后是向量(VECTORS)段，可以定义特定中端发生时程序该跳转到哪里，在myprogram里我们定义了3个向量(nmi,reset,irq)，实际只使用到了reset，用它了指明程序入口。
+
+接着，我们给予6个NES的寄存器映射地址名称（实际上NES一共有8个这样的寄存器映射地址），以便方便地访问这些寄存器来控制PPU(图形处理芯片)
+
+最后，是实际的程序。首先我们初始化NES硬件。我们重置了栈顶指针，关闭了两个中断和PPU渲染，等待PPU预热。然后初始化调色板，等待VBlank中断，进行描画。
+
+基本流程就是这样了，自己体会吧。
+
+ cc65sources2.12.0.tar.bz2.rar(cc65源代码)
+ 编译好的ca65和ld65
+ myprogram的源代码和最终生成的rom文件

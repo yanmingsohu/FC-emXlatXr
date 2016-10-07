@@ -1,88 +1,124 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="src\cpu.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="23916" topLine="834" />
+	<File name="src\mmc.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="669" topLine="140" />
+		</Cursor>
 	</File>
-	<File name="src\cpu.h" open="1" top="0" tabpos="4">
-		<Cursor position="6090" topLine="82" />
+	<File name="src\mmc.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1718" topLine="87" />
+		</Cursor>
 	</File>
-	<File name="src\debug.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="5457" topLine="3" />
+	<File name="src\nes_sys.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1268" topLine="53" />
+		</Cursor>
 	</File>
-	<File name="src\debug.h" open="0" top="0" tabpos="0">
-		<Cursor position="1876" topLine="0" />
+	<File name="src\main.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\main.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="1910" topLine="4" />
+	<File name="src\nes_sys.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\mem.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="1548" topLine="17" />
+	<File name="src\mem.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\mem.h" open="0" top="0" tabpos="6">
-		<Cursor position="2649" topLine="17" />
+	<File name="src\pad.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\mmc.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="4136" topLine="154" />
+	<File name="src\mem.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\mmc.h" open="1" top="0" tabpos="2">
-		<Cursor position="3672" topLine="30" />
+	<File name="src\ppu.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="14978" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\nes_sys.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="3494" topLine="68" />
+	<File name="src\cpu.cpp" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2613" topLine="118" />
+		</Cursor>
 	</File>
-	<File name="src\nes_sys.h" open="0" top="0" tabpos="1">
-		<Cursor position="2587" topLine="32" />
+	<File name="src\ppu.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\pad.h" open="0" top="0" tabpos="3">
-		<Cursor position="2932" topLine="0" />
+	<File name="src\cpu.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4730" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\ppu.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="5574" topLine="323" />
+	<File name="src\rom.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="372" topLine="85" />
+		</Cursor>
 	</File>
-	<File name="src\ppu.h" open="0" top="0" tabpos="6">
-		<Cursor position="6832" topLine="120" />
+	<File name="src\debug.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5096" topLine="174" />
+		</Cursor>
 	</File>
-	<File name="src\rom.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="580" topLine="0" />
+	<File name="src\rom.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\rom.h" open="0" top="0" tabpos="6">
-		<Cursor position="741" topLine="6" />
+	<File name="src\testroms.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="504" topLine="4" />
+		</Cursor>
 	</File>
-	<File name="src\speed.h" open="0" top="0" tabpos="0">
-		<Cursor position="305" topLine="0" />
+	<File name="src\type.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="31" />
+		</Cursor>
 	</File>
-	<File name="src\testroms.h" open="1" top="1" tabpos="5">
-		<Cursor position="97" topLine="0" />
+	<File name="src\video.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\type.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="1747" topLine="0" />
+	<File name="src\win\d3dvideo.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="24" topLine="15" />
+		</Cursor>
 	</File>
-	<File name="src\type.h" open="1" top="0" tabpos="7">
-		<Cursor position="1780" topLine="3" />
+	<File name="src\win\main_window.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\video.h" open="0" top="0" tabpos="2">
-		<Cursor position="1932" topLine="6" />
+	<File name="src\win\winsys.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\win\d3dvideo.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="3289" topLine="103" />
+	<File name="src\win\winsys.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\win\d3dvideo.h" open="0" top="0" tabpos="0">
-		<Cursor position="2122" topLine="40" />
+	<File name="src\win\wit.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
-	<File name="src\win\main_window.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="4389" topLine="149" />
-	</File>
-	<File name="src\win\winsys.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="4662" topLine="0" />
-	</File>
-	<File name="src\win\winsys.h" open="0" top="0" tabpos="2">
-		<Cursor position="2039" topLine="18" />
-	</File>
-	<File name="src\win\wit.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="6492" topLine="226" />
-	</File>
-	<File name="src\win\wit.h" open="0" top="0" tabpos="4">
-		<Cursor position="2961" topLine="78" />
+	<File name="src\win\wit.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

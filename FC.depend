@@ -1,43 +1,43 @@
 # depslib dependency file v1.0
-1321967568 source:e:\c-project\fc\src\cpu.cpp
+1374275415 source:e:\c-project\fc\src\cpu.cpp
 	"mem.h"
 	"cpu.h"
 	"stdio.h"
 	"stdlib.h"
 
-1316167831 e:\c-project\fc\src\mem.h
+1374275415 e:\c-project\fc\src\mem.h
 	"type.h"
 	"rom.h"
 	"mmc.h"
 	"ppu.h"
 	"pad.h"
 
-1321970096 e:\c-project\fc\src\type.h
+1374275415 e:\c-project\fc\src\type.h
 
-1315994112 e:\c-project\fc\src\rom.h
+1374275415 e:\c-project\fc\src\rom.h
 	"type.h"
 	"string"
 
-1321267003 e:\c-project\fc\src\mmc.h
+1374275415 e:\c-project\fc\src\mmc.h
 	"rom.h"
 	<stdio.h>
 
-1321967568 e:\c-project\fc\src\ppu.h
+1374275415 e:\c-project\fc\src\ppu.h
 	"mmc.h"
 	"video.h"
 
-1321438387 e:\c-project\fc\src\video.h
+1374275415 e:\c-project\fc\src\video.h
 	"type.h"
 
-1321267003 e:\c-project\fc\src\pad.h
+1374275415 e:\c-project\fc\src\pad.h
 	<memory.h>
 
-1321881467 e:\c-project\fc\src\cpu.h
+1374275415 e:\c-project\fc\src\cpu.h
 	"type.h"
 	"mem.h"
 	"ppu.h"
 
-1321658125 source:e:\c-project\fc\src\main.cpp
+1374275415 source:e:\c-project\fc\src\main.cpp
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -45,44 +45,44 @@
 	<windows.h>
 	"win/winsys.h"
 
-1321967568 source:e:\c-project\fc\src\mem.cpp
+1374275415 source:e:\c-project\fc\src\mem.cpp
 	"mem.h"
 	"string.h"
 	<stdio.h>
 	<memory.h>
 
-1321971221 source:e:\c-project\fc\src\mmc.cpp
+1374275415 source:e:\c-project\fc\src\mmc.cpp
 	"mmc.h"
 	"type.h"
 	"ppu.h"
 	<stdio.h>
 	<memory.h>
 
-1321967568 source:e:\c-project\fc\src\nes_sys.cpp
+1374275415 source:e:\c-project\fc\src\nes_sys.cpp
 	"nes_sys.h"
 	"debug.h"
 	<stdio.h>
 
-1321666364 e:\c-project\fc\src\nes_sys.h
+1374275415 e:\c-project\fc\src\nes_sys.h
 	"cpu.h"
 	"mem.h"
 	"rom.h"
 	"video.h"
 	"pad.h"
 
-1315994112 e:\c-project\fc\src\debug.h
+1374275415 e:\c-project\fc\src\debug.h
 
-1321969602 source:e:\c-project\fc\src\ppu.cpp
+1374275415 source:e:\c-project\fc\src\ppu.cpp
 	"ppu.h"
 	<stdio.h>
 	<string.h>
 
-1321267003 source:e:\c-project\fc\src\rom.cpp
+1374275415 source:e:\c-project\fc\src\rom.cpp
 	"rom.h"
 	<stdio.h>
 	<stdlib.h>
 
-1321611189 source:e:\c-project\fc\src\type.cpp
+1374275415 source:e:\c-project\fc\src\type.cpp
 	<stdio.h>
 	<stdarg.h>
 	"type.h"
@@ -105,13 +105,13 @@
 	"ddraw.h"
 	"pad.h"
 
-1313667364 e:\c-project\fc\dx81sdk\ddraw.h
+1374275415 e:\c-project\fc\dx81sdk\ddraw.h
 	<objbase.h>
 
 1314701755 source:e:\c-project\fc\src\winsys.cpp
 	"winsys.h"
 
-1321767281 source:e:\c-project\fc\src\debug.cpp
+1374275415 source:e:\c-project\fc\src\debug.cpp
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -270,13 +270,13 @@
 	"../ppu.h"
 	"d3dvideo.h"
 
-1321526089 e:\c-project\fc\src\win\winsys.h
+1374275415 e:\c-project\fc\src\win\winsys.h
 	<windows.h>
 	<stdio.h>
 	"../nes_sys.h"
 	"ddraw.h"
 
-1321758338 source:e:\c-project\fc\src\win\main_window.cpp
+1374275415 source:e:\c-project\fc\src\win\main_window.cpp
 	<windows.h>
 	<stdio.h>
 	<time.h>
@@ -288,7 +288,7 @@
 	"../speed.h"
 	"wit.h"
 
-1321657874 source:e:\c-project\fc\src\win\winsys.cpp
+1374275415 source:e:\c-project\fc\src\win\winsys.cpp
 	"winsys.h"
 
 1321357778 source:e:\c-project\fc\src\win\bgpanel.cpp
@@ -446,18 +446,18 @@
 
 1321934416 f:\c-project\fc\src\testroms.h
 
-1321972572 e:\c-project\fc\src\testroms.h
+1374275415 e:\c-project\fc\src\testroms.h
 
 1234010226 e:\c-project\d3d\dx9sdk\include\ddraw.h
 	<objbase.h>
 
-1321438387 source:e:\c-project\fc\src\win\d3dvideo.cpp
+1374275415 source:e:\c-project\fc\src\win\d3dvideo.cpp
 	"d3dvideo.h"
 	<d3dx9.h>
 	<d3dx9math.h>
 	<stdio.h>
 
-1321438387 e:\c-project\fc\src\win\d3dvideo.h
+1374275415 e:\c-project\fc\src\win\d3dvideo.h
 	"../video.h"
 	<windows.h>
 	<d3d9.h>
@@ -713,14 +713,72 @@
 
 1234010226 e:\c-project\dx9sdk\include\d3dx9anim.h
 
-1321612639 source:e:\c-project\fc\src\win\wit.cpp
+1374275415 source:e:\c-project\fc\src\win\wit.cpp
 	"wit.h"
 	<map>
 	<stdio.h>
 
-1321612147 e:\c-project\fc\src\win\wit.h
+1374275415 e:\c-project\fc\src\win\wit.h
 	<windows.h>
 
-1321526089 e:\c-project\fc\src\speed.h
+1374275415 e:\c-project\fc\src\speed.h
 	<Winbase.h>
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\ddraw.h
+	<objbase.h>
+
+1263880288 d:\microsoft directx sdk (february 2010)\include\d3d9.h
+	<stdlib.h>
+	<objbase.h>
+	<windows.h>
+	"d3d9types.h"
+	"d3d9caps.h"
+
+1263880288 d:\microsoft directx sdk (february 2010)\include\d3d9types.h
+	<float.h>
+
+1263880288 d:\microsoft directx sdk (february 2010)\include\d3d9caps.h
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9.h
+	<limits.h>
+	"d3d9.h"
+	"d3dx9math.h"
+	"d3dx9core.h"
+	"d3dx9xof.h"
+	"d3dx9mesh.h"
+	"d3dx9shader.h"
+	"d3dx9effect.h"
+	"d3dx9tex.h"
+	"d3dx9shape.h"
+	"d3dx9anim.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9math.h
+	"d3dx9.h"
+	<math.h>
+	"d3dx9math.inl"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9math.inl
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9core.h
+	"d3dx9.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9xof.h
+	"d3dx9.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9mesh.h
+	"d3dx9.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9shader.h
+	"d3dx9.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9effect.h
+	"d3dx9.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9tex.h
+	"d3dx9.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9shape.h
+	"d3dx9.h"
+
+1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9anim.h
 

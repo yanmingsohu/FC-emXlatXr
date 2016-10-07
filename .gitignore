@@ -9,6 +9,7 @@ rom/*
 *.dll
 *.db
 *.lnk
+*.lib
 
 *.exp
 *.pdb

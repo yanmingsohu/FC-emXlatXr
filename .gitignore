@@ -5,12 +5,15 @@ config/*.*
 bin/*
 obj/*
 rom/*
-vs/*
+.vs
+Release
+Debug
 
 *.dll
 *.db
 *.lnk
 *.lib
+*.obj
 
 *.exp
 *.pdb
@@ -18,3 +21,6 @@ vs/*
 *.pch
 *.dep
 *.manifest
+*.sdf
+*.log
+*.tlog

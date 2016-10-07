@@ -43,7 +43,7 @@
 				</Linker>
 			</Target>
 			<Environment>
-				<Variable name="d3d9sdk" value='&quot;D:\Microsoft DirectX SDK (February 2010)&quot;' />
+				<Variable name="d3d9sdk" value='&quot;C:\Programs86\Microsoft DirectX SDK (February 2010)&quot;' />
 			</Environment>
 		</Build>
 		<Compiler>
@@ -87,6 +87,8 @@
 		<Unit filename="src/win/d3dvideo.cpp" />
 		<Unit filename="src/win/d3dvideo.h" />
 		<Unit filename="src/win/main_window.cpp" />
+		<Unit filename="src/win/sound.cpp" />
+		<Unit filename="src/win/sound.h" />
 		<Unit filename="src/win/winsys.cpp" />
 		<Unit filename="src/win/winsys.h" />
 		<Unit filename="src/win/wit.cpp" />
@@ -101,6 +103,15 @@
 					<wxPanel wxs="wxsmith/NewPanel.wxs" src="NewPanel.cpp" hdr="NewPanel.h" fwddecl="0" i18n="1" name="NewPanel" language="CPP" />
 				</resources>
 			</wxsmith>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

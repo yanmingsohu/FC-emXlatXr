@@ -228,7 +228,7 @@ public:
 
     /** 绘制帧的算法 利用该类优化绘制速度:每一帧预读取提高效率  */
     struct Painter {
-        friend class PPU;
+        friend struct PPU;
     private:
         Video *panel;  /* 绘制图形的面板 */
         word   baseX;

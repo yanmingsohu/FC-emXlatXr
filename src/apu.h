@@ -17,48 +17,75 @@
 |* [ TXT CHARSET WINDOWS-936 / GBK ]         | https://github.com/yanmingsohu *|
 |*                                           | qQ:412475540                   *|
 |*----------------------------------------------------------------------------*/
-#ifndef MEM_H_INCLUDED
-#define MEM_H_INCLUDED
-
+#ifndef aPU_H_INCLUDED
+#define aPU_H_INCLUDED
+#include "win/sound.h"
 #include "type.h"
-#include "rom.h"
-#include "mmc.h"
-#include "ppu.h"
-#include "pad.h"
-#include "apu.h"
 
-/*--------------------------------------------------*-
- * $0000-$00FF 系统零页                             *
- * $0100-$01FF 系统堆栈                             *
- * $0200-$03FF 卡通图形定义                         *
- * $0400-$07FF CPU数据暂存                          *
- * $0800-$1FFF 空区                                 *
- * $2000-$7FFF i/o区和用户工作区                    *
- * $6000-$7FFF 为电池存档(卡带中)                   *
- * $8000-$FFFF 游戏程序当程序>32KB则在              *
- * $8000-$BFFF 的16KB间进行存储切换(不能直接使用)   *
- * $C000-$FFFF 可以直接访问                         *
--*--------------------------------------------------*/
-struct memory {
 
-private:
-    MMC     *mmc;
-    PPU     *ppu;
-    PlayPad *pad;
-    Apu     *apu;
-    byte    ram[0x07FF];
-    byte    batteryRam[0x2000];
+struct Register {
+    //--- Register 0 = Rectangle/Noise
+    // 4bit fix volume
+    byte volume;
+    // 1bit, 0=Envelope/Decay, 1=Fixed Volume
+    byte type;
+    // 1bit,
+    // 0: Disable Looping, stay at 0 on end of decay [ \_____ ]
+    // 1: Enable Looping, restart decay at F         [ \\\\\\ ]
+    byte looping;
+    // 2bit
+    byte duty_type;
 
-public:
-    memory(MMC *mmc, PPU *_ppu, PlayPad* _pad, Apu* a);
-    /** 重置内存状态全部清0                        */
-    void hard_reset();
-    /** 软重置,不会清除内存                        */
-    void soft_reset();
-    /** 可以读取全部地址                           */
-    byte read(const word offset);
-    /** 可以写入全部地址                           */
-    void write(const word offset, const byte data);
+    //--- Register 0 = Triangle
+    // 6bit linear counter load register
+    byte linear;
+    // length counter clock disable / linear counter start
+    byte use_linear;
+
+    //--- Register 1 = Rectangle
+    // 3bit, Sweep right shift amount (S=0..7)
+    byte sw_rs;
+    // 1bit, Sweep Direction (0=[+]Increase, 1=[-]Decrease)
+    byte sw_dir;
+    // 3bit, Sweep update rate (N=0..7), NTSC=120Hz/(N+1), PAL=96Hz/(N+1)
+    byte sw_rete;
+    // 1bit, Sweep enable (0=Disable, 1=Enable)
+    byte sw_en;
+    
+    //--- Register 2 = Rectangle/Triangle
+    byte wavelength_l;
+    // F = 1.79MHz/(N+1)/16 for Rectangle channels
+    // F = 1.79MHz/(N+1)/32 for Triangle channel
+    float freq;
+    
+    //--- Register 2 = Noise
+    word nfreq;
+    byte rand_type;
+    
+    //--- Register 3 = ALL
+    // 3bit, Upper 3 bits of wavelength (unused on noise channel)
+    byte wavelength_h;
+    // 5bit, Length counter load register 
+    byte length_counter;
 };
 
-#endif // MEM_H_INCLUDED
+
+class Apu {
+private:
+    word frame_counter;
+    byte* irq;
+    byte tmp;
+
+    Register r1, r2, ns, tr;
+    
+public:
+    void write(const word offset, const byte data);
+    // only 0x4015 can read
+    byte read();
+    void setIrq(byte* i);
+
+    Apu() : irq(&tmp) {}
+};
+
+
+#endif // aPU_H_INCLUDED

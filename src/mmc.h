@@ -21,6 +21,7 @@
 #define MMC_H_INCLUDED
 
 #include "rom.h"
+#include "apu.h"
 #include <stdio.h>
 
 #define MMC_CAPABILITY_CHECK_SWITCH     (   1) /* 需要检查端口写入以切换页面 */
@@ -83,6 +84,7 @@ private:
     MapperImpl* sw;
     PPU*        ppu;
     byte*       IRQ;
+    Apu*        apu;
     uint        capability;
 
 public:
@@ -156,6 +158,10 @@ public:
 
     void setIRQ(byte* i) {
         IRQ = i;
+    }
+
+    void setApu(Apu* a) {
+        apu = a;
     }
 };
 

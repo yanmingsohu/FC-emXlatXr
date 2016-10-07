@@ -782,3 +782,149 @@
 
 1263880289 d:\microsoft directx sdk (february 2010)\include\d3dx9anim.h
 
+1440804700 source:d:\c-project\fc\src\cpu.cpp
+	"mem.h"
+	"cpu.h"
+	"stdio.h"
+	"stdlib.h"
+
+1374275415 d:\c-project\fc\src\mem.h
+	"type.h"
+	"rom.h"
+	"mmc.h"
+	"ppu.h"
+	"pad.h"
+
+1374275415 d:\c-project\fc\src\type.h
+
+1374275415 d:\c-project\fc\src\rom.h
+	"type.h"
+	"string"
+
+1374275415 d:\c-project\fc\src\mmc.h
+	"rom.h"
+	<stdio.h>
+
+1374275415 d:\c-project\fc\src\ppu.h
+	"mmc.h"
+	"video.h"
+
+1374275415 d:\c-project\fc\src\video.h
+	"type.h"
+
+1374275415 d:\c-project\fc\src\pad.h
+	<memory.h>
+
+1374275415 d:\c-project\fc\src\cpu.h
+	"type.h"
+	"mem.h"
+	"ppu.h"
+
+1374275415 source:d:\c-project\fc\src\debug.cpp
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<time.h>
+	"cpu.h"
+	"nes_sys.h"
+	"pad.h"
+
+1374275415 d:\c-project\fc\src\nes_sys.h
+	"cpu.h"
+	"mem.h"
+	"rom.h"
+	"video.h"
+	"pad.h"
+
+1374275415 source:d:\c-project\fc\src\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	"type.h"
+	<windows.h>
+	"win/winsys.h"
+
+1374275415 d:\c-project\fc\src\win\winsys.h
+	<windows.h>
+	<stdio.h>
+	"../nes_sys.h"
+	"ddraw.h"
+
+1374275415 d:\c-project\fc\dx81sdk\ddraw.h
+	<objbase.h>
+
+1475837510 source:d:\c-project\fc\src\mem.cpp
+	"mem.h"
+	"string.h"
+	<stdio.h>
+	<memory.h>
+
+1374275415 source:d:\c-project\fc\src\mmc.cpp
+	"mmc.h"
+	"type.h"
+	"ppu.h"
+	<stdio.h>
+	<memory.h>
+
+1374275415 source:d:\c-project\fc\src\nes_sys.cpp
+	"nes_sys.h"
+	"debug.h"
+	<stdio.h>
+
+1374275415 d:\c-project\fc\src\debug.h
+
+1374275415 source:d:\c-project\fc\src\ppu.cpp
+	"ppu.h"
+	<stdio.h>
+	<string.h>
+
+1374275415 source:d:\c-project\fc\src\rom.cpp
+	"rom.h"
+	<stdio.h>
+	<stdlib.h>
+
+1374275415 source:d:\c-project\fc\src\type.cpp
+	<stdio.h>
+	<stdarg.h>
+	"type.h"
+	"rom.h"
+
+1374275415 source:d:\c-project\fc\src\win\d3dvideo.cpp
+	"d3dvideo.h"
+	<d3dx9.h>
+	<d3dx9math.h>
+	<stdio.h>
+
+1374275415 d:\c-project\fc\src\win\d3dvideo.h
+	"../video.h"
+	<windows.h>
+	<d3d9.h>
+
+1374275415 source:d:\c-project\fc\src\win\main_window.cpp
+	<windows.h>
+	<stdio.h>
+	<time.h>
+	<Winuser.h>
+	"winsys.h"
+	"../debug.h"
+	"../testRoms.h"
+	"d3dvideo.h"
+	"../speed.h"
+	"wit.h"
+
+1374275415 d:\c-project\fc\src\testroms.h
+
+1374275415 d:\c-project\fc\src\speed.h
+	<Winbase.h>
+
+1374275415 d:\c-project\fc\src\win\wit.h
+	<windows.h>
+
+1374275415 source:d:\c-project\fc\src\win\winsys.cpp
+	"winsys.h"
+
+1374275415 source:d:\c-project\fc\src\win\wit.cpp
+	"wit.h"
+	<map>
+	<stdio.h>
+

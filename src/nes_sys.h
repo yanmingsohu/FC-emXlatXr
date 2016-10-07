@@ -25,6 +25,7 @@
 #include "rom.h"
 #include "video.h"
 #include "pad.h"
+#include "apu.h"
 
 struct NesSystem {
 
@@ -35,6 +36,7 @@ private:
     MMC*        mmc;
     PPU*        ppu;
     PlayPad*    pad;
+    Apu*        apu;
 
     int         _cyc;    /* 系统时序,每帧之间互补 */
     bool        every_f; /* 偶数帧为true */

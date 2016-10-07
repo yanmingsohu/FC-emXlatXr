@@ -28,18 +28,22 @@ bool __stop_and_debug__ = 0;
 NesSystem::NesSystem(PlayPad *_pad)
     : pad(_pad), _cyc(0)
 {
+    apu = new Apu();
     mmc = new MMC();
     ppu = new PPU(mmc);
-    ram = new memory(mmc, ppu, pad);
+    ram = new memory(mmc, ppu, pad, apu);
     cpu = new cpu_6502(ram);
     rom = new nes_file();
 
     ppu->setNMI(&cpu->NMI);
     mmc->setPPU(ppu);
     mmc->setIRQ(&cpu->IRQ);
+    mmc->setApu(apu);
+    apu->setIrq(&cpu->IRQ);
 }
 
 NesSystem::~NesSystem() {
+    delete apu;
     delete cpu;
     delete ram;
     delete ppu;

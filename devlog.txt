@@ -10,6 +10,8 @@
            完成mapper19 mapper1 cpu brk指令有疑问; 
            有时 NES CPU Test by Kevin Horton 不能运行,有时切换ROM会出错;
 
+2016-10-08 简单完成四通道 APU, 没有计数器, 音色有问题.
+
 2011-11-22 完成Mapper4,吞噬天地2,快打旋风,魂斗罗2; IRQ中断时机仍然有问题.
 2011-11-21 修正NMI中断错误;
 2011-11-20 完成Mapper2,赤色要塞.

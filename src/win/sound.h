@@ -1,5 +1,6 @@
 #ifndef SOUND_H_INCLUDED
 #define SOUND_H_INCLUDED
+#define _USE_MATH_DEFINES
 
 // #define _WIN32_WINNT 0x0500
 
@@ -50,7 +51,7 @@ public:
 class DXSound {
     LPDIRECTSOUND8 sound;
 public:
-    DXSound();
+    DXSound(HWND hwnd = 0);
     ~DXSound();
 
 friend DXChannel;
@@ -80,7 +81,7 @@ public:
 
     template<class SType>
     void play(SType &filter, DWORD flag = DSBPLAY_LOOPING) {
-        stop();
+        // stop();
         CreateSample cs(*this);
         lockBuffer(cs);
         filter(cs);
@@ -90,6 +91,8 @@ public:
 
     const WAVEFORMATEX& getWfx() { return wfx; }
     const BufferDesc& getBufDsc() { return bdesc; }
+    void setFormat(BufferDesc&);
+    void setFrequency(DWORD f);
 };
 
 

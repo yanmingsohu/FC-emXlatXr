@@ -25,10 +25,11 @@
 bool __stop_and_debug__ = 0;
 #endif
 
-NesSystem::NesSystem(PlayPad *_pad)
+
+NesSystem::NesSystem(PlayPad *_pad, HWND hwnd)
     : pad(_pad), _cyc(0)
 {
-    apu = new Apu();
+    apu = new Apu(hwnd);
     mmc = new MMC();
     ppu = new PPU(mmc);
     ram = new memory(mmc, ppu, pad, apu);

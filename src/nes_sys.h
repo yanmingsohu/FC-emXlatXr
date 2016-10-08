@@ -45,7 +45,7 @@ private:
 
 public:
     /* PlayPad 在该类销毁时销毁 */
-    NesSystem(PlayPad*);
+    NesSystem(PlayPad*, HWND h);
     ~NesSystem();
 
     /* 读取rom文件,成功返回0,失败返回错误代码, *

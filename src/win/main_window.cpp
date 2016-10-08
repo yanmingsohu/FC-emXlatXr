@@ -141,7 +141,7 @@ public:
         // WindowsVideo | DirectXVideo | DirectX3DVideo
         video   = new DirectX3DVideo(getWindowHandle(), WIDTH, HEIGHT);
         pad     = new WinPad();
-        fc      = new NesSystem(pad);
+        fc      = new NesSystem(pad, getWindowHandle());
 
         #ifdef TEST_ROM
         run = !fc->load_rom(TEST_ROM);

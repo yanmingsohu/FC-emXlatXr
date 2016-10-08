@@ -15,13 +15,17 @@ void init_wave(WAVEFORMATEX &wfx, BufferDesc &desc) {
 }
 
 // --------------------------------------------------------------------- DXSound ----//
-DXSound::DXSound() : sound(0) {
+DXSound::DXSound(HWND hwnd) : sound(0) {
     HRESULT ret = DirectSoundCreate8(NULL, &sound, NULL);
     if (FAILED(ret)) {
         throw "create dsound failed.";
     }
 
-    ret = sound->SetCooperativeLevel(GetConsoleWindow(), DSSCL_NORMAL);
+    if (hwnd == 0) {
+        hwnd = GetConsoleWindow();
+    }
+
+    ret = sound->SetCooperativeLevel(hwnd, DSSCL_NORMAL);
     if (FAILED(ret)) {
         sound->Release();
         sound = NULL;
@@ -43,7 +47,8 @@ DXChannel::DXChannel(DXSound &ds, BufferDesc desc) : dxs(ds), bdesc(desc) {
     HRESULT ret = ds.sound->CreateSoundBuffer(&bufdesc, &buffer, NULL);
 
     if (FAILED(ret)) {
-        throw "not create buffer.";
+        printf("Not create dxbuffer 0x%x", ret);
+        throw ret;
     }
 }
 
@@ -52,9 +57,15 @@ void DXChannel::init_desc(BufferDesc &desc) {
 
     memset(&bufdesc, 0, sizeof(DSBUFFERDESC));
     bufdesc.dwSize          = sizeof(DSBUFFERDESC);
-    bufdesc.dwFlags         = 0; //DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
+    //DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
+    bufdesc.dwFlags         = DSBCAPS_CTRLFREQUENCY; 
     bufdesc.dwBufferBytes   = desc.BufferBytes ? desc.BufferBytes : 3 * wfx.nAvgBytesPerSec;
     bufdesc.lpwfxFormat     = &wfx;
+}
+
+void DXChannel::setFormat(BufferDesc &d) {
+    init_wave(wfx, d);
+    buffer->SetFormat(&wfx);
 }
 
 void DXChannel::free() {
@@ -93,12 +104,16 @@ void DXChannel::freeBuffer(CreateSample &cs) {
 }
 
 void DXChannel::play(DWORD flag) {
-    buffer->SetCurrentPosition(0);
+    // buffer->SetCurrentPosition(0);
     buffer->Play(0, 0, flag);
 }
 
 void DXChannel::stop() {
     buffer->Stop();
+}
+
+void DXChannel::setFrequency(DWORD f) {
+    HRESULT r = buffer->SetFrequency(f);
 }
 
 // ------------------------------------------------------------------- ChannelPool ----//
@@ -155,6 +170,7 @@ void square::operator()(CreateSample &cs) {
 
     for (int i=0; i<cs.dwLength; ++i) {
         cs[i] = (i%z > b) ? cs.maxval: 1;
+        // printf("S %d %d %d\n", i, cs[i], z);
     }
 }
 

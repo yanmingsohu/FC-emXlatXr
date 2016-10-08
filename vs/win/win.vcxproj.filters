@@ -27,6 +27,9 @@
     <ClCompile Include="..\..\src\win\wit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\win\sound.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\win\d3dvideo.h">
@@ -36,6 +39,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\win\wit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win\sound.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

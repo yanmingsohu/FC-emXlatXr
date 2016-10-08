@@ -139,11 +139,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\win\d3dvideo.cpp" />
     <ClCompile Include="..\..\src\win\main_window.cpp" />
+    <ClCompile Include="..\..\src\win\sound.cpp" />
     <ClCompile Include="..\..\src\win\winsys.cpp" />
     <ClCompile Include="..\..\src\win\wit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\win\d3dvideo.h" />
+    <ClInclude Include="..\..\src\win\sound.h" />
     <ClInclude Include="..\..\src\win\winsys.h" />
     <ClInclude Include="..\..\src\win\wit.h" />
   </ItemGroup>

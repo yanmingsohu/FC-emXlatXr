@@ -70,13 +70,53 @@ struct Register {
 };
 
 
+class NesSound {
+protected:
+    BufferDesc desc;
+    DXChannel ch;
+
+    NesSound(DXSound &dxs, BufferDesc d) : ch(dxs, d), desc(d), r({0}) {}
+    virtual ~NesSound() {}
+public:
+    Register r;
+
+    void change() { ch.play(*this); }
+    void stop() { ch.stop(); }
+    virtual void operator()(CreateSample &cs) = 0;
+};
+
+
+class NesSquare : public NesSound {
+public:
+    NesSquare(DXSound &dx) : NesSound(dx, {100,8,1,8}) {}
+    void operator()(CreateSample &cs);
+};
+
+
+class NesTriangle : public NesSound {
+public:
+    NesTriangle(DXSound &dx) : NesSound(dx, {100,8,1,32}) {}
+    void operator()(CreateSample &cs);
+};
+
+
+class NesNoise : public NesSound {
+public:
+    NesNoise(DXSound &dx) : NesSound(dx, {10000,8,1,32}) {}
+    void operator()(CreateSample &cs);
+};
+
+
 class Apu {
 private:
     word frame_counter;
     byte* irq;
     byte tmp;
 
-    Register r1, r2, ns, tr;
+    DXSound dxs;
+    NesSquare r1, r2;
+    NesTriangle tr;
+    NesNoise ns;
     
 public:
     void write(const word offset, const byte data);
@@ -84,7 +124,7 @@ public:
     byte read();
     void setIrq(byte* i);
 
-    Apu() : irq(&tmp) {}
+    Apu(HWND hwnd);
 };
 
 

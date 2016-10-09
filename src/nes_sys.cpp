@@ -36,6 +36,7 @@ NesSystem::NesSystem(PlayPad *_pad, HWND hwnd)
     cpu = new cpu_6502(ram);
     rom = new nes_file();
 
+    apu->stop();
     ppu->setNMI(&cpu->NMI);
     mmc->setPPU(ppu);
     mmc->setIRQ(&cpu->IRQ);
@@ -159,6 +160,7 @@ int NesSystem::load_rom(string filename) {
             ram->hard_reset();
             ppu->switchMirror(rom->t1 & 0x05);
             ppu->reset();
+            apu->stop();
             cpu->RES = 1;
             _cyc = 0;
             every_f = false;

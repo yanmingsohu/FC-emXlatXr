@@ -58,7 +58,7 @@ void DXChannel::init_desc(BufferDesc &desc) {
     memset(&bufdesc, 0, sizeof(DSBUFFERDESC));
     bufdesc.dwSize          = sizeof(DSBUFFERDESC);
     //DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-    bufdesc.dwFlags         = DSBCAPS_CTRLFREQUENCY; 
+    bufdesc.dwFlags         = DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME; 
     bufdesc.dwBufferBytes   = desc.BufferBytes ? desc.BufferBytes : 3 * wfx.nAvgBytesPerSec;
     bufdesc.lpwfxFormat     = &wfx;
 }
@@ -113,7 +113,11 @@ void DXChannel::stop() {
 }
 
 void DXChannel::setFrequency(DWORD f) {
-    HRESULT r = buffer->SetFrequency(f);
+    buffer->SetFrequency(f);
+}
+
+void DXChannel::setVolume(double per) {
+    buffer->SetVolume(int((-DSBVOLUME_MIN) * per) + DSBVOLUME_MIN);
 }
 
 // ------------------------------------------------------------------- ChannelPool ----//
@@ -174,13 +178,14 @@ void square::operator()(CreateSample &cs) {
     }
 }
 
-CreateSample::CreateSample(DXChannel &ds)
-    : desc(ds.getWfx()),
+CreateSample::CreateSample(DXChannel &ds, void *x)
+    : desc(ds.getWfx()), xdata(x),
       lpvWrite(0), dwLength(0),
       maxval((1 << ds.getWfx().wBitsPerSample) -1) {
 }
 
-CreateSample::CreateSample(BufferDesc &bd) : lpvWrite(0), dwLength(0), desc({0})  {
+CreateSample::CreateSample(BufferDesc &bd, void *x) 
+        : lpvWrite(0), dwLength(0), desc({0}), xdata(x) {
     init_wave(desc, bd);
     maxval = (1 << desc.wBitsPerSample) -1;
 }

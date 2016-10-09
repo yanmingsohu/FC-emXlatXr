@@ -33,9 +33,10 @@ public:
     DWORD         dwLength;   // 数组长度
     WAVEFORMATEX  desc;
     double        maxval;     // 最大音量
+    void          *xdata;
 
-    CreateSample(BufferDesc &bd);
-    CreateSample(DXChannel &ds);
+    CreateSample(BufferDesc &bd, void *x =0);
+    CreateSample(DXChannel &ds, void *x =0);
 
     ~CreateSample() {
         dwLength = 0;
@@ -80,9 +81,9 @@ public:
     void stop();
 
     template<class SType>
-    void play(SType &filter, DWORD flag = DSBPLAY_LOOPING) {
+    void play(SType &filter, void *xdata = 0, DWORD flag = DSBPLAY_LOOPING) {
         // stop();
-        CreateSample cs(*this);
+        CreateSample cs(*this, xdata);
         lockBuffer(cs);
         filter(cs);
         freeBuffer(cs);
@@ -93,6 +94,8 @@ public:
     const BufferDesc& getBufDsc() { return bdesc; }
     void setFormat(BufferDesc&);
     void setFrequency(DWORD f);
+    /* 0min ~ 1max */
+    void setVolume(double per); 
 };
 
 

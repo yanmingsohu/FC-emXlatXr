@@ -19,6 +19,7 @@
 |*----------------------------------------------------------------------------*/
 #ifndef aPU_H_INCLUDED
 #define aPU_H_INCLUDED
+
 #include "win/sound.h"
 #include "type.h"
 
@@ -80,29 +81,43 @@ protected:
 public:
     Register r;
 
-    void change() { ch.play(*this); }
-    void stop() { ch.stop(); }
+    virtual void change() { ch.play(*this, this); }
+    virtual void stop() { ch.stop(); }
     virtual void operator()(CreateSample &cs) = 0;
 };
 
 
 class NesSquare : public NesSound {
+private:
+    byte old_type;
+    DXChannel ch2, ch3, ch4;
+    struct {
+        DXChannel *pch;
+        int freq;
+        float sound;
+    } chs[4];
 public:
-    NesSquare(DXSound &dx) : NesSound(dx, {100,8,1,8}) {}
+    NesSquare(DXSound &dx);
+    void change();
+    void stop();
     void operator()(CreateSample &cs);
 };
 
 
 class NesTriangle : public NesSound {
 public:
-    NesTriangle(DXSound &dx) : NesSound(dx, {100,8,1,32}) {}
+    NesTriangle(DXSound &dx);
     void operator()(CreateSample &cs);
+
 };
 
 
 class NesNoise : public NesSound {
+    DXChannel ch_low;
 public:
-    NesNoise(DXSound &dx) : NesSound(dx, {10000,8,1,32}) {}
+    NesNoise(DXSound &dx);
+    void change();
+    void stop();
     void operator()(CreateSample &cs);
 };
 
@@ -123,6 +138,7 @@ public:
     // only 0x4015 can read
     byte read();
     void setIrq(byte* i);
+    void stop();
 
     Apu(HWND hwnd);
 };

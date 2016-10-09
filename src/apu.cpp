@@ -19,8 +19,15 @@
 |*----------------------------------------------------------------------------*/
 #include "apu.h"
 
+#define SUD_FREQ     100
+#define SUD_CHC      1
+#define SUD_WID      8
+#define SUD_SQU_BUF  8
+#define SUD_TRI_BUF  32
+#define SUD_NOS_BUF  320000
+#define VOL_OFF      0.15
 
-static const word noise_freq [] = {
+static const word noise_freq[] = {
     0x002,0x004,0x008,0x010,
     0x020,0x030,0x040,0x050,
     0x065,0x07F,0x0BE,0x0FE,
@@ -55,6 +62,8 @@ void setr1(Register &r, byte v) {
 void setr2n(Register &r, byte v) {
     r.nfreq = noise_freq[0x0F & v];
     r.rand_type = 0x80 & v;
+    // printf("CHANGE rand type:0x%x freq:%d\n", 
+    // r.rand_type, r.nfreq);
 }
 
 
@@ -145,6 +154,14 @@ Apu::Apu(HWND hwnd)
 }
 
 
+void Apu::stop() {
+    r1.stop();
+    r2.stop();
+    tr.stop();
+    ns.stop();
+}
+
+
 static const byte Duty_cycle[][8] = {
     { 0,1,0,0, 0,0,0,0 },
     { 0,1,1,0, 0,0,0,0 },
@@ -153,23 +170,66 @@ static const byte Duty_cycle[][8] = {
 };
 
 
-void NesSquare::operator()(CreateSample & cs) {
-    double volumn = cs.maxval * (float(r.volume) / 0x0F);
-    const byte *dc = Duty_cycle[r.duty_type];
-    cs[0] = dc[0] ? volumn : 0;
-    cs[1] = dc[1] ? volumn : 0;
-    cs[2] = dc[2] ? volumn : 0;
-    cs[3] = dc[3] ? volumn : 0;
-    cs[4] = dc[4] ? volumn : 0;
-    cs[5] = dc[5] ? volumn : 0;
-    cs[6] = dc[6] ? volumn : 0;
-    cs[7] = dc[7] ? volumn : 0;
+static void initSquare(CreateSample cs) {
+    int duty_type = (int) cs.xdata;
+    const byte *dc = Duty_cycle[duty_type];
+    for (int i=0; i<cs.dwLength; ++i) {
+        cs[i] = dc[i%8] ? cs.maxval : 0;
+    }
+}
 
+
+NesSquare::NesSquare(DXSound &dx) 
+        : NesSound(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_SQU_BUF})
+        , ch2(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_SQU_BUF})
+        , ch3(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_SQU_BUF})
+        , ch4(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_SQU_BUF}) {
+    chs[0] = { &ch,  1, 0 };
+    chs[1] = { &ch2, 2, 0.1f };
+    chs[2] = { &ch3, 4, 0.2f };
+    chs[3] = { &ch4, 8, 0.3f };
+    old_type = 0xFF;
+}
+
+
+void NesSquare::change() {
+    ch.play( *this, (void*)0);
+    ch2.play(*this, (void*)1);
+    ch3.play(*this, (void*)2);
+    ch4.play(*this, (void*)3);
+}
+
+
+void NesSquare::stop() {
+    ch.stop();
+    ch2.stop();
+    ch3.stop();
+    ch4.stop();
+}
+
+
+void NesSquare::operator()(CreateSample & cs) {
     float wave = (dword(r.wavelength_h) << 8) + r.wavelength_l + 1;
-    // ? why /16
-    float freq = main_freq /2/ wave;
-    // printf("S:%f, 0:%d 1:%d 2:%d v:%f rv:%d,%f \n", freq, cs[0], cs[1], cs[2], volumn, r.volume, wave);
-    ch.setFrequency(freq);
+    float freq = main_freq / 2 / wave;
+
+    double volumn = 0;
+    if (r.volume) {
+        volumn = float(r.volume) / (0x0F*7) + (1-float(0xf)/(0xf*7)) - VOL_OFF;
+    }
+
+    if (old_type != r.duty_type) {
+        const byte *dc = Duty_cycle[r.duty_type];
+        for (int i=0; i<cs.dwLength; ++i) {
+            cs[i] = dc[i] ? cs.maxval : 0;
+        }
+        old_type = r.duty_type;
+    }
+
+    int i = (int) cs.xdata;
+    DXChannel *pch = chs[i].pch;
+    pch->setFrequency(freq * chs[i].freq);
+    pch->setVolume(max(0, volumn - chs[i].sound));
+    // printf("S:%f, v:%f rv:%d,%f \n", freq, volumn, r.volume, wave);
 }
 
 
@@ -181,31 +241,74 @@ static const byte tri_cycle[] = {
 };
 
 
-void NesTriangle::operator()(CreateSample & cs) {
-    static bool isset = false;
-    if (!isset) {
-        for (int i=0; i<sizeof(tri_cycle); ++i){
-            cs[i] = tri_cycle[i] * 0x0F;
-        }
-        isset = true;
+static void initTriangle(CreateSample cs) {
+    for (int i=0; i<cs.dwLength; ++i){
+        cs[i] = tri_cycle[i % sizeof(tri_cycle)] * 0x0F;
     }
+} 
 
+
+NesTriangle::NesTriangle(DXSound &dx) 
+        : NesSound(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_TRI_BUF}) {
+    ch.play(initTriangle);
+    ch.setVolume(1 - VOL_OFF - 0.1);
+}
+
+
+void NesTriangle::operator()(CreateSample & cs) {
     float wave = (dword(r.wavelength_h) << 8) + r.wavelength_l + 1;
-    // ? why /32
     float freq = main_freq / wave;
-    // printf("T:%f, 0:%d 1:%d 2:%d rv:%f \n", freq, cs[0], cs[1], cs[2], wave);
     ch.setFrequency(freq);
+    // printf("T:%f, v:%d rv:%f \n", freq, r.volume, wave);
+}
+
+
+static void initNoise(CreateSample &cs) {
+    int32_t rb = 0;
+    for (int i=0; i<cs.dwLength; ++i){
+        if (rb % 32 == 0) rb = rand();
+        byte bit = rb & 0x1;
+        cs[i] = bit ? cs.maxval : 0;
+        rb >>= 1;
+    }
+}
+
+
+NesNoise::NesNoise(DXSound &dx) 
+        : NesSound(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_NOS_BUF})
+        , ch_low(dx, {SUD_FREQ,SUD_WID,SUD_CHC,32}) {
+    ch.play(initNoise, this);
+    ch_low.play(initNoise, this);
+}
+
+
+void NesNoise::change() {
+    ch.play(*this);
+    ch_low.play(*this);
+}
+
+
+void NesNoise::stop() {
+    ch.stop();
+    ch_low.stop();
 }
 
 
 void NesNoise::operator()(CreateSample & cs) {
-    double volumn = cs.maxval * (float(r.volume) / 0x0F);
-
-    for (int i=0; i<32; ++i){
-        cs[i] = (rand() % 2) * volumn;
+    float freq = main_freq / 2 / (r.nfreq + 1);
+    double volumn = 0;
+    if (r.volume) {
+        volumn = float(r.volume) / (0x0F*2) + (1-float(0xf)/(0xf*2)) - VOL_OFF;
     }
 
-    float freq = main_freq / 8 / (r.nfreq + 1);
+    ch.setVolume(volumn);
     ch.setFrequency(freq);
-    // printf("N:%f, v:%f  %d \n", freq, volumn, cs[0]);
+
+    if (r.nfreq > noise_freq[ sizeof(noise_freq) - 6 ]) {
+        ch_low.setVolume(volumn);
+        ch_low.setFrequency(freq/4);
+    } else {
+        ch_low.setVolume(0);
+    }
+    //printf("N:%f, v:%f  %d \n", freq, volumn, cs[0]);
 }

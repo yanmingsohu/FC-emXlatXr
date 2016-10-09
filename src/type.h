@@ -20,8 +20,8 @@
 #ifndef TYPE_H_INCLUDED
 #define TYPE_H_INCLUDED
 
-#define SF_NAME_JYM      "FC emu. -=CatfoOD=- "
-#define SF_VERSION_JYM   "v0.03"
+#define SF_NAME_JYM      "Brk FC emu. -=CatfoOD=- "
+#define SF_VERSION_JYM   "v0.05"
 
 /*-------------------------------------------| 定义DEBUG消息 |----*/
 /* 显示NMI调用与返回的消息                                        */

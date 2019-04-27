@@ -1,4 +1,4 @@
-﻿# CatfoOD 2011-2016 猫饭作品::CatfoOD
+﻿# CatfoOD 2011-2016 猫饭::CatfoOD
 
 ![screen1](https://github.com/yanmingsohu/FC-emXlatXr/blob/master/screen1.jpg)
 
@@ -34,8 +34,7 @@ yanming-sohu@sohu.com - Qq:412475540
 
 如果不小心按了'中断调试',点击后面的控制台
 按下'x'就可以了,
-如果想尝试'调试'功能,按下'h'能看到帮助信息;  
-
+如果想尝试'调试'功能,按下'h'能看到帮助信息;   
 when 'break debug', push botton 'x' on console to return game.
 push 'h' on console to print help info.
 

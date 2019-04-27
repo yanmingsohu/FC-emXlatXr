@@ -1,4 +1,6 @@
-﻿CatfoOD 2011-2016 猫饭作品::CatfoOD
+﻿# CatfoOD 2011-2016 猫饭作品::CatfoOD
+
+![screen1](https://github.com/yanmingsohu/FC-emXlatXr/tree/master/screen1.jpg)
 
 
 模拟一台坏掉的红白机模拟器
@@ -10,13 +12,11 @@ $ 源代码使用GBK编码, The source is encoded using GBK
 $ 项目由Code::Block 10.05编辑, 或者 vs2015, open with Code::Block or vs2015
 
 
-源码:	git@github.com:yanmingsohu/FC-emulator.git
-	https://github.com/yanmingsohu/FC-emulator
-
-
 yanming-sohu@sohu.com - Qq:412475540
 
----------------------------------------------按键, play:
+
+# 按键, play
+---------------------------------------------
 
 上	W	up
 下	S	down
@@ -27,7 +27,9 @@ yanming-sohu@sohu.com - Qq:412475540
 A键	J (比如开枪,打球等) A button
 B键	K (比如跳起,取消等) B button
 
----------------------------------------------其他, other:
+
+# 其他, other
+---------------------------------------------
 
 
 如果不小心按了'中断调试',点击后面的控制台

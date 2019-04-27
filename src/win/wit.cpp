@@ -28,7 +28,7 @@ static LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message,
     if (message == WM_DESTROY) {
         if (w) {
             wins.erase(hwnd);
-            delete w;
+            //delete w;
         }
         if (!wins.size()) {
             PostQuitMessage(0);

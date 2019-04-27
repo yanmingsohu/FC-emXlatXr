@@ -185,9 +185,9 @@ NesSquare::NesSquare(DXSound &dx)
         , ch3(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_SQU_BUF})
         , ch4(dx, {SUD_FREQ,SUD_WID,SUD_CHC,SUD_SQU_BUF}) {
     chs[0] = { &ch,  1, 0 };
-    chs[1] = { &ch2, 2, 0.1f };
-    chs[2] = { &ch3, 4, 0.2f };
-    chs[3] = { &ch4, 8, 0.3f };
+    chs[1] = { &ch2, 2, 0 };
+    chs[2] = { &ch3, 4, 0 };
+    chs[3] = { &ch4, 8, 0 };
     old_type = 0xFF;
 }
 

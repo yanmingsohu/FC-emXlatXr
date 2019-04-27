@@ -1,6 +1,6 @@
 ﻿# CatfoOD 2011-2016 猫饭作品::CatfoOD
 
-![screen1](https://github.com/yanmingsohu/FC-emXlatXr/tree/master/screen1.jpg)
+![screen1](https://github.com/yanmingsohu/FC-emXlatXr/blob/master/screen1.jpg)
 
 
 模拟一台坏掉的红白机模拟器
